@@ -350,12 +350,20 @@ recovery = 0, harmful = 0 on the smoke scenarios).
 ```python
 class DnsFailure(Fault):
     type = "dns_failure"
-    def correct_sequences(self): return [["rollback_config(api)"], ["restart_service(api)"]]
+
+    def correct_sequences(self):
+        return [["rollback_config(api)"], ["restart_service(api)"]]
+
     def tick(self, world, tick):  # mutate world.effects[self.target], emit logs/flows
-        if self.is_active(tick): world.effects[self.target].error_add += 0.7
+        if self.is_active(tick):
+            world.effects[self.target].error_add += 0.7
+
     def on_action(self, action, world, tick):
         if action.target == self.target and action.name in ("rollback_config", "restart_service"):
-            self.resolve(tick, "resolver restored"); return "name resolution restored"
+            self.resolve(tick, "resolver restored")
+            return "name resolution restored"
+
+
 # faults/registry.py: add to FAULT_CLASSES and VALID_TARGETS
 ```
 
