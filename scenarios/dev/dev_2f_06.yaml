@@ -1,0 +1,28 @@
+id: dev_2f_06
+split: dev
+seed: 1016
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: c2_beacon
+  target: api
+  start: 47
+  params:
+    interval: 51
+    jitter: 0.19
+    dst: 198.51.100.23
+- type: process_crash
+  target: cache
+  start: 49
+  params: {}
+ground_truth:
+  root_causes:
+  - service: api
+    type: c2_beacon
+  - service: cache
+    type: process_crash
+  has_security: true
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

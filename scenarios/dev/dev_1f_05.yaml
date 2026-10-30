@@ -1,0 +1,19 @@
+id: dev_1f_05
+split: dev
+seed: 1005
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: process_crash
+  target: worker
+  start: 55
+  params: {}
+ground_truth:
+  root_causes:
+  - service: worker
+    type: process_crash
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

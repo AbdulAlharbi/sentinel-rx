@@ -1,0 +1,38 @@
+id: heldout_3f_05__timestamp_jitter
+split: perturbations/timestamp_jitter
+seed: 5018
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: bad_config_deploy
+  target: api
+  start: 55
+  params:
+    error: 0.32
+- type: disk_full
+  target: db
+  start: 54
+  params:
+    rate: 5.4
+- type: memory_leak
+  target: gateway
+  start: 49
+  params:
+    rate: 1.25
+ground_truth:
+  root_causes:
+  - service: api
+    type: bad_config_deploy
+  - service: db
+    type: disk_full
+  - service: gateway
+    type: memory_leak
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2
+perturbation:
+  name: timestamp_jitter
+  params: {}
+base_id: heldout_3f_05

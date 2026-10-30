@@ -1,0 +1,36 @@
+id: dev_3f_04
+split: dev
+seed: 1026
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: bad_config_deploy
+  target: gateway
+  start: 41
+  params:
+    error: 0.52
+- type: c2_beacon
+  target: api
+  start: 52
+  params:
+    interval: 37
+    jitter: 0.16
+    dst: 198.51.100.23
+- type: latency_injection
+  target: db
+  start: 58
+  params:
+    ms: 489
+ground_truth:
+  root_causes:
+  - service: gateway
+    type: bad_config_deploy
+  - service: api
+    type: c2_beacon
+  - service: db
+    type: latency_injection
+  has_security: true
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

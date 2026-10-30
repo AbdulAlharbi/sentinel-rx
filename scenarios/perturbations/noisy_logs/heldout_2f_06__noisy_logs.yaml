@@ -1,0 +1,31 @@
+id: heldout_2f_06__noisy_logs
+split: perturbations/noisy_logs
+seed: 5010
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: bad_config_deploy
+  target: api
+  start: 57
+  params:
+    error: 0.37
+- type: latency_injection
+  target: cache
+  start: 46
+  params:
+    ms: 496
+ground_truth:
+  root_causes:
+  - service: api
+    type: bad_config_deploy
+  - service: cache
+    type: latency_injection
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2
+perturbation:
+  name: noisy_logs
+  params: {}
+base_id: heldout_2f_06

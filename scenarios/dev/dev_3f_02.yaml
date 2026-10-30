@@ -1,0 +1,34 @@
+id: dev_3f_02
+split: dev
+seed: 1024
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: credential_stuffing
+  target: gateway
+  start: 50
+  params:
+    burst: 4
+- type: db_conn_exhaustion
+  target: db
+  start: 43
+  params:
+    ramp: 6.9
+- type: memory_leak
+  target: worker
+  start: 40
+  params:
+    rate: 1.63
+ground_truth:
+  root_causes:
+  - service: gateway
+    type: credential_stuffing
+  - service: db
+    type: db_conn_exhaustion
+  - service: worker
+    type: memory_leak
+  has_security: true
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

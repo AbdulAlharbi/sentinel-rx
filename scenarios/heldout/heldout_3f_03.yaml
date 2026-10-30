@@ -1,0 +1,32 @@
+id: heldout_3f_03
+split: heldout
+seed: 5016
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: cache_failure
+  target: cache
+  start: 47
+  params: {}
+- type: latency_injection
+  target: db
+  start: 41
+  params:
+    ms: 526
+- type: process_crash
+  target: api
+  start: 53
+  params: {}
+ground_truth:
+  root_causes:
+  - service: cache
+    type: cache_failure
+  - service: db
+    type: latency_injection
+  - service: api
+    type: process_crash
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

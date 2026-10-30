@@ -1,0 +1,33 @@
+id: dev_3f_03
+split: dev
+seed: 1025
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: cache_failure
+  target: cache
+  start: 61
+  params: {}
+- type: credential_stuffing
+  target: gateway
+  start: 45
+  params:
+    burst: 7
+- type: memory_leak
+  target: api
+  start: 40
+  params:
+    rate: 1.35
+ground_truth:
+  root_causes:
+  - service: cache
+    type: cache_failure
+  - service: gateway
+    type: credential_stuffing
+  - service: api
+    type: memory_leak
+  has_security: true
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

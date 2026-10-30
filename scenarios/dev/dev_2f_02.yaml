@@ -1,0 +1,26 @@
+id: dev_2f_02
+split: dev
+seed: 1012
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: memory_leak
+  target: gateway
+  start: 43
+  params:
+    rate: 1.71
+- type: process_crash
+  target: cache
+  start: 42
+  params: {}
+ground_truth:
+  root_causes:
+  - service: gateway
+    type: memory_leak
+  - service: cache
+    type: process_crash
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

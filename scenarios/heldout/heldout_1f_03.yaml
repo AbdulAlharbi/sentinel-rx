@@ -1,0 +1,19 @@
+id: heldout_1f_03
+split: heldout
+seed: 5003
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: process_crash
+  target: cache
+  start: 56
+  params: {}
+ground_truth:
+  root_causes:
+  - service: cache
+    type: process_crash
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

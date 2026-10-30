@@ -1,0 +1,29 @@
+id: heldout_2f_04
+split: heldout
+seed: 5008
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: c2_beacon
+  target: worker
+  start: 45
+  params:
+    interval: 44
+    jitter: 0.25
+    dst: 198.51.100.23
+- type: memory_leak
+  target: api
+  start: 40
+  params:
+    rate: 1.5
+ground_truth:
+  root_causes:
+  - service: worker
+    type: c2_beacon
+  - service: api
+    type: memory_leak
+  has_security: true
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

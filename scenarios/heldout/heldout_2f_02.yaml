@@ -1,0 +1,28 @@
+id: heldout_2f_02
+split: heldout
+seed: 5006
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: c2_beacon
+  target: api
+  start: 46
+  params:
+    interval: 58
+    jitter: 0.31
+    dst: 198.51.100.23
+- type: cache_failure
+  target: cache
+  start: 49
+  params: {}
+ground_truth:
+  root_causes:
+  - service: api
+    type: c2_beacon
+  - service: cache
+    type: cache_failure
+  has_security: true
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

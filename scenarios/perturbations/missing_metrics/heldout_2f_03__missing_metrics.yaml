@@ -1,0 +1,31 @@
+id: heldout_2f_03__missing_metrics
+split: perturbations/missing_metrics
+seed: 5007
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: bad_config_deploy
+  target: gateway
+  start: 55
+  params:
+    error: 0.55
+- type: disk_full
+  target: worker
+  start: 41
+  params:
+    rate: 5.4
+ground_truth:
+  root_causes:
+  - service: gateway
+    type: bad_config_deploy
+  - service: worker
+    type: disk_full
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2
+perturbation:
+  name: missing_metrics
+  params: {}
+base_id: heldout_2f_03

@@ -1,0 +1,33 @@
+id: dev_3f_06
+split: dev
+seed: 1028
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: bad_config_deploy
+  target: api
+  start: 44
+  params:
+    error: 0.49
+- type: memory_leak
+  target: worker
+  start: 54
+  params:
+    rate: 1.64
+- type: process_crash
+  target: cache
+  start: 42
+  params: {}
+ground_truth:
+  root_causes:
+  - service: api
+    type: bad_config_deploy
+  - service: worker
+    type: memory_leak
+  - service: cache
+    type: process_crash
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

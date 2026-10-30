@@ -1,0 +1,20 @@
+id: dev_1f_01
+split: dev
+seed: 1001
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: db_conn_exhaustion
+  target: db
+  start: 48
+  params:
+    ramp: 8.2
+ground_truth:
+  root_causes:
+  - service: db
+    type: db_conn_exhaustion
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

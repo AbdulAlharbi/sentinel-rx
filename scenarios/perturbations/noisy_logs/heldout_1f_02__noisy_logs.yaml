@@ -1,0 +1,24 @@
+id: heldout_1f_02__noisy_logs
+split: perturbations/noisy_logs
+seed: 5002
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: memory_leak
+  target: gateway
+  start: 48
+  params:
+    rate: 1.35
+ground_truth:
+  root_causes:
+  - service: gateway
+    type: memory_leak
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2
+perturbation:
+  name: noisy_logs
+  params: {}
+base_id: heldout_1f_02

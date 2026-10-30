@@ -1,0 +1,24 @@
+id: heldout_1f_01__noisy_logs
+split: perturbations/noisy_logs
+seed: 5001
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: bad_config_deploy
+  target: gateway
+  start: 45
+  params:
+    error: 0.42
+ground_truth:
+  root_causes:
+  - service: gateway
+    type: bad_config_deploy
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2
+perturbation:
+  name: noisy_logs
+  params: {}
+base_id: heldout_1f_01

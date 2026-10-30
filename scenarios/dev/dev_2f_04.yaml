@@ -1,0 +1,27 @@
+id: dev_2f_04
+split: dev
+seed: 1014
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: disk_full
+  target: db
+  start: 51
+  params:
+    rate: 4.4
+- type: memory_leak
+  target: api
+  start: 42
+  params:
+    rate: 1.21
+ground_truth:
+  root_causes:
+  - service: db
+    type: disk_full
+  - service: api
+    type: memory_leak
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

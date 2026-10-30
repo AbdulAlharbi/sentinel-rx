@@ -1,0 +1,26 @@
+id: dev_2f_05
+split: dev
+seed: 1015
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: cache_failure
+  target: cache
+  start: 43
+  params: {}
+- type: latency_injection
+  target: db
+  start: 60
+  params:
+    ms: 442
+ground_truth:
+  root_causes:
+  - service: cache
+    type: cache_failure
+  - service: db
+    type: latency_injection
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2
