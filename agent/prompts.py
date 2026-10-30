@@ -107,8 +107,11 @@ Actions (allowlist): {", ".join(f"{k} = {v}" for k, v in ACTION_DOCS.items())}.
 Rules: a dependency's symptoms propagate upstream, so prefer the deepest anomalous service as the
 cause. A service listed in down_services is NOT running: that is process_crash and only
 restart_service brings it back (flush/rollback cannot). Restarting fixes nothing if the cause is a
-bad config. If a host is beaconing to an unknown external destination, CONTAIN it first
-(block_egress or isolate_host) and only then restart it. Never act on services with no evidence.
+bad config. A log line on service X that names a dependency ('cache miss', 'db query failed',
+'upstream unreachable') is a symptom of that dependency, not a fault of X: put the hypothesis
+and the action on the dependency. If a host is beaconing to an unknown external destination,
+CONTAIN it first (block_egress or isolate_host) and only then restart it. Never act on services
+with no evidence.
 Never repeat a plan that already failed verification; change the action or the target."""
 
 DIAGNOSE_PROMPT = """Evidence (ranked by detectors; higher score = more likely root cause):

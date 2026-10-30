@@ -53,19 +53,22 @@ class SafetyLayer:
         beacon_hosts: set[str],
         services: list[str],
         status: dict[str, str],
+        detector_enabled: bool = True,
     ) -> list[SafetyDecision]:
-        """Validate and reorder a plan. Returns decisions in execution order."""
+        """Validate and reorder a plan. Returns decisions in execution order.
+
+        Containment needs *outbound-compromise* evidence: a beacon finding from the detector
+        when the detector is running, otherwise an open ``c2_beacon`` hypothesis. An inbound
+        attack (credential stuffing) never unlocks containment.
+        """
         for st_name, st in status.items():
             if st in ("isolated",):
                 self.contained.add(st_name)
         if not self.enabled:
             return [SafetyDecision(a, True, "safety layer disabled") for a in plan]
         security = self._security_targets(hypotheses, beacon_hosts)
-        security_hyps = {
-            h.service
-            for h in hypotheses
-            if h.type in ("c2_beacon", "credential_stuffing") and h.status != "refuted"
-        }
+        c2_hyps = {h.service for h in hypotheses if h.type == "c2_beacon" and h.status != "refuted"}
+        containable = beacon_hosts if detector_enabled else (c2_hyps | beacon_hosts)
         ordered = sorted(plan, key=lambda a: 0 if a.name in CONTAINMENT_ACTIONS else 1)
         out: list[SafetyDecision] = []
         will_contain = set(self.contained)
@@ -74,10 +77,10 @@ class SafetyLayer:
                 out.append(SafetyDecision(a, False, "action not in allowlist"))
             elif a.target not in services:
                 out.append(SafetyDecision(a, False, f"unknown service {a.target!r}"))
-            elif a.name == "isolate_host" and a.target not in security_hyps | beacon_hosts:
+            elif a.name in CONTAINMENT_ACTIONS and a.target not in containable:
                 out.append(
                     SafetyDecision(
-                        a, False, "no security hypothesis implicates this host; refusing quarantine"
+                        a, False, "no beacon evidence on this host; refusing containment"
                     )
                 )
             elif (

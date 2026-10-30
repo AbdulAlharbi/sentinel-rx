@@ -281,7 +281,14 @@ class SentinelAgent(Agent):
             it["plan"] = [a.key() for a in plan]
             # 4. safety + act
             status = {k: v.state for k, v in env.get_status().items()}
-            decisions = safety.screen(plan, hyps, beacon_hosts, services, status)
+            decisions = safety.screen(
+                plan,
+                hyps,
+                beacon_hosts,
+                services,
+                status,
+                detector_enabled=eb is not None and self.use_beacon,
+            )
             records = [safety.execute(env, d) for d in decisions]
             it["actions"] = records
             trace.actions.extend(records)

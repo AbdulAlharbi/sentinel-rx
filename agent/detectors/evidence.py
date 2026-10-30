@@ -187,12 +187,17 @@ class EvidenceBuilder:
             return self.build(env, window=w + TRANSIENT_S)
         metrics = detect_metric_anomalies(samples, baseline=self._metric_baseline)
         logs = detect_log_signatures(lines, now, w, baseline=self._log_baseline)
-        return self._assemble(env, now, metrics, logs, env.get_flows(max(w, now - since)))
+        return self._assemble(env, now, metrics, logs, env.get_flows(max(w, now - since)), True)
 
-    def _assemble(self, env: Env, now: float, metrics, logs, flows) -> Evidence:
+    def _assemble(
+        self, env: Env, now: float, metrics, logs, flows, strict: bool = False
+    ) -> Evidence:
         status = {k: v.state for k, v in env.get_status().items()}
+        # verification windows are short, so new pairs need stronger evidence than in the
+        # incident view (a few Poisson events can look periodic by chance)
+        min_p = 0.75 if strict else None
         beacons = (
-            self.beacon.detect(flows, env.list_services(), env.external_allowlist())
+            self.beacon.detect(flows, env.list_services(), env.external_allowlist(), min_p=min_p)
             if self.beacon
             else []
         )
