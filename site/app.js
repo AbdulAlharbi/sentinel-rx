@@ -1,9 +1,9 @@
 /* Sentinel-RX site: renders site/data.json (produced by `make report`). Vanilla JS + Chart.js. */
 (async function () {
   // HUMAIN / PIF palette: colour follows the configuration, never its rank
-  const PALETTE = { agent: "#D0F94A", runbook: "#CBA35C", single_shot: "#1fa85a", llm_only: "#7dd3fc",
-    do_nothing: "#6f8279", random: "#a3b4ad",
-    no_verify: "#f06a5c", no_loop: "#e29bff", no_beacon: "#ffb454", no_safety: "#ff6f91" };
+  const PALETTE = { agent: "#D4F94A", runbook: "#5CC8B8", single_shot: "#7CC5E8", llm_only: "#F2B544",
+    do_nothing: "#6f8a84", random: "#a7bdb6",
+    no_verify: "#f06a5c", no_loop: "#c9a0ff", no_beacon: "#ff9f5a", no_safety: "#ff6f91" };
   const css = getComputedStyle(document.documentElement);
   const MUTED = css.getPropertyValue("--muted").trim() || "#52514e";
   const GRID = css.getPropertyValue("--grid").trim() || "#e6e5e1";
@@ -79,7 +79,7 @@
       type: "bar",
       data: { labels: rows.map((r) => r.perturbation), datasets: [
         { label: "recovered (perturbed)", backgroundColor: PALETTE.agent, borderRadius: 4, data: rows.map((r) => 100 * r.recovered.perturbed) },
-        { label: "top-1 (perturbed)", backgroundColor: "#7f9a2e", borderRadius: 4, data: rows.map((r) => 100 * r.top1.perturbed) },
+        { label: "top-1 (perturbed)", backgroundColor: "#8aa83a", borderRadius: 4, data: rows.map((r) => 100 * r.top1.perturbed) },
         { label: "recovered (clean held-out)", type: "line", borderColor: PALETTE.agent, borderDash: [5, 4], borderWidth: 1.5, pointRadius: 0, data: rows.map(() => 100 * H.agent.summary.metrics.recovered.mean) },
       ] },
       options: { ...base, indexAxis: "y", scales: { x: { min: 0, max: 100, title: { display: true, text: "% of runs" }, grid: { color: GRID } }, y: { grid: { display: false } } } },
