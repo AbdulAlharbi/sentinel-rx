@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sentinel-RX — security-aware agentic recovery of failing systems</title>
 <meta name="description" content="Sentinel-RX identifies, diagnoses, recovers and verifies the recovery of a failing enterprise system with concurrent faults and hidden security incidents. Held-out results, robustness, ablations, figures, reports and an incident replay viewer. Humain Hackathon, Challenge 1.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%2302090B'/><circle cx='16' cy='16' r='7' fill='%23D0F94A'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23061417'/><circle cx='16' cy='16' r='7' fill='%23D4F94A'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -18,6 +18,7 @@
   <div class="wrap">
     <a class="brand" href="#top"><span class="dot"></span>Sentinel-RX</a>
     <nav class="top-nav">
+      <a href="#name">The name</a>
       <a href="#impact">Impact</a>
       <a href="#criteria">Judging Criteria</a>
       <a href="#approach">Approach</a>
@@ -29,7 +30,7 @@
     </nav>
     <a class="gh" href="https://github.com/AbdulAlharbi/sentinel-rx" target="_blank" rel="noopener">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
-      AbdulAlharbi/sentinel-rx
+      <span class="label">AbdulAlharbi/sentinel-rx</span>
     </a>
   </div>
 </header>
@@ -46,8 +47,8 @@
       Docker, every number replayable without a GPU.
     </p>
     <div class="cta">
-      <a class="btn primary" href="sentinel_rx_brief.pdf">Read the 6-page report (PDF)</a>
-      <a class="btn green" href="literature_review.pdf">Research paper: literature review (PDF)</a>
+      <a class="btn primary" href="sentinel_rx_brief.pdf" target="_blank" rel="noopener">Read the 6-page report (PDF)</a>
+      <a class="btn green" href="literature_review.pdf" target="_blank" rel="noopener">Research paper: literature review (PDF)</a>
       <a class="btn" href="#replay">Step through a recorded incident</a>
     </div>
     <div class="chips">
@@ -57,6 +58,19 @@
       <span class="chip"><span class="pip"></span>top-1 root cause <b>92%</b></span>
       <span class="chip"><span class="pip"></span><b>6 103</b> tokens / incident</span>
       <span class="chip"><span class="pip"></span><b>108</b> tests · replay cache · CI</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= NAME ================= -->
+<section id="name" style="padding:34px 0">
+  <div class="wrap">
+    <div class="name-strip">
+      <div class="word">Sentinel<span>-RX</span></div>
+      <div><h3>Sentinel — the one that keeps watch</h3>
+        <p>A sentinel stands guard and raises the alarm before the damage spreads. The agent watches metrics, logs and network flows continuously, and it is security-aware: it treats a quiet beacon to an unknown host as seriously as a crashed service.</p></div>
+      <div><h3>RX — the prescription</h3>
+        <p>℞ is the pharmacist's mark for a prescription: diagnose, prescribe the remedy, and check that the patient actually recovered. RX is also shorthand for <em>recovery</em>. Diagnosis without verification is a guess; Sentinel-RX only signs off when the telemetry says the system is healthy again.</p></div>
     </div>
   </div>
 </section>
@@ -111,7 +125,7 @@
 </section>
 
 <!-- ================= CRITERIA ================= -->
-<section id="criteria">
+<section id="criteria" class="bright">
   <div class="wrap">
     <div class="sec-head">
       <div class="eyebrow">Built to the Judging Criteria</div>
@@ -343,13 +357,13 @@ flowchart TB
         <h3>Technical brief <span class="badge lime">start here</span></h3>
         <div class="meta">6 pages · PDF · impact, Judging Criteria map, results, honesty, reproduction</div>
         <p>The short version: why it matters locally and globally, one evidence row per criterion, the held-out table, robustness and ablations, the live demo timeline, and the limitations stated plainly.</p>
-        <a class="btn primary" href="sentinel_rx_brief.pdf">Open the brief</a>
+        <a class="btn primary" href="sentinel_rx_brief.pdf" target="_blank" rel="noopener">Open the brief</a>
       </article>
       <article class="report">
         <h3>Literature review <span class="badge green">research</span></h3>
         <div class="meta">8 pages · PDF · 23 references</div>
         <p>A structured review of AIOps, LLM agents, agentic SRE benchmarks, remediation safety and C2 beacon detection, ending with the five gaps G1–G5 and the research questions this project answers.</p>
-        <a class="btn green" href="literature_review.pdf">Open the review</a>
+        <a class="btn green" href="literature_review.pdf" target="_blank" rel="noopener">Open the review</a>
       </article>
       <article class="report">
         <h3>Full technical report <span class="badge sand">for the curious</span></h3>
@@ -360,7 +374,7 @@ flowchart TB
           <li>Agent algorithm and verification gate</li><li>Evaluation methodology and metrics</li><li>Results, robustness, ablations, cost, live demo</li>
           <li>Scorer audit</li><li>Discussion, limitations, path to production</li><li>Reproduction commands, repository map</li>
         </ul>
-        <a class="btn" href="sentinel_rx_technical_report.pdf">Open the full report</a>
+        <a class="btn" href="sentinel_rx_technical_report.pdf" target="_blank" rel="noopener">Open the full report</a>
       </article>
     </div>
   </div>
@@ -394,7 +408,7 @@ flowchart TB
 <footer>
   <div class="wrap">
     <div id="footer-meta">Sentinel-RX — MIT licensed. Built for the Humain Hackathon, Challenge 1. Simulated and local systems only.</div>
-    <div><a href="https://github.com/AbdulAlharbi/sentinel-rx">github.com/AbdulAlharbi/sentinel-rx</a></div>
+    <div><a href="https://github.com/AbdulAlharbi/sentinel-rx" target="_blank" rel="noopener">github.com/AbdulAlharbi/sentinel-rx</a></div>
   </div>
 </footer>
 
