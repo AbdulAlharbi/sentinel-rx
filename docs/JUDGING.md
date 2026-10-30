@@ -60,7 +60,7 @@ copied from that file (held-out, qwen2.5:7b, 3 seeds; llm_only, ablations and pe
 
 | evidence | where |
 |---|---|
-| One-command targets | `Makefile`: setup, test, lint, smoke, bench-dev, bench-heldout, bench-perturb, ablate, report, demo-live, all-final |
+| One-command targets | `Makefile`: setup, test, lint, smoke, bench-dev, bench-heldout, bench-perturb, ablate, report, demo-live, demo-video, replay-check, all-final |
 | Pinned dependencies, Python 3.12 | `pyproject.toml`, `requirements.lock` |
 | Typed, documented modules (ruff with pydocstyle; all but the report generator under 400 lines) | `ruff check .` clean; `pyproject.toml [tool.ruff]` |
 | Reproducible with no LLM installed | `make smoke` and `make replay-check` (replay) in CI |

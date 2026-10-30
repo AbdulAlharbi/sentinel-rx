@@ -406,6 +406,7 @@ flowchart TB
 <span class="p">$</span> make setup          <span class="c"># venv, pinned deps, scenarios, beacon detector training (~1 min)</span>
 <span class="p">$</span> make test           <span class="c"># 109 tests</span>
 <span class="p">$</span> make smoke          <span class="c"># 5 dev scenarios from the replay cache (&lt; 60 s); CI adds regression floors</span>
+<span class="p">$</span> make demo-video     <span class="c"># ~1 min narrated tour of the recorded live run + a live replay check</span>
 
 <span class="c"># exact replay of the headline table from the committed cache</span>
 <span class="p">$</span> python -m bench.runner --split heldout --config agent --seeds 3 --final --replay
