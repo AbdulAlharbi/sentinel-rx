@@ -17,7 +17,8 @@
 **Site:** https://AbdulAlharbi.github.io/sentinel-rx/ ·
 **6-page brief:** [`docs/technical_report/sentinel_rx_brief.pdf`](docs/technical_report/sentinel_rx_brief.pdf) ·
 **full technical report (27 pages):** [`docs/technical_report/sentinel_rx_technical_report.pdf`](docs/technical_report/sentinel_rx_technical_report.pdf) ·
-**research paper (literature review):** [`docs/literature_review.pdf`](docs/literature_review.pdf)
+**research paper (literature review):** [`docs/literature_review.pdf`](docs/literature_review.pdf) ·
+**slides (11):** [`docs/slides/sentinel_rx_slides.pdf`](docs/slides/sentinel_rx_slides.pdf) ([PowerPoint](docs/slides/sentinel_rx_slides.pptx))
 
 Sentinel-RX is an agent that **identifies, diagnoses, recovers and verifies the recovery** of a
 failing enterprise system when several faults are active at once and a security compromise may be
@@ -125,7 +126,7 @@ Details and file-level pointers in [`docs/JUDGING.md`](docs/JUDGING.md).
 | Evaluation & Iteration | `docs/RESULTS.md`: v0→v3 with before/after numbers and a mid-development scorer audit; do_nothing/random sanity floors; 4 ablations; 109 tests; CI replays every committed held-out result and diffs it |
 | Technical Judgment & Creativity | hybrid detectors + LLM measured against its raw-telemetry twin; beacon RandomForest on scale-invariant timing features; contain-before-restart; transactional rollback; verification gate with a known-beacon rule; `docs/DESIGN.md` |
 | Engineering Quality | one `make` target per step, pinned deps, ruff-clean typed modules (all but the report generator under 400 lines), one `Env` interface, content-addressed LLM cache, one branch per phase merged `--no-ff` |
-| Communication | this README, the [site](https://AbdulAlharbi.github.io/sentinel-rx/), the [brief](docs/technical_report/sentinel_rx_brief.pdf), the [full report](docs/technical_report/sentinel_rx_technical_report.pdf), the [literature review](docs/literature_review.pdf), DESIGN / RESULTS / LIMITATIONS, an incident replay viewer |
+| Communication | this README, the [site](https://AbdulAlharbi.github.io/sentinel-rx/), the [brief](docs/technical_report/sentinel_rx_brief.pdf), the [full report](docs/technical_report/sentinel_rx_technical_report.pdf), the [literature review](docs/literature_review.pdf), the [slides](docs/slides/sentinel_rx_slides.pdf), DESIGN / RESULTS / LIMITATIONS, an incident replay viewer |
 
 ## Design decisions
 
@@ -221,7 +222,7 @@ bench/       runner.py (held-out guard, run log), configs.py (agent/baselines/ab
 models/      beacon_rf.joblib + beacon_metrics.json
 cache/       committed LLM responses keyed by content hash (record/replay)
 results/     per-run JSON, traces/, summary.md, heldout_runs.log, demo_live_console.txt + trace
-docs/        DESIGN.md, RESULTS.md (dev iteration log + scorer audit), LIMITATIONS.md, JUDGING.md, figures/, literature_review.pdf, technical_report/ (brief + full report, .tex + .pdf)
+docs/        DESIGN.md, RESULTS.md (dev iteration log + scorer audit), LIMITATIONS.md, JUDGING.md, figures/, literature_review.pdf, technical_report/ (brief + full report, .tex + .pdf), slides/ (deck, .pptx + .pdf)
 site/        static site (HUMAIN/PIF palette): impact, Judging Criteria, results, figures, replay viewer, reports; data.json from make report; logo/ (copies the site serves)
 assets/logo/ logo masters: icon (600×600), shield mark, wide logo for dark / light backgrounds, each as SVG + PNG
 tests/       109 tests;  .github/workflows/  ci.yml (lint, tests, replay smoke, floors, full replay check) and pages.yml (deploys site/)
@@ -334,6 +335,7 @@ as the only path to "resolved".
 ## Documents
 
 * [Technical brief, 6 pages](docs/technical_report/sentinel_rx_brief.pdf) · [full technical report, 27 pages](docs/technical_report/sentinel_rx_technical_report.pdf) · [research paper: literature review](docs/literature_review.pdf)
+* [Slides, 11 slides (PDF)](docs/slides/sentinel_rx_slides.pdf) · [PowerPoint with speaker notes](docs/slides/sentinel_rx_slides.pptx)
 * [`docs/DESIGN.md`](docs/DESIGN.md) decisions and trade-offs · [`docs/RESULTS.md`](docs/RESULTS.md) dev iteration log and scorer audit · [`docs/LIMITATIONS.md`](docs/LIMITATIONS.md) · [`docs/JUDGING.md`](docs/JUDGING.md)
 * Site: https://AbdulAlharbi.github.io/sentinel-rx/
 

@@ -51,6 +51,7 @@
     <div class="cta">
       <a class="btn primary" href="sentinel_rx_brief.pdf" target="_blank" rel="noopener">Read the 6-page report (PDF)</a>
       <a class="btn green" href="literature_review.pdf" target="_blank" rel="noopener">Research paper: literature review (PDF)</a>
+      <a class="btn" href="sentinel_rx_slides.pdf" target="_blank" rel="noopener">Slides (PDF)</a>
       <a class="btn" href="#replay">Step through a recorded incident</a>
     </div>
     <div class="chips">
@@ -151,8 +152,8 @@
         <p>One <code>make</code> target per step, pinned dependencies, ruff-clean typed modules, one <code>Env</code> interface for simulator and live system, a content-addressed LLM cache so CI replays all 508 held-out and perturbation runs with no model, one branch per phase merged with <code>--no-ff</code>.</p>
         <div class="where">Makefile · env/base.py · agent/llm.py · cache/</div></div>
       <div class="crit"><div class="n">06</div><h3>Communication</h3>
-        <p>This page, a 6-page brief, a 27-page technical report, a literature review with a gap analysis the design answers point by point, README with real console output, DESIGN / RESULTS / LIMITATIONS, and an incident replay viewer.</p>
-        <div class="where">site/ · docs/technical_report/ · docs/literature_review.pdf</div></div>
+        <p>This page, a 6-page brief, a 27-page technical report, an 11-slide deck with speaker notes, a literature review with a gap analysis the design answers point by point, README with real console output, DESIGN / RESULTS / LIMITATIONS, and an incident replay viewer.</p>
+        <div class="where">site/ · docs/technical_report/ · docs/slides/ · docs/literature_review.pdf</div></div>
     </div>
   </div>
 </section>
@@ -353,8 +354,8 @@ flowchart TB
 <section id="reports">
   <div class="wrap">
     <div class="sec-head">
-      <div class="eyebrow">Reports &amp; paper</div>
-      <h2 class="sec">Three documents, three depths</h2>
+      <div class="eyebrow">Reports, slides &amp; paper</div>
+      <h2 class="sec">Four documents, four depths</h2>
     </div>
     <div class="reports">
       <article class="report brief">
@@ -362,6 +363,15 @@ flowchart TB
         <div class="meta">6 pages · PDF · impact, Judging Criteria map, results, honesty, reproduction</div>
         <p>The short version: why it matters locally and globally, one evidence row per criterion, the held-out table, robustness and ablations, the live demo timeline, and the limitations stated plainly.</p>
         <a class="btn primary" href="sentinel_rx_brief.pdf" target="_blank" rel="noopener">Open the brief</a>
+      </article>
+      <article class="report">
+        <h3>Slides <span class="badge green">presentation</span></h3>
+        <div class="meta">11 slides · PDF and PowerPoint · speaker notes in the .pptx</div>
+        <p>The pitch deck: the problem, the five research gaps, the verified recovery loop, how it is built, held-out results, robustness and ablations, what is new, honest limits, and the demo links.</p>
+        <div class="btns">
+          <a class="btn green" href="sentinel_rx_slides.pdf" target="_blank" rel="noopener">Open the slides</a>
+          <a class="btn" href="sentinel_rx_slides.pptx" download>PowerPoint (.pptx)</a>
+        </div>
       </article>
       <article class="report">
         <h3>Literature review <span class="badge green">research</span></h3>
