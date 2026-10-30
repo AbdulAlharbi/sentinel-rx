@@ -5,8 +5,9 @@
 ![tests](https://img.shields.io/badge/tests-108%20passed-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
 
-> Repository status: developed and evaluated fully offline on one laptop. The CI badge becomes
-> live once the repository is pushed with the commands listed at the end of this file.
+> Developed and evaluated fully offline on one laptop (MacBook Air, no GPU, no cloud). CI runs
+> ruff, the tests, a replay smoke run and regression floors on every push; GitHub Pages serves
+> `site/` through `.github/workflows/pages.yml`.
 
 Sentinel-RX is an agent that **identifies, diagnoses, recovers and verifies the recovery** of a
 failing enterprise system — and a reproducible benchmark that measures it on incidents it has
@@ -82,6 +83,23 @@ raw telemetry instead of detectors — recovers 35 %, makes 0.55 harmful actions
 nothing (random: 3.45 harmful actions/run). Top-1 on single-fault incidents (75 %) is the weak
 spot: type confusions whose fix coincides (latency on the cache labelled `cache_failure`, fixed
 by a restart), scored as misses on purpose.
+
+## The challenge, line by line
+
+The challenge asks for an agent that can *investigate potential problems, analyze available
+information such as logs and system metrics, identify likely causes, recommend or carry out
+corrective actions, and verify that the system has recovered successfully*, in environments where
+*multiple issues occur at once*. Where each clause is met, and the number that proves it:
+
+| Challenge clause | Where it is met | Held-out evidence (20 scenarios × 3 seeds) |
+|---|---|---|
+| investigate potential problems | the Observe step runs four detectors over the last 900 s and the LLM requests up to 3 targeted checks per iteration (`agent/loop.py`, `_run_check`) | 2.2 iterations and 4.6 LLM calls per incident |
+| analyze logs and system metrics | robust z-scores on 8 metrics per service, log-template signatures, flow-timing features for beacons (`agent/detectors/`) | detector-only runbook already reaches top-1 87% |
+| identify likely causes | ranked hypotheses with confidence, dependency ranker separates cause from symptom (`agent/detectors/ranker.py`) | top-1 92% [83, 98], per-fault recall 82% |
+| recommend or carry out corrective actions | ordered plan from an 8-action allowlist, executed through the safety layer; `--dry-run` recommends only (`agent/safety.py`) | recovered 100%, harmful actions 0.00/run, action precision 81% |
+| verify that the system has recovered | verification gate compares post-action telemetry with the healthy baseline; a claim is scored against hidden ground truth (`agent/detectors/evidence.py::verify`) | false "recovered" 0% (single-shot LLM: 70%) |
+| multiple issues at once | 1–3 concurrent faults per scenario, including a security compromise inside an ops incident | recovered 100% at 1, 2 and 3 faults; runbook 75/37/38% |
+| free choice of environment | a deterministic simulator for the benchmark and five real local processes for the demo, behind one `Env` interface | same agent, byte-identical, on both |
 
 ## Requirements → design decisions
 
@@ -406,8 +424,8 @@ table (3 seeds; `llm_only` 1 seed), ablations and perturbations (1 seed), the sm
 run, one recorded `make demo-live`, `make smoke` from the cache, the full test suite, ruff.
 
 **Known gaps:**
-* The GitHub remote, CI run and Pages site have not been created yet (everything is local;
-  see the commands at the end). The CI workflow has therefore never executed on GitHub.
+* Everything was developed and evaluated on one laptop; CI and Pages run from the committed
+  cache and artefacts, so a CI run never calls a model.
 * `llm_only`, perturbations, ablations and the smaller-model run use one seed (`docs/LIMITATIONS.md`).
 * `llm_only`'s verification is LLM-judged; its false-recovery rate reflects that design.
 * Live-environment numbers are not benchmark numbers (non-deterministic timing; no cache).
@@ -426,7 +444,7 @@ multi-cluster topology, learned (not hand-written) fault signatures, stronger lo
 
 * Technical brief (6 pages): [`docs/technical_report/sentinel_rx_brief.pdf`](docs/technical_report/sentinel_rx_brief.pdf) · full technical report (27 pages): [`docs/technical_report/sentinel_rx_technical_report.pdf`](docs/technical_report/sentinel_rx_technical_report.pdf)
 * Literature review: [`docs/literature_review.pdf`](docs/literature_review.pdf)
-* Site (static, serve locally): `python -m http.server -d site 8000` → http://localhost:8000
+* Site: https://AbdulAlharbi.github.io/sentinel-rx/ (GitHub Pages from `site/`), or locally: `python -m http.server -d site 8000`
 * Design: [`docs/DESIGN.md`](docs/DESIGN.md) · Iteration log: [`docs/RESULTS.md`](docs/RESULTS.md) · Judging map: [`docs/JUDGING.md`](docs/JUDGING.md)
 
 License: MIT.

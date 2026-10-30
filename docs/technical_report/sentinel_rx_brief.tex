@@ -511,8 +511,8 @@ perturbations, ablations and the small-model run use one seed (the 3-seed llm\_o
 stopped twice at 10/60 for time; both attempts are in the run log), so their deltas are
 directional. Replay is exact but re-recording with Ollama is not bit-stable. Rollback is
 best-effort (restarts and rollbacks are irreversible, and recorded as such). No multi-step attacks,
-network partitions or multi-cluster topologies. The GitHub remote, CI run and site have not been
-published yet; everything is local.
+network partitions or multi-cluster topologies. Isolation and egress blocking in the live
+environment are flags inside the process, not real network policy.
 \end{limitation}
 
 \paragraph{Path to production.} Swap the telemetry adapters (NetFlow/Zeek, Prometheus, a log

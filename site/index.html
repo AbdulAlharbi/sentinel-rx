@@ -324,7 +324,7 @@ flowchart TB
           <li><b>One seed for the secondary arms.</b> <code>llm_only</code>, perturbations, ablations and the small-model run use one seed (n = 20); their deltas are directional. The 3-seed <code>llm_only</code> pass was stopped twice for time and both attempts are in the run log.</li>
           <li><b>Synthetic beacon training data.</b> No real captures; a real deployment would retrain on NetFlow or Zeek data and face evasion.</li>
           <li><b>Replay is exact, re-recording is not.</b> Ollama decoding is not bit-stable even at temperature 0, so a fresh recording is a new experiment.</li>
-          <li><b>Not published yet.</b> The repository, CI run and this site live locally until the author pushes them.</li>
+          <li><b>Single host, loopback only.</b> In the live environment isolation and egress blocking are flags inside the service process, not real network policy.</li>
         </ul>
       </div>
     </div>
