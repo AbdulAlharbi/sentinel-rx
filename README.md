@@ -401,14 +401,14 @@ tests/            108 tests
 ## Verified / known gaps
 
 **Verified (actually run in this repository):** everything in `results/` — dev iterations v0–v3
-(1 seed), audit baselines (3 seeds), held-out runs for every configuration listed in the
-headline table (3 seeds), ablations and perturbations (1 seed), the smaller-model run, one
-recorded `make demo-live`, `make smoke` from the cache, the full test suite, ruff.
+(1 seed), audit baselines (3 seeds), held-out runs for every configuration in the headline
+table (3 seeds; `llm_only` 1 seed), ablations and perturbations (1 seed), the smaller-model
+run, one recorded `make demo-live`, `make smoke` from the cache, the full test suite, ruff.
 
 **Known gaps:**
 * The GitHub remote, CI run and Pages site have not been created yet (everything is local;
   see the commands at the end). The CI workflow has therefore never executed on GitHub.
-* Perturbations, ablations and the smaller-model run use one seed (`docs/LIMITATIONS.md`).
+* `llm_only`, perturbations, ablations and the smaller-model run use one seed (`docs/LIMITATIONS.md`).
 * `llm_only`'s verification is LLM-judged; its false-recovery rate reflects that design.
 * Live-environment numbers are not benchmark numbers (non-deterministic timing; no cache).
 * Re-recording with Ollama is not bit-reproducible; the committed cache is.
