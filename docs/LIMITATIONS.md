@@ -46,8 +46,10 @@ Each item names the file that embodies the limitation so it can be checked.
   directional. llm_only's 3-seed pass was started twice and stopped (10/60 both times; see
   `results/heldout_runs.log`) because its raw-telemetry prompts make it ~5× slower than the
   agent. The exact wall-clock of every command is recorded in `results/*.json`
-  (`meta.elapsed_s`): agent held-out 63 min, llm_only (1 seed) 93 min, ablations 99 min,
-  smaller model 115 min, perturbations ~70 min, dev iterations 25–53 min each.
+  (`meta.elapsed_s`): agent held-out 63 min, single_shot 29 min, llm_only (1 seed) 95 min,
+  ablations 39 min in total (no_beacon 32, no_safety 6.5; no_verify and no_loop replay the
+  agent's first-iteration cache entries in seconds), smaller model 45 min, perturbations 78 min
+  in total (19 / 22 / 20 / 9 / 8), dev iterations 25–53 min each.
 * **Recording time.** The brief asked for benchmark commands under 15 minutes; with a 7B model
   at ~20 tokens/s the held-out commands exceed that and we chose fewer seeds over fewer
   scenarios. `make smoke` and CI run from the cache in under a minute.
