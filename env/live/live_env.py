@@ -12,21 +12,22 @@ import atexit
 import json
 import shutil
 import signal
-import socket
 import subprocess
 import sys
 import threading
 import time
 import urllib.error
 import urllib.request
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.server import ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 
 from env.base import Env
+from env.live.sinkhole import Sinkhole, free_port, http
 from env.sim.world import TOPOLOGY
 from env.types import (
     ACTION_ALLOWLIST,
+    METRIC_NAMES,
     Action,
     ActionResult,
     Flow,
@@ -36,41 +37,10 @@ from env.types import (
 )
 
 ROLES = ("gateway", "api", "db", "cache", "worker")
+DOWN_SAMPLE: dict[str, float] = {m: 0.0 for m in METRIC_NAMES} | {"error_rate": 1.0}
 SAMPLE_INTERVAL = 2.0
 ACTION_SETTLE_S = 4.0
 ROOT = Path(__file__).resolve().parents[2]
-
-
-def _free_port() -> int:
-    with socket.socket() as s:
-        s.bind(("127.0.0.1", 0))
-        return s.getsockname()[1]
-
-
-def _http(url: str, data: dict | None = None, timeout: float = 2.0) -> Any:
-    req = urllib.request.Request(url, data=json.dumps(data).encode() if data is not None else None)
-    if data is not None:
-        req.add_header("Content-Type", "application/json")
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return json.loads(r.read() or b"{}")
-
-
-class _Sinkhole(BaseHTTPRequestHandler):
-    """Accepts beacon check-ins and update polls; counts them."""
-
-    hits: dict[str, int] = {"gate": 0, "updates": 0}
-
-    def log_message(self, *args: Any) -> None:  # noqa: D102
-        pass
-
-    def do_GET(self) -> None:  # noqa: N802, D102
-        key = "gate" if self.path.startswith("/gate") else "updates"
-        _Sinkhole.hits[key] += 1
-        body = b'{"ok":true}'
-        self.send_response(200)
-        self.send_header("Content-Length", str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
 
 
 class LiveEnv(Env):
@@ -116,11 +86,11 @@ class LiveEnv(Env):
         self.injected = {}
         self.contained = set()
         self.egress_blocked = set()
-        self.sink_port = _free_port()
-        self.sink = ThreadingHTTPServer(("127.0.0.1", self.sink_port), _Sinkhole)
+        self.sink_port = free_port()
+        self.sink = ThreadingHTTPServer(("127.0.0.1", self.sink_port), Sinkhole)
         self.sink.daemon_threads = True
         threading.Thread(target=self.sink.serve_forever, daemon=True).start()
-        self.ports = {r: _free_port() for r in ROLES}
+        self.ports = {r: free_port() for r in ROLES}
         for role in ("db", "cache", "api", "worker", "gateway"):
             self._launch(role)
         self._wait_healthy()
@@ -168,7 +138,7 @@ class LiveEnv(Env):
         for role in ROLES:
             while time.time() < deadline:
                 try:
-                    _http(f"http://127.0.0.1:{self.ports[role]}/health", timeout=0.5)
+                    http(f"http://127.0.0.1:{self.ports[role]}/health", timeout=0.5)
                     break
                 except Exception:  # noqa: BLE001
                     time.sleep(0.2)
@@ -210,27 +180,12 @@ class LiveEnv(Env):
             for role in ROLES:
                 self._record_flow(t, "monitor", role, 120)
                 try:
-                    m = _http(f"http://127.0.0.1:{self.ports[role]}/metrics", timeout=1.0)
+                    m = http(f"http://127.0.0.1:{self.ports[role]}/metrics", timeout=1.0)
                     self._metrics.append(
                         MetricSample(round(t, 3), role, {k: float(v) for k, v in m.items()})
                     )
                 except Exception:  # noqa: BLE001
-                    self._metrics.append(
-                        MetricSample(
-                            round(t, 3),
-                            role,
-                            {
-                                "latency_p50": 0.0,
-                                "latency_p95": 0.0,
-                                "error_rate": 1.0,
-                                "cpu": 0.0,
-                                "mem": 0.0,
-                                "conn_count": 0.0,
-                                "disk_used": 0.0,
-                                "queue_depth": 0.0,
-                            },
-                        )
-                    )
+                    self._metrics.append(MetricSample(round(t, 3), role, dict(DOWN_SAMPLE)))
             time.sleep(SAMPLE_INTERVAL)
 
     def _record_flow(self, t: float, src: str, dst: str, nbytes: int) -> None:
@@ -257,7 +212,7 @@ class LiveEnv(Env):
 
     def _admin(self, role: str) -> dict[str, Any] | None:
         try:
-            return _http(f"http://127.0.0.1:{self.ports[role]}/admin/status", timeout=1.0)
+            return http(f"http://127.0.0.1:{self.ports[role]}/admin/status", timeout=1.0)
         except Exception:  # noqa: BLE001
             return None
 
@@ -341,7 +296,7 @@ class LiveEnv(Env):
         spec = {"type": ftype, "params": params or {}}
         self.injected.setdefault(target, []).append(spec)
         try:
-            r = _http(f"http://127.0.0.1:{self.ports[target]}/admin/inject", spec)
+            r = http(f"http://127.0.0.1:{self.ports[target]}/admin/inject", spec)
             return r.get("msg", "")
         except (urllib.error.URLError, ConnectionError, OSError):
             return "injected (process exited)"
@@ -378,7 +333,7 @@ class LiveEnv(Env):
             self._wait_healthy(timeout=5)
         else:
             try:
-                msg = _http(
+                msg = http(
                     f"http://127.0.0.1:{self.ports[target]}/admin/action", {"name": action.name}
                 ).get("msg", "")
             except Exception as e:  # noqa: BLE001
@@ -411,7 +366,7 @@ class LiveEnv(Env):
         if inverse is None:
             return False
         try:
-            _http(f"http://127.0.0.1:{self.ports[action.target]}/admin/action", {"name": inverse})
+            http(f"http://127.0.0.1:{self.ports[action.target]}/admin/action", {"name": inverse})
         except Exception:  # noqa: BLE001
             return False
         self.contained.discard(action.target)
@@ -437,6 +392,6 @@ class LiveEnv(Env):
             "active_faults": active,
             "all_faults_resolved": all(not v for v in active.values()),
             "restart_before_containment": self.restart_before_containment,
-            "sinkhole_hits": dict(_Sinkhole.hits),
+            "sinkhole_hits": dict(Sinkhole.hits),
             "actions": list(self.action_log),
         }
