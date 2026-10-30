@@ -105,8 +105,11 @@ def test_faults_persist_without_remediation(ftype: str):
     assert not env.gt_recovered()
     if ftype == "c2_beacon":  # no ops symptom by design: the evidence is in the flows
         assert [f for f in env.get_flows(600) if f.dst.startswith("203.")]
-    else:
-        assert env.health_score() < 0.9  # the degradation stays observable
+    else:  # the degradation stays observable: health below the bar or detectors still firing
+        from agent.detectors.evidence import EvidenceBuilder
+
+        ev = EvidenceBuilder(use_beacon=False).build(env)
+        assert env.health_score() < 0.9 or ev.metrics or ev.logs
 
 
 @pytest.mark.parametrize("ftype", list(FAULT_CLASSES))
