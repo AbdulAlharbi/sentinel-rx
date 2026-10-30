@@ -1,6 +1,6 @@
 # SLIDES.md — 9 slides with speaker notes
 
-Numbers in brackets are filled from `results/summary.md` (held-out) — never from dev.
+All numbers below are held-out (`results/summary.md`; agent/runbook/single_shot 3 seeds, llm_only/ablations/perturbations 1 seed).
 
 ## 1. Title — Sentinel-RX: security-aware agentic recovery of a failing system
 *Visual:* name, one-line pitch, "100% local & free: qwen2.5:7b via Ollama, no Docker".
@@ -41,14 +41,11 @@ Record/replay cache: the full benchmark re-runs with no LLM.
 
 ## 7. Held-out results
 *Visual:* leaderboard table + `results-by-config.png` + `accuracy-by-number-of-concurrent-faults.png`.
-*Notes:* [agent vs runbook vs single_shot vs llm_only: top-1, recall, recovered, false recovery,
-harmful, tokens]. Emphasise false-recovery and harmful-action columns: that is where the
-verification gate and the safety layer show up.
+*Notes:* agent: top-1 92% [83, 98], per-fault recall 82%, recovered 100%, false claims 0%, harmful 0.00, 6.1k tokens. Runbook: top-1 87%, recovered 45%, false claims 5%. Single-shot LLM: recovered 30%, false claims 70%, harmful 0.27/run. LLM-only loop: recovered 35%, false claims 15%, harmful 0.55/run, 35k tokens (5.7× the hybrid). do_nothing / random: 0% recovered (random: 3.45 harmful/run). Emphasise the false-recovery and harmful columns: that is where the verification gate and the safety layer show up.
 
 ## 8. Robustness and ablations
 *Visual:* `robustness-drop.png`, `ablation-deltas.png`, `cost-vs-accuracy.png`.
-*Notes:* [per-perturbation drop]; smaller model run; which component contributes what;
-cost per incident vs recovery.
+*Notes:* recovered stays 95–100% under noisy logs, missing metrics, renamed services, timestamp jitter and the unseen fault type (unseen type: top-1 62%, the agent labels it 'other' but still fixes it). 1.5B model: recovered 50%, top-1 40%, still 0% false claims and 0 harmful. Ablations: no verify → false claims 80%; no loop → recovered 20%; no beacon detector → recovered 50%, false claims 35%; no safety → 0.60 harmful actions/run. Cost: 4.6 calls / 6.1k tokens per incident vs 18.4 calls / 35k for llm_only.
 
 ## 9. Limitations, path to production, links
 *Visual:* three bullets each; repo / Pages / literature review links.

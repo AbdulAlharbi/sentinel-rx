@@ -39,14 +39,18 @@ Each item names the file that embodies the limitation so it can be checked.
 
 ## Evaluation budget (laptop, fanless)
 
-* **Seeds.** Held-out headline numbers use 3 seed offsets per scenario (60 runs per
-  configuration). Perturbation runs, ablations and the smaller-model run use **1 seed** (20 runs
-  each) to keep every benchmark command within the laptop time budget; their CIs are wide and
-  their deltas should be read as directional. The exact wall-clock of every command is recorded
-  in `results/*.json` (`meta.elapsed_s`).
-* **Recording time.** One full dev run of the agent is ~25–50 min of model time (2–3 Ollama
-  workers). All held-out, perturbation and ablation recordings together take several hours;
-  that is why `make smoke` and CI run from the cache.
+* **Seeds.** Held-out headline numbers for agent, runbook, single_shot, do_nothing and random
+  use 3 seed offsets per scenario (60 runs each). **llm_only, the perturbation runs, the
+  ablations and the smaller-model run use 1 seed** (20 runs each; 8 for the unseen fault type)
+  to keep the laptop time budget; their CIs are wide and their deltas should be read as
+  directional. llm_only's 3-seed pass was started twice and stopped (10/60 both times; see
+  `results/heldout_runs.log`) because its raw-telemetry prompts make it ~5× slower than the
+  agent. The exact wall-clock of every command is recorded in `results/*.json`
+  (`meta.elapsed_s`): agent held-out 63 min, llm_only (1 seed) 93 min, ablations 99 min,
+  smaller model 115 min, perturbations ~70 min, dev iterations 25–53 min each.
+* **Recording time.** The brief asked for benchmark commands under 15 minutes; with a 7B model
+  at ~20 tokens/s the held-out commands exceed that and we chose fewer seeds over fewer
+  scenarios. `make smoke` and CI run from the cache in under a minute.
 * **Dev baselines.** Only the runbook was run on dev with 3 seeds; LLM baselines were measured
   on held-out only (single-shot and llm_only are not tuned, so dev numbers would add cost
   without changing anything).
