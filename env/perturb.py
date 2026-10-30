@@ -6,6 +6,7 @@ ground truth), so the same scenario can be scored against the same answer key.
 
 from __future__ import annotations
 
+import zlib
 from typing import Any
 
 import numpy as np
@@ -227,6 +228,11 @@ class RenamedServices(PerturbedEnv):
         return snap
 
 
+def _stable_salt(src: str, dst: str) -> int:
+    """Per-pair salt that is identical in every process (``hash()`` of a str is randomised)."""
+    return zlib.crc32(f"{src}->{dst}".encode()) & 0xFFFF
+
+
 class TimestampJitter(PerturbedEnv):
     """Flow and log timestamps carry +/- 2 s Gaussian jitter (clock skew between collectors)."""
 
@@ -237,7 +243,7 @@ class TimestampJitter(PerturbedEnv):
     def get_flows(self, window: float) -> list[Flow]:
         """Jittered flows."""
         out = [
-            Flow(self._jit(f.t, hash((f.src, f.dst)) & 0xFFFF), f.src, f.dst, f.nbytes)
+            Flow(self._jit(f.t, _stable_salt(f.src, f.dst)), f.src, f.dst, f.nbytes)
             for f in self.inner.get_flows(window)
         ]
         return sorted(out, key=lambda f: f.t)
