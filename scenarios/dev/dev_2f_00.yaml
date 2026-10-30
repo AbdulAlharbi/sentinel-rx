@@ -1,0 +1,27 @@
+id: dev_2f_00
+split: dev
+seed: 1010
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: bad_config_deploy
+  target: api
+  start: 40
+  params:
+    error: 0.34
+- type: memory_leak
+  target: worker
+  start: 47
+  params:
+    rate: 1.67
+ground_truth:
+  root_causes:
+  - service: api
+    type: bad_config_deploy
+  - service: worker
+    type: memory_leak
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

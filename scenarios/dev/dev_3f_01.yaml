@@ -1,0 +1,33 @@
+id: dev_3f_01
+split: dev
+seed: 1023
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: disk_full
+  target: db
+  start: 44
+  params:
+    rate: 4.7
+- type: memory_leak
+  target: gateway
+  start: 44
+  params:
+    rate: 1.74
+- type: process_crash
+  target: worker
+  start: 63
+  params: {}
+ground_truth:
+  root_causes:
+  - service: db
+    type: disk_full
+  - service: gateway
+    type: memory_leak
+  - service: worker
+    type: process_crash
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

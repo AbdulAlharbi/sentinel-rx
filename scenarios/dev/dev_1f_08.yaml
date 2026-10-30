@@ -1,0 +1,20 @@
+id: dev_1f_08
+split: dev
+seed: 1008
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: credential_stuffing
+  target: gateway
+  start: 47
+  params:
+    burst: 7
+ground_truth:
+  root_causes:
+  - service: gateway
+    type: credential_stuffing
+  has_security: true
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

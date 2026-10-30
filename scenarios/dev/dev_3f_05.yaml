@@ -1,0 +1,36 @@
+id: dev_3f_05
+split: dev
+seed: 1027
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: c2_beacon
+  target: api
+  start: 42
+  params:
+    interval: 38
+    jitter: 0.24
+    dst: 203.0.113.47
+- type: db_conn_exhaustion
+  target: db
+  start: 57
+  params:
+    ramp: 8.8
+- type: memory_leak
+  target: gateway
+  start: 46
+  params:
+    rate: 1.27
+ground_truth:
+  root_causes:
+  - service: api
+    type: c2_beacon
+  - service: db
+    type: db_conn_exhaustion
+  - service: gateway
+    type: memory_leak
+  has_security: true
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

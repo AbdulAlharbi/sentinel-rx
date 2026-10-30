@@ -1,0 +1,39 @@
+id: heldout_3f_00__noisy_logs
+split: perturbations/noisy_logs
+seed: 5013
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: c2_beacon
+  target: worker
+  start: 53
+  params:
+    interval: 48
+    jitter: 0.35
+    dst: 203.0.113.88
+- type: cache_failure
+  target: cache
+  start: 47
+  params: {}
+- type: disk_full
+  target: db
+  start: 45
+  params:
+    rate: 5.5
+ground_truth:
+  root_causes:
+  - service: worker
+    type: c2_beacon
+  - service: cache
+    type: cache_failure
+  - service: db
+    type: disk_full
+  has_security: true
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2
+perturbation:
+  name: noisy_logs
+  params: {}
+base_id: heldout_3f_00

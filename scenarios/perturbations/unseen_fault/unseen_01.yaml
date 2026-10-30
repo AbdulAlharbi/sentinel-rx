@@ -1,0 +1,22 @@
+id: unseen_01
+split: perturbations/unseen_fault
+seed: 5501
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: dns_failure
+  target: worker
+  start: 62
+  params: {}
+ground_truth:
+  root_causes:
+  - service: worker
+    type: dns_failure
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2
+perturbation:
+  name: unseen_fault
+  params: {}

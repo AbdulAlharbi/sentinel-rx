@@ -1,0 +1,20 @@
+id: dev_1f_02
+split: dev
+seed: 1002
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: disk_full
+  target: db
+  start: 47
+  params:
+    rate: 5.6
+ground_truth:
+  root_causes:
+  - service: db
+    type: disk_full
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

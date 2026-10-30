@@ -1,0 +1,26 @@
+id: dev_2f_11
+split: dev
+seed: 1021
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: bad_config_deploy
+  target: gateway
+  start: 50
+  params:
+    error: 0.39
+- type: cache_failure
+  target: cache
+  start: 49
+  params: {}
+ground_truth:
+  root_causes:
+  - service: gateway
+    type: bad_config_deploy
+  - service: cache
+    type: cache_failure
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

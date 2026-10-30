@@ -1,0 +1,27 @@
+id: dev_2f_09
+split: dev
+seed: 1019
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: latency_injection
+  target: cache
+  start: 48
+  params:
+    ms: 294
+- type: memory_leak
+  target: gateway
+  start: 41
+  params:
+    rate: 1.38
+ground_truth:
+  root_causes:
+  - service: cache
+    type: latency_injection
+  - service: gateway
+    type: memory_leak
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

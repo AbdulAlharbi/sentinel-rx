@@ -1,0 +1,31 @@
+id: unseen_04
+split: perturbations/unseen_fault
+seed: 5504
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: c2_beacon
+  target: worker
+  start: 50
+  params:
+    interval: 35
+    jitter: 0.3
+    dst: 192.0.2.199
+- type: dns_failure
+  target: api
+  start: 49
+  params: {}
+ground_truth:
+  root_causes:
+  - service: worker
+    type: c2_beacon
+  - service: api
+    type: dns_failure
+  has_security: true
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2
+perturbation:
+  name: unseen_fault
+  params: {}

@@ -1,0 +1,29 @@
+id: heldout_2f_08
+split: heldout
+seed: 5012
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: bad_config_deploy
+  target: gateway
+  start: 45
+  params:
+    error: 0.4
+- type: c2_beacon
+  target: api
+  start: 53
+  params:
+    interval: 46
+    jitter: 0.24
+    dst: 198.51.100.23
+ground_truth:
+  root_causes:
+  - service: gateway
+    type: bad_config_deploy
+  - service: api
+    type: c2_beacon
+  has_security: true
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

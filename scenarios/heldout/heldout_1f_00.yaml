@@ -1,0 +1,20 @@
+id: heldout_1f_00
+split: heldout
+seed: 5000
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: latency_injection
+  target: api
+  start: 43
+  params:
+    ms: 534
+ground_truth:
+  root_causes:
+  - service: api
+    type: latency_injection
+  has_security: false
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2

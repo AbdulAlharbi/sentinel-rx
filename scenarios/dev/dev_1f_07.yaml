@@ -1,0 +1,22 @@
+id: dev_1f_07
+split: dev
+seed: 1007
+duration_ticks: 150
+agent_start_tick: 90
+tick_seconds: 10.0
+faults:
+- type: c2_beacon
+  target: api
+  start: 44
+  params:
+    interval: 27
+    jitter: 0.25
+    dst: 203.0.113.47
+ground_truth:
+  root_causes:
+  - service: api
+    type: c2_beacon
+  has_security: true
+recovery_check:
+  health_min: 0.9
+  stable_ticks: 2
