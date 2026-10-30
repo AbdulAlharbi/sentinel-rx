@@ -1,7 +1,9 @@
 /* Sentinel-RX site: renders site/data.json (produced by `make report`). Vanilla JS + Chart.js. */
 (async function () {
-  const PALETTE = { agent: "#2a78d6", runbook: "#eb6834", single_shot: "#1baf7a", llm_only: "#eda100",
-    no_verify: "#e87ba4", no_loop: "#008300", no_beacon: "#6250d6", no_safety: "#e34948" };
+  // HUMAIN / PIF palette: colour follows the configuration, never its rank
+  const PALETTE = { agent: "#D0F94A", runbook: "#CBA35C", single_shot: "#1fa85a", llm_only: "#7dd3fc",
+    do_nothing: "#6f8279", random: "#a3b4ad",
+    no_verify: "#f06a5c", no_loop: "#e29bff", no_beacon: "#ffb454", no_safety: "#ff6f91" };
   const css = getComputedStyle(document.documentElement);
   const MUTED = css.getPropertyValue("--muted").trim() || "#52514e";
   const GRID = css.getPropertyValue("--grid").trim() || "#e6e5e1";
@@ -14,7 +16,7 @@
     data = await (await fetch("data.json")).json();
   } catch (e) {
     document.getElementById("results-meta").textContent =
-      "data.json not found. Run `make report` and serve this folder (python -m http.server -d site).";
+      `data.json could not be loaded (${e && e.message ? e.message : e}). Run \`make report\` and serve this folder (python -m http.server -d site).`;
     return;
   }
   const pct = (m) => (m == null || isNaN(m.mean)) ? "n/a" : `${(100 * m.mean).toFixed(0)}% [${(100 * m.ci_lo).toFixed(0)}, ${(100 * m.ci_hi).toFixed(0)}]`;
@@ -77,7 +79,7 @@
       type: "bar",
       data: { labels: rows.map((r) => r.perturbation), datasets: [
         { label: "recovered (perturbed)", backgroundColor: PALETTE.agent, borderRadius: 4, data: rows.map((r) => 100 * r.recovered.perturbed) },
-        { label: "top-1 (perturbed)", backgroundColor: "#9dbfe8", borderRadius: 4, data: rows.map((r) => 100 * r.top1.perturbed) },
+        { label: "top-1 (perturbed)", backgroundColor: "#7f9a2e", borderRadius: 4, data: rows.map((r) => 100 * r.top1.perturbed) },
         { label: "recovered (clean held-out)", type: "line", borderColor: PALETTE.agent, borderDash: [5, 4], borderWidth: 1.5, pointRadius: 0, data: rows.map(() => 100 * H.agent.summary.metrics.recovered.mean) },
       ] },
       options: { ...base, indexAxis: "y", scales: { x: { min: 0, max: 100, title: { display: true, text: "% of runs" }, grid: { color: GRID } }, y: { grid: { display: false } } } },
@@ -163,5 +165,5 @@
   document.getElementById("prev").addEventListener("click", () => { si--; render(); });
   document.getElementById("next").addEventListener("click", () => { si++; render(); });
   render();
-  document.getElementById("footer-meta").textContent = `Generated from site/data.json (git ${data.generated_git}) by make report. ${(data.heldout_run_log || []).length} held-out runs are logged in results/heldout_runs.log.`;
+  document.getElementById("footer-meta").textContent = `Sentinel-RX — MIT licensed. Built for the Humain Hackathon, Challenge 1. Data: site/data.json (git ${data.generated_git}) from make report. ${(data.heldout_run_log || []).length} held-out runs are logged in results/heldout_runs.log.`;
 })();

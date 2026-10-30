@@ -486,6 +486,17 @@ def summary_md(res: dict, robustness: list, ablations: list, beacon: dict | None
     return "\n".join(lines) + "\n"
 
 
+def _nan_to_none(obj):
+    """Recursively replace float NaN/inf with None so the output is strict JSON."""
+    if isinstance(obj, float) and (obj != obj or obj in (float("inf"), float("-inf"))):
+        return None
+    if isinstance(obj, dict):
+        return {k: _nan_to_none(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_nan_to_none(v) for v in obj]
+    return obj
+
+
 def main() -> None:
     """Build everything."""
     res = load_results()
@@ -536,7 +547,8 @@ def main() -> None:
         else [],
     }
     SITE_DATA.parent.mkdir(parents=True, exist_ok=True)
-    SITE_DATA.write_text(json.dumps(data, default=str))
+    # NaN is not valid JSON (browsers reject it); write null instead
+    SITE_DATA.write_text(json.dumps(_nan_to_none(data), default=str, allow_nan=False))
     site_figs = SITE_DATA.parent / "figures"
     site_figs.mkdir(exist_ok=True)
     for png in FIGURES.glob("*.png"):
