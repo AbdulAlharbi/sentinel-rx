@@ -72,6 +72,10 @@ class PerturbedEnv(Env):
         """Delegate."""
         self.inner.wait(seconds)
 
+    def undo_action(self, action: Action) -> bool:
+        """Delegate."""
+        return self.inner.undo_action(action)
+
     def reset(self) -> None:
         """Delegate."""
         self.inner.reset()
@@ -207,6 +211,12 @@ class RenamedServices(PerturbedEnv):
         )
         r = self.inner.apply_action(inner_action)
         return ActionResult(action, r.applied, r.message, r.time)
+
+    def undo_action(self, action: Action) -> bool:
+        """Map the target back to the inner name."""
+        return self.inner.undo_action(
+            Action(action.name, self.back.get(action.target, action.target), action.params)
+        )
 
     def snapshot(self) -> dict[str, Any]:
         """Renamed snapshot."""

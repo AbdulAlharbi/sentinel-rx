@@ -227,6 +227,44 @@ class SimEnv(Env):
         self.advance(ACTION_TICKS)
         return ActionResult(action, True, msg, t)
 
+    def undo_action(self, action: Action) -> bool:
+        """Inverse of reversible actions (containment, rate limit, pool scaling)."""
+        w = self.world
+        if action.target not in w.services:
+            return False
+        st = w.state[action.target]
+        match action.name:
+            case "isolate_host":
+                st.state = "up"
+                st.egress_blocked = False
+            case "block_egress":
+                st.egress_blocked = False
+            case "rate_limit_auth":
+                w.rate_limited[action.target] = False
+            case "scale_connections":
+                w.pool_size[action.target] = max(1, w.pool_size[action.target] // 2)
+            case _:
+                return False
+        for f in self.faults:
+            if (
+                f.type == "c2_beacon"
+                and f.target == action.target
+                and action.name in ("isolate_host", "block_egress")
+            ):
+                f.contained = False
+        self.action_log.append(
+            {
+                "tick": self.tick,
+                "t": self.now(),
+                "action": action.to_dict(),
+                "notes": ["undo"],
+                "harmful": None,
+                "undo": True,
+            }
+        )
+        self.advance(1)
+        return True
+
     # ---- hidden ground truth (runner / scorer only; NOT part of the agent interface) -----
     def gt_all_faults_resolved(self) -> bool:
         """True when every injected fault has been resolved."""
