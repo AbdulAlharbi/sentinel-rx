@@ -21,6 +21,7 @@
 % ---------- layout ---------------------------------------------------
 \usepackage[a4paper,margin=2.5cm]{geometry}
 \usepackage{graphicx}
+\usepackage{adjustbox}
 \graphicspath{{figures/}}
 \usepackage{booktabs}
 \usepackage{tabularx}
@@ -108,7 +109,7 @@
   beacon/.style={-{Stealth[length=2.2mm]},line width=0.9pt,draw=attack,dashed},
   lbl/.style={font=\tiny,text=muted,fill=white,inner sep=1.5pt,align=center},
   group/.style={draw=accent!55,dashed,rounded corners=6pt,fill=groupfill!45,inner sep=9pt},
-  grouplbl/.style={font=\scriptsize\bfseries,text=accent},
+  grouplbl/.style={font=\scriptsize\bfseries,text=accent,anchor=south west,inner sep=2pt},
   decision/.style={diamond,aspect=2.4,draw=accent,fill=white,align=center,font=\footnotesize,
                    inner sep=1.5pt,line width=0.6pt},
   brace/.style={decorate,decoration={brace,amplitude=4pt},draw=accent2},
@@ -126,7 +127,7 @@
 \begin{titlepage}
 \thispagestyle{empty}
 \vspace*{2.2cm}
-{\color{accent}\rule{\textwidth}{1.2pt}}\\[1.2em]
+\noindent{\color{accent}\rule{\textwidth}{1.2pt}}\\[1.2em]
 {\color{accent}\Huge\bfseries Sentinel-RX}\\[0.4em]
 {\color{accent}\LARGE\bfseries Security-Aware Agentic Recovery of Failing Systems}\\[1.0em]
 {\large Technical Report \textemdash\ Humain Hackathon, Challenge~1: Agentic Recovery of a Failing System}\\[0.6em]
@@ -185,10 +186,12 @@ declares ``recovered'' without checking is worse than no agent at all.
 \end{itemize}
 
 \textbf{Headline result (held-out, \code{qwen2.5:7b}, 20 scenarios $\times$ 3 seeds).}
-\begin{center}\small
+\begin{center}\footnotesize
+\setlength{\tabcolsep}{5pt}
+\adjustbox{max width=\textwidth}{%
 \begin{tabular}{lrrrrr}
 \toprule
-configuration & top-1 root cause & recovered & false ``recovered'' & harmful actions/run & LLM tokens/run \\
+configuration & top-1 root cause & recovered & false ``recovered'' & harmful / run & LLM tokens / run \\
 \midrule
 \rowcolor{groupfill}\textbf{Sentinel-RX agent} & \pct{92} & \pct{100} & \pct{0} & 0.00 & \num{6103} \\
 runbook (rules, no LLM) & \pct{87} & \pct{45} & \pct{5} & 0.00 & 0 \\
@@ -196,7 +199,7 @@ single-shot LLM & \pct{63} & \pct{30} & \pct{70} & 0.27 & \num{2421} \\
 LLM only (no detectors, $n=20$) & \pct{35} & \pct{35} & \pct{15} & 0.55 & \num{35018} \\
 do-nothing / random floors & \pct{0} & \pct{0} & \pct{0} / \pct{10} & 0.00 / 3.45 & 0 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{center}
 
 \textbf{Why it works.} Ablations show each component protects a different metric: removing the
@@ -341,7 +344,7 @@ in the simulator it is a destination address, in the live environment a real loc
 
 \begin{figure}[H]
 \centering
-\resizebox{\textwidth}{!}{%
+\adjustbox{max width=\textwidth}{%
 \begin{tikzpicture}
   % ---- enterprise system ----
   \node[service] (gw) at (0,2) {gateway};
@@ -356,25 +359,25 @@ in the simulator it is a destination address, in the live environment a real loc
   \draw[flow] (worker) -- (cache);
   \begin{scope}[on background layer]
     \node[group,fit=(gw)(api)(db)(cache)(worker),
-          label={[grouplbl]north west:Enterprise system (SimEnv \,|\, LiveEnv), dependency arrows point downstream}] (sys) {};
+          label={[grouplbl]north west:Enterprise system (SimEnv or LiveEnv)}] (sys) {};
   \end{scope}
   % ---- outside world ----
-  \node[bad,dashed] (c2) at (11.6,0) {C2 server\\(sinkhole in LiveEnv)};
-  \draw[beacon] (worker) -- node[lbl,above] {periodic beacon,\\jittered, small payloads} (c2);
-  \node[box,draw=muted,text=muted] (ext) at (11.6,2.6) {allow-listed external\\(update mirror, payments)};
-  \draw[flow,draw=muted] (api.north) to[out=60,in=180] node[lbl,above,pos=0.6] {legitimate egress} (ext.west);
+  \node[bad,dashed] (c2) at (11.4,0) {C2 server\\(sinkhole in LiveEnv)};
+  \draw[beacon] (worker) -- node[lbl,above] {periodic beacon,\\jittered} (c2);
+  \node[box,draw=muted,text=muted] (ext) at (11.4,2.6) {allow-listed external\\(update mirror, payments)};
+  \draw[flow,draw=muted] (api.north) to[out=70,in=180] node[lbl,above,pos=0.55] {legitimate egress} (ext.west);
   % ---- telemetry ----
-  \node[output] (met) at (1,-2.3) {metrics (8 per service)};
-  \node[output] (logs) at (4.2,-2.3) {logs};
-  \node[output] (flows) at (7.2,-2.3) {network flows};
+  \node[output] (met) at (1,-1.9) {metrics (8 per service)};
+  \node[output] (logs) at (4.2,-1.9) {logs};
+  \node[output] (flows) at (7.2,-1.9) {network flows};
   \draw[flow] (sys.south -| met) -- (met);
   \draw[flow] (sys.south -| logs) -- (logs);
   \draw[flow] (sys.south -| flows) -- (flows);
   % ---- detectors ----
-  \node[detector] (zs) at (0,-4.5) {robust z-score\\metric anomalies};
-  \node[detector] (lt) at (3,-4.5) {log template\\signatures};
-  \node[detector] (rk) at (6,-4.5) {dependency-aware\\root-cause ranker};
-  \node[detector] (bc) at (9.4,-4.5) {beacon detector\\(RandomForest)};
+  \node[detector] (zs) at (0,-3.7) {robust z-score\\metric anomalies};
+  \node[detector] (lt) at (3,-3.7) {log template\\signatures};
+  \node[detector] (rk) at (6,-3.7) {dependency-aware\\root-cause ranker};
+  \node[detector] (bc) at (9.6,-3.7) {beacon detector\\(RandomForest)};
   \draw[flow] (met) -- (zs);
   \draw[flow] (logs) -- (lt);
   \draw[flow] (flows) -- (bc);
@@ -382,28 +385,29 @@ in the simulator it is a destination address, in the live environment a real loc
   \draw[flow] (lt) -- (rk);
   \begin{scope}[on background layer]
     \node[group,fill=detfill!50,fit=(zs)(lt)(rk)(bc),
-          label={[grouplbl]north west:Detector layer (deterministic, no LLM)}] (det) {};
+          label={[grouplbl,anchor=north west]south west:Detector layer (deterministic, no LLM)}] (det) {};
   \end{scope}
-  % ---- evidence, llm, safety ----
-  \node[output,minimum width=52mm] (ev) at (4.5,-6.6) {ranked evidence, grouped per service\\($\approx$1.5k prompt tokens per call)};
+  % ---- evidence, LLM, safety (left column) ----
+  \node[output,minimum width=52mm] (ev) at (4,-5.6) {ranked evidence, grouped per service\\($\approx$1.5k prompt tokens per call)};
   \draw[flow] (rk) -- (ev);
-  \draw[flow] (bc) -- (ev);
-  \node[llm,minimum width=52mm] (llm) at (4.5,-8.5) {LLM reasoning (qwen2.5:7b via Ollama)\\call 1: hypotheses + checks \quad call 2: ordered plan};
+  \draw[flow] (bc.south) -- (ev.east);
+  \node[llm,minimum width=52mm] (llm) at (4,-7.1) {LLM reasoning (qwen2.5:7b via Ollama)\\call 1: hypotheses + checks \quad call 2: ordered plan};
   \draw[flow] (ev) -- (llm);
-  \draw[flow,dashed,draw=muted] (llm.west) -- ++(-4.2,0) |- node[lbl,pos=0.25,left] {targeted checks\\(logs / metrics / flows)} (sys.west);
-  \node[safety,minimum width=52mm] (safe) at (4.5,-10.4) {Safety layer\\allowlist $\cdot$ evidence gate $\cdot$ contain-before-restart $\cdot$ dry-run $\cdot$ transactional rollback};
+  \draw[flow,dashed,draw=muted] (llm.west) -- ++(-3.2,0) |- node[lbl,pos=0.3,left] {targeted\\checks} (sys.west);
+  \node[safety,text width=52mm] (safe) at (4,-8.7) {Safety layer: allowlist $\cdot$ evidence gate $\cdot$ contain-before-restart $\cdot$ dry-run $\cdot$ transactional rollback};
   \draw[flow] (llm) -- node[lbl,right] {plan} (safe);
-  \draw[flow] (safe.east) -- ++(9.6,0) |- node[lbl,pos=0.25,right] {actions\\(8 allow-listed)} (sys.east);
-  % ---- verification ----
-  \node[detector,minimum width=40mm] (ver) at (9.4,-8.5) {Verification gate\\post-action telemetry vs.\ healthy baseline;\\known beacon pairs; denied-egress attempts};
-  \draw[flow] (bc) -- node[lbl,right] {re-run on\\post-action window} (ver);
-  \draw[flow] (ver.west) -- node[lbl,above] {problems $\rightarrow$ next iteration} (llm.east);
-  \node[good,minimum width=40mm] (rec) at (9.4,-10.4) {RECOVERED claim\\(checked by the scorer against hidden ground truth)};
+  % ---- verification (right column) ----
+  \node[detector,text width=40mm] (ver) at (10.4,-7.0) {Verification gate: post-action telemetry vs.\ healthy baseline; known beacon pairs; denied egress};
+  \draw[flow] (bc) -- node[lbl,right] {re-run on the\\post-action window} (ver);
+  \draw[flow] (ver.west) -- node[lbl,above] {problems $\rightarrow$\\next iteration} (llm.east);
+  \node[good,text width=40mm] (rec) at (10.4,-9.0) {RECOVERED claim (checked by the scorer against hidden ground truth)};
   \draw[flow,draw=recovered!70!black] (ver) -- node[lbl,right] {no problems} (rec);
+  % ---- actions back into the system ----
+  \draw[flow] (safe.south) |- (13.6,-10.1) |- node[lbl,pos=0.35,right] {actions\\(8 allow-listed)} (sys.east);
   % ---- legend ----
-  \draw[flow] (-1.3,-12) -- (-0.6,-12); \node[lbl,anchor=west] at (-0.5,-12) {data / control};
-  \draw[beacon] (2.0,-12) -- (2.7,-12); \node[lbl,anchor=west] at (2.8,-12) {attack path};
-  \draw[flow,dashed,draw=muted] (4.8,-12) -- (5.5,-12); \node[lbl,anchor=west] at (5.6,-12) {on-demand check (LLM-requested)};
+  \draw[flow] (-1.3,-11.0) -- (-0.6,-11.0); \node[lbl,anchor=west] at (-0.5,-11.0) {data / control};
+  \draw[beacon] (2.4,-11.0) -- (3.1,-11.0); \node[lbl,anchor=west] at (3.2,-11.0) {attack path};
+  \draw[flow,dashed,draw=muted] (5.4,-11.0) -- (6.1,-11.0); \node[lbl,anchor=west] at (6.2,-11.0) {on-demand check (LLM-requested)};
 \end{tikzpicture}}
 \caption{System architecture. Telemetry from the enterprise system is compressed by four
 deterministic detectors into ranked evidence; the LLM reasons, the safety layer screens and executes,
@@ -418,12 +422,12 @@ the hidden security incident.}
 % =====================================================================
 
 \subsection{Environment interface}
-Both environments implement one abstract class (\code{env/base.py::Env}): \code{list\_services},
+{\sloppy Both environments implement one abstract class (\code{env/base.py::Env}): \code{list\_services},
 \code{get\_topology}, \code{get\_status}, \code{get\_metrics(window)},
 \code{get\_logs(service, window, grep)}, \code{get\_flows(window)}, \code{apply\_action},
 \code{undo\_action}, \code{wait}, \code{snapshot}, \code{now}. Everything not on the interface is
 invisible to the agent. The benchmark runner reaches hidden ground truth through
-\code{SimEnv.gt\_*} methods wrapped in a probe that the agent cannot call.
+\code{SimEnv.gt\_*} methods wrapped in a probe that the agent cannot call.\par}
 
 \begin{designdecision}{one agent interface, two environments}
 Benchmarks need thousands of cheap, seeded, reproducible episodes; a demo needs real memory growth,
@@ -477,12 +481,12 @@ any of the 8 actions on any other service or by any wrong action on the right se
 (\code{tests/test\_faults.py}).
 
 \begin{table}[H]
-\centering\small
+\centering\footnotesize
 \caption{Fault library (\code{faults/}). Containment-first is enforced for the beacon: a restart
 before containment is harmful, re-establishes the implant with a new interval and is counted as a
 reinfection.}
 \label{tab:faults}
-\begin{tabularx}{\textwidth}{l l X l}
+\begin{tabularx}{\textwidth}{l >{\raggedright\arraybackslash}p{2.2cm} X >{\raggedright\arraybackslash}p{3.1cm}}
 \toprule
 type & targets & observable symptoms & correct remediation \\
 \midrule
@@ -494,7 +498,7 @@ bad\_config\_deploy & gateway, api & step change in error rate after a ``config 
 process\_crash & api, worker, cache & status down, CPU and connections drop to 0; dependents get connection refused & restart\_service \\
 cache\_failure & cache & cache errors up, api latency up, db CPU/connections up; eviction logs & flush\_cache or restart \\
 \addlinespace
-\textcolor{attack}{c2\_beacon} & worker, api & small periodic outbound flows to an unknown external IP, slight CPU rise, no errors; hidden among health checks and update polls & \textbf{block\_egress or isolate\_host, then restart} \\
+\textcolor{attack}{c2\_beacon} & worker, api & small periodic outbound flows to an unknown external IP, slight CPU rise, no errors; hidden among health checks and update polls & \textbf{block\_egress or isolate\_host, \emph{then} restart\_service} \\
 \textcolor{attack}{credential\_stuffing} & gateway & burst of ``authentication failed'' from many IPs; CPU and latency up; auth backend saturates & rate\_limit\_auth \\
 \addlinespace
 dns\_failure (unseen) & api, worker & error rate spikes on the target while dependencies look healthy but receive less traffic & rollback\_config or restart \\
@@ -512,7 +516,7 @@ services do the same.
 \subsection{LiveEnv: five real processes}
 \label{sec:live}
 The live environment (\code{env/live/}) starts five stdlib \code{http.server} processes
-(\code{gateway}$\to$\code{api}$\to$\code{db}(sqlite)/\code{cache}; \code{worker}$\to$\code{db}/\code{cache}),
+(\code{gateway} calls \code{api}, which calls \code{db} (SQLite) and \code{cache}; \code{worker} calls \code{db} and \code{cache}),
 a load generator, a monitor thread that samples metrics every 2\,s and emits health-check flows, and
 a sinkhole that plays both the C2 server and the update mirror. Faults are real where that is safe
 (the heap actually grows, a process actually exits, the pool is actually held, periodic HTTP calls
@@ -553,9 +557,9 @@ sorted timestamps $t_1<\dots<t_n$ give inter-arrival times $\Delta_i$ with media
 detector computes scale-invariant features:
 \begin{align}
   \text{iat\_cv} &= \frac{\sigma(\Delta)}{\mu(\Delta)}, &
-  \text{mad\_ratio} &= \frac{\operatorname{med}|\Delta - m|}{m}, &
-  \text{within\_30} &= \frac{1}{n-1}\sum_i \mathbf{1}\big[|\Delta_i - m| \le 0.3\,m\big], \\
-  \text{spectral} &= \frac{\max_{k\ge1} |X_k|^2}{\sum_{k\ge1} |X_k|^2}, &
+  \text{mad\_ratio} &= \frac{\operatorname{med}|\Delta - m|}{m}, \notag\\
+  \text{within\_30} &= \frac{1}{n-1}\sum_i \mathbf{1}\big[|\Delta_i - m| \le 0.3\,m\big], &
+  \text{spectral} &= \frac{\max_{k\ge1} |X_k|^2}{\sum_{k\ge1} |X_k|^2}, \notag\\
   \text{autocorr} &= \max\!\big(0,\, \rho(x_t, x_{t+m})\big), &
   \text{stability} &= 1 - \frac{\sigma(q)}{\mu(q)},
   \label{eq:beacon}
@@ -605,7 +609,7 @@ and the record says so.
 
 \begin{figure}[H]
 \centering
-\resizebox{0.92\textwidth}{!}{%
+\adjustbox{max width=\textwidth}{%
 \begin{tikzpicture}[node distance=9mm and 14mm]
   \node[box,minimum width=40mm] (start) {planned action (name, target)\\from the LLM plan};
   \node[decision,below=of start] (d1) {in allowlist and\\known service?};
@@ -710,7 +714,7 @@ returns no problems; when the budget is exhausted it escalates with the full tra
 
 \begin{figure}[H]
 \centering
-\resizebox{\textwidth}{!}{%
+\adjustbox{max width=\textwidth}{%
 \begin{tikzpicture}
   \node[box,minimum width=24mm] (obs) at (0,0) {Observe};
   \node[llm,minimum width=24mm] (hyp) at (3.4,0) {Hypothesize};
@@ -745,7 +749,7 @@ returns no problems; when the budget is exhausted it escalates with the full tra
 
 \begin{figure}[H]
 \centering
-\resizebox{\textwidth}{!}{%
+\adjustbox{max width=\textwidth}{%
 \begin{tikzpicture}
   % ---- left: hybrid ----
   \node[output,minimum width=46mm] (rawL) at (0,0) {raw telemetry, 900\,s window\\metrics $\cdot$ logs $\cdot$ flows};
@@ -797,33 +801,31 @@ perturbation, ablation and small-model number in this report was produced after 
 
 \begin{figure}[H]
 \centering
-\resizebox{\textwidth}{!}{%
+\adjustbox{max width=\textwidth}{%
 \begin{tikzpicture}
   \node[box,minimum width=30mm] (gen) at (0,0) {scenario generator\\seeded, split guards\\(\code{scenarios/generate.py})};
-  \node[output,minimum width=34mm] (dev) at (4.6,1.6) {dev: 30 scenarios\\10 / 12 / 8 faults\\\emph{tuning only}};
-  \node[output,minimum width=34mm] (held) at (4.6,0) {held-out: 20 scenarios\\4 / 9 / 7 faults, disjoint combos\\and type multisets};
-  \node[output,minimum width=34mm] (pert) at (4.6,-1.7) {perturbations: 4 $\times$ 20\\+ unseen fault type $\times$ 8};
+  \node[output,minimum width=36mm] (dev) at (4.8,1.9) {dev: 30 scenarios\\10 / 12 / 8 faults\\\emph{tuning only}};
+  \node[output,minimum width=36mm] (held) at (4.8,0) {held-out: 20 scenarios\\4 / 9 / 7 faults, disjoint combos\\and type multisets};
+  \node[output,minimum width=36mm] (pert) at (4.8,-1.9) {perturbations: 4 $\times$ 20\\+ unseen fault type $\times$ 8};
   \draw[flow] (gen) -- (dev.west); \draw[flow] (gen) -- (held.west); \draw[flow] (gen) -- (pert.west);
-  \node[decision,aspect=1.8] (guard) at (8.9,0) {\code{--final}?};
-  \draw[flow] (held) -- (guard); \draw[flow] (pert) -- (guard.south west);
-  \node[bad] (refuse) at (8.9,-2.4) {refused\\(tune on dev only)};
-  \draw[flow,draw=attack] (guard) -- node[lbl,right] {no} (refuse);
-  \node[box,minimum width=34mm] (run) at (12.6,0) {runner (\code{bench/runner.py})\\$\le4$ workers, 3 seed offsets\\budget 8 iterations};
-  \draw[flow] (guard) -- node[lbl,above] {yes; logged to\\\code{heldout\_runs.log}} (run);
-  \draw[flow] (dev) -| (run.north);
-  \node[llm,minimum width=34mm] (cfg) at (12.6,2.6) {configurations\\agent $\cdot$ runbook $\cdot$ single\_shot $\cdot$ llm\_only\\do\_nothing $\cdot$ random $\cdot$ 4 ablations};
+  \node[decision,aspect=1.6] (guard) at (9.6,0) {non-dev split\\without \code{--final}?};
+  \draw[flow] (dev.east) -- (guard.north west); \draw[flow] (held.east) -- (guard.west); \draw[flow] (pert.east) -- (guard.south west);
+  \node[bad] (refuse) at (9.6,-2.6) {refused\\(tune on dev only)};
+  \draw[flow,draw=attack] (guard) -- node[lbl,right] {yes} (refuse);
+  \node[box,text width=46mm] (run) at (14.4,0) {runner (\code{bench/runner.py})\\$\le4$ workers, 3 seed offsets, budget 8\\non-dev runs logged with git revision};
+  \draw[flow] (guard) -- node[lbl,above] {no} (run);
+  \node[llm,text width=46mm] (cfg) at (14.4,2.6) {configurations: agent $\cdot$ runbook\\single\_shot $\cdot$ llm\_only $\cdot$ do\_nothing\\random $\cdot$ 4 ablations};
   \draw[flow] (cfg) -- (run);
-  \node[safety,minimum width=34mm] (cache) at (12.6,-2.4) {LLM cache (content hash)\\record / \code{--replay}};
+  \node[safety,minimum width=40mm] (cache) at (14.4,-2.6) {LLM cache (content hash)\\record / \code{--replay}};
   \draw[flow,<->] (run) -- (cache);
-  \node[box,minimum width=28mm] (score) at (17,0) {scorer (\code{score.py})\\vs.\ hidden ground truth};
-  \draw[flow] (run) -- node[lbl,above] {traces} (score);
-  \node[box,minimum width=28mm] (agg) at (17,-2.4) {aggregate\\95\,\% percentile bootstrap\\2000 resamples};
+  \node[box,minimum width=28mm] (score) at (20.2,0) {scorer (\code{score.py})\\vs.\ hidden ground truth};
+  \draw[flow] (run) -- (score);
+  \node[box,minimum width=28mm] (agg) at (20.2,-2.6) {aggregate: 95\,\% percentile\\bootstrap, 2000 resamples};
   \draw[flow] (score) -- (agg);
-  \node[good,minimum width=28mm] (rep) at (17,2.6) {report\\figures $\cdot$ \code{summary.md}\\\code{site/data.json}};
-  \draw[flow] (agg.east) -- ++(1.2,0) |- (rep.east);
-  \draw[flow] (score) -- (rep);
+  \node[good,minimum width=28mm] (rep) at (20.2,2.6) {report: figures,\\\code{summary.md}, \code{site/data.json}};
+  \draw[flow] (agg.east) -- ++(0.9,0) |- (rep.east);
 \end{tikzpicture}}
-\caption{Evaluation pipeline. Nothing outside dev can be run without the \code{--final} flag, and every such run is logged with its git revision.}
+\caption{Evaluation pipeline. Nothing outside dev can be run without the \code{--final} flag, and every such run is logged with its git revision in \code{results/heldout\_runs.log}; per-scenario traces flow from the runner to the scorer.}
 \label{fig:pipeline}
 \end{figure}
 
@@ -856,13 +858,14 @@ Let $T$ be the set of injected (service, type) faults, $R$ the agent's final non
 ranked by confidence, $A$ the applied actions, and $A_{\text{eff}}\subseteq A$ those the simulator
 recorded as resolving or containing a fault.
 \begin{align}
-  \text{top-}k &= \mathbf{1}\big[\exists\, h\in R_{1..k},\, t\in T:\; h=t\big], &
-  \text{recall} &= \frac{|\{t\in T:\exists h\in R_{\text{diag}}, h=t\}|}{|T|}, \\
-  \text{recovered} &= \mathbf{1}[\text{ground truth: all faults resolved, all up, } H\ge0.9 \text{ for 2 ticks}], &
-  \text{false recovery} &= \mathbf{1}[\text{claimed} \wedge \neg\text{recovered}], \\
-  \text{harmful} &= |\{a\in A: \text{restart before containment}\}| + |\{a\in A: \text{containment of an uncompromised host}\}|, \hspace{-4em} \\
-  \text{unnecessary} &= |A| - |A_{\text{eff}}|, &
-  \text{action precision} &= \frac{|A_{\text{eff}}|}{|A|},
+  \text{top-}k &= \mathbf{1}\big[\exists\, h\in R_{1..k},\, t\in T:\; h=t\big], \notag\\
+  \text{recall} &= \frac{|\{t\in T:\exists h\in R_{\text{diag}}, h=t\}|}{|T|}, \notag\\
+  \text{recovered} &= \mathbf{1}[\text{all faults resolved, all services up, } H\ge0.9 \text{ for 2 ticks}], \notag\\
+  \text{false recovery} &= \mathbf{1}[\text{claimed} \wedge \neg\text{recovered}], \notag\\
+  \text{harmful} &= \#\{\text{restarts before containment}\} + \#\{\text{containments of uncompromised hosts}\}, \notag\\
+  \text{unnecessary} &= |A| - |A_{\text{eff}}|, \qquad
+  \text{action precision} = \frac{|A_{\text{eff}}|}{|A|},
+  \label{eq:metrics}
 \end{align}
 plus isolated-before-restart (1 if no beacon was reinfected), rolled-back actions, LLM calls and
 tokens (prompt + completion), wall-clock and time to recovery. Per-run scores are averaged over
@@ -877,7 +880,7 @@ scenario ($n=60$); \code{llm\_only}, perturbations, ablations and the small-mode
 % =====================================================================
 
 \subsection{Held-out benchmark}
-\Cref{tab:heldout} is the headline table; \cref{fig:byconfig} plots the four main metrics.
+\Cref{tab:heldout} is the headline table; \cref{fig:byconfig} plots the four main metrics. Top-3 root-cause accuracy is \pct{95} for the agent and the runbook, \pct{78} for single\_shot and \pct{60} for llm\_only.
 All configurations run the same 20 held-out scenarios with the same 8-iteration budget; agent,
 runbook, single\_shot, do\_nothing and random use 3 seed offsets, llm\_only 1.
 
@@ -887,18 +890,19 @@ runbook, single\_shot, do\_nothing and random use 3 seed offsets, llm\_only 1.
 bootstrap CIs. Harmful and unnecessary actions are counts per run. Source: \code{results/summary.md}.}
 \label{tab:heldout}
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{l r r r r r r r r r r}
+\adjustbox{max width=\textwidth}{%
+\begin{tabular}{l r r r r r r r r r}
 \toprule
-config & top-1 & top-3 & recall & recovered & false ``rec.'' & harmful & action prec. & calls & tokens & $n$ \\
+config & top-1 & recall & recovered & false ``rec.'' & harmful / run & action prec. & calls & tokens & $n$ \\
 \midrule
-\rowcolor{groupfill}\textbf{agent} & \textbf{92} \ci{83}{98} & 95 \ci{88}{100} & \textbf{82} \ci{74}{89} & \textbf{100} \ci{100}{100} & \textbf{0} \ci{0}{0} & \textbf{0.00} & \textbf{81} \ci{74}{88} & 4.6 & \num{6103} & 60 \\
-runbook & 87 \ci{78}{95} & 95 \ci{88}{100} & 81 \ci{74}{87} & 45 \ci{32}{58} & 5 \ci{0}{12} & 0.00 & 74 \ci{68}{80} & 0 & 0 & 60 \\
-single\_shot & 63 \ci{50}{75} & 78 \ci{67}{88} & 50 \ci{41}{59} & 30 \ci{20}{42} & 70 \ci{58}{80} & 0.27 \ci{0.15}{0.38} & 37 \ci{30}{43} & 1.0 & \num{2421} & 60 \\
-llm\_only & 35 \ci{15}{55} & 60 \ci{40}{80} & 44 \ci{28}{61} & 35 \ci{15}{55} & 15 \ci{0}{30} & 0.55 \ci{0.15}{1.05} & 25 \ci{13}{39} & 18.4 & \num{35018} & 20 \\
-do\_nothing & 0 & 0 & 0 & 0 & 0 & 0.00 & n/a & 0 & 0 & 60 \\
-random & 0 & 0 & 0 & 0 & 10 \ci{3}{18} & 3.45 \ci{2.92}{3.98} & 5 \ci{4}{7} & 0 & 0 & 60 \\
+\rowcolor{groupfill}\textbf{agent} & \textbf{92} \ci{83}{98} & \textbf{82} \ci{74}{89} & \textbf{100} \ci{100}{100} & \textbf{0} \ci{0}{0} & \textbf{0.00} & \textbf{81} \ci{74}{88} & 4.6 & \num{6103} & 60 \\
+runbook & 87 \ci{78}{95} & 81 \ci{74}{87} & 45 \ci{32}{58} & 5 \ci{0}{12} & 0.00 & 74 \ci{68}{80} & 0 & 0 & 60 \\
+single\_shot & 63 \ci{50}{75} & 50 \ci{41}{59} & 30 \ci{20}{42} & 70 \ci{58}{80} & 0.27 \ci{0.15}{0.38} & 37 \ci{30}{43} & 1.0 & \num{2421} & 60 \\
+llm\_only & 35 \ci{15}{55} & 44 \ci{28}{61} & 35 \ci{15}{55} & 15 \ci{0}{30} & 0.55 \ci{0.15}{1.05} & 25 \ci{13}{39} & 18.4 & \num{35018} & 20 \\
+do\_nothing & 0 & 0 & 0 & 0 & 0.00 & n/a & 0 & 0 & 60 \\
+random & 0 & 0 & 0 & 10 \ci{3}{18} & 3.45 \ci{2.92}{3.98} & 5 \ci{4}{7} & 0 & 0 & 60 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \begin{figure}[H]
@@ -1042,11 +1046,12 @@ compromised hosts when nothing stops it.
 \subsection{Cost}
 \begin{table}[H]
 \centering\small
-\caption{Cost per incident on held-out (means). Wall-clock is the agent's own run time per incident on the laptop; ``recording'' is the elapsed time of the whole evaluation command.}
+\caption{Cost per incident on held-out (means). Wall-clock is the agent's own run time per incident on the laptop; ``whole command'' is the elapsed time of the evaluation command that produced the result file.}
 \label{tab:cost}
+\adjustbox{max width=\textwidth}{%
 \begin{tabular}{l r r r r r r}
 \toprule
-config & LLM calls & tokens & iterations & actions & wall-clock / incident & recording \\
+config & LLM calls & tokens & iterations & actions & wall-clock / incident & whole command \\
 \midrule
 \rowcolor{groupfill}agent (3 seeds) & 4.6 & \num{6103} & 2.2 & 3.7 & 190\,s & 63\,min \\
 single\_shot (3 seeds) & 1.0 & \num{2421} & 1.0 & 2.9 & 85\,s & 29\,min \\
@@ -1054,7 +1059,7 @@ llm\_only (1 seed) & 18.4 & \num{35018} & 5.4 & 9.8 & 816\,s & 95\,min \\
 agent, qwen2.5:1.5b (1 seed) & 17.8 & \num{29659} & 6.0 & 6.7 & 394\,s & 45\,min \\
 runbook / do\_nothing / random & 0 & 0 & 2.5 / 8 / 7.6 & 2.5 / 0 / 13.8 & $<0.02$\,s & $<2$\,s \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \begin{figure}[H]
@@ -1088,31 +1093,31 @@ hits on the sinkhole before containment, final health 1.00. The agent used 6 LLM
 
 \begin{figure}[H]
 \centering
-\resizebox{\textwidth}{!}{%
+\adjustbox{max width=\textwidth}{%
 \begin{tikzpicture}[x=0.027cm,y=1cm]
   % lanes
-  \foreach \y/\n in {2.4/api,1.5/db,0.6/worker} {
+  \foreach \y/\n in {3.4/api,2.0/db,0.6/worker} {
     \node[anchor=east,font=\footnotesize\bfseries,text=accent] at (-8,\y) {\n};
     \draw[gray!35] (0,\y) -- (470,\y);
   }
   % fault bars
-  \draw[line width=6pt,accent!35] (35,2.4) -- (198,2.4);
-  \node[lbl,above=3pt] at (116,2.4) {memory\_leak active};
-  \draw[line width=6pt,accent!35] (35,1.5) -- (310,1.5);
-  \node[lbl,above=3pt] at (172,1.5) {db\_conn\_exhaustion active (pool held)};
+  \draw[line width=6pt,accent!35] (35,3.4) -- (198,3.4);
+  \node[lbl,above=3pt] at (116,3.4) {memory\_leak active on api};
+  \draw[line width=6pt,accent!35] (35,2.0) -- (310,2.0);
+  \node[lbl,above=3pt] at (172,2.0) {db\_conn\_exhaustion active (pool held)};
   \draw[line width=6pt,attack!40,dashed] (35,0.6) -- (427,0.6);
   \node[lbl,above=3pt,text=attack] at (231,0.6) {c2\_beacon active: 97 beacons reached the sinkhole};
   \draw[line width=6pt,orange!70] (427,0.6) -- (431,0.6);
   % injection and agent start
-  \draw[attack,line width=0.8pt] (35,-0.3) -- (35,3.1);
-  \node[lbl,text=attack,anchor=south] at (35,3.1) {t=35\,s: 3 faults injected\\health 1.00 $\to$ 0.10};
-  \draw[accent,line width=0.8pt,dashed] (81,-0.3) -- (81,3.1);
-  \node[lbl,anchor=south] at (81,3.1) {t=81\,s: agent starts\\(detector view built)};
+  \draw[attack,line width=0.8pt] (35,-0.3) -- (35,4.1);
+  \node[lbl,text=attack,anchor=south east] at (33,4.1) {t=35\,s: 3 faults injected\\health 1.00 $\to$ 0.10};
+  \draw[accent,line width=0.8pt,dashed] (81,-0.3) -- (81,4.1);
+  \node[lbl,anchor=south west] at (83,4.1) {t=81\,s: agent starts\\(detector view built)};
   % actions
-  \fill[recovered] (198,2.4) circle (2.2pt);
-  \node[lbl,below=4pt,align=center] at (196,2.4) {t=194--198: scale\_connections(api) [no effect]\\restart\_service(api) $\Rightarrow$ leak cleared};
-  \fill[recovered] (310,1.5) circle (2.2pt);
-  \node[lbl,below=4pt] at (312,1.5) {t=310: scale\_connections(db)\\$\Rightarrow$ pool freed};
+  \fill[recovered] (198,3.4) circle (2.2pt);
+  \node[lbl,below=4pt] at (196,3.4) {t=194--198: scale\_connections(api) [no effect]\\restart\_service(api) $\Rightarrow$ leak cleared};
+  \fill[recovered] (310,2.0) circle (2.2pt);
+  \node[lbl,below=4pt] at (312,2.0) {t=310: scale\_connections(db)\\$\Rightarrow$ pool freed};
   \fill[attack] (194,0.6) circle (2.2pt);
   \node[lbl,below=4pt,text=attack] at (194,0.6) {t=194: restart\_service(worker)\\BLOCKED: contain before restart};
   \fill[orange!80!black] (427,0.6) circle (2.2pt);
@@ -1126,10 +1131,10 @@ hits on the sinkhole before containment, final health 1.00. The agent used 6 LLM
   \draw[flow,draw=muted] (0,-1.7) -- (470,-1.7);
   \foreach \t in {0,100,200,300,400} { \draw[muted] (\t,-1.75) -- (\t,-1.65); \node[lbl,below] at (\t,-1.75) {\t\,s}; }
   % braces for phases
-  \draw[brace] (0,3.9) -- (35,3.9) node[lbl,midway,above=4pt] {baseline};
-  \draw[brace] (36,3.9) -- (216,3.9) node[lbl,midway,above=4pt] {incident $+$ iteration 0 (2 LLM calls, 113\,s)};
-  \draw[brace] (217,3.9) -- (333,3.9) node[lbl,midway,above=4pt] {iteration 1 (89\,s)};
-  \draw[brace] (334,3.9) -- (447,3.9) node[lbl,midway,above=4pt] {iteration 2 (90\,s)};
+  \draw[brace] (0,5.0) -- (35,5.0) node[lbl,midway,above=4pt] {baseline};
+  \draw[brace] (36,5.0) -- (216,5.0) node[lbl,midway,above=4pt] {incident $+$ iteration 0 (2 LLM calls, 113\,s)};
+  \draw[brace] (217,5.0) -- (333,5.0) node[lbl,midway,above=4pt] {iteration 1 (89\,s)};
+  \draw[brace] (334,5.0) -- (447,5.0) node[lbl,midway,above=4pt] {iteration 2 (90\,s)};
 \end{tikzpicture}}
 \caption{The recorded live-demo incident: memory leak on \code{api}, pool exhaustion on \code{db}
 and a C2 beacon on \code{worker}, on five real processes. Bars are the hidden fault lifetimes; dots
@@ -1185,17 +1190,18 @@ claims (a known beacon pair had slipped under the strict short-window threshold)
 \centering\small
 \caption{Dev-split iteration history, re-scored with the audited scorer (1 seed, $n=30$; runbook 3 seeds, $n=90$). Pre-audit harmful values for v0/v1 were 0.00.}
 \label{tab:audit}
-\begin{tabular}{l r r r r r r r}
+\adjustbox{max width=\textwidth}{%
+\begin{tabular}{p{6.2cm} r r r r r r r}
 \toprule
 version & top-1 & recall & recovered & false ``rec.'' & harmful/run & action prec. & calls \\
 \midrule
-runbook (P2) & \pct{84} & \pct{84} & \pct{60} & \pct{0} & 0.03 & \pct{72} & 0 \\
-agent v0 & \pct{70} & \pct{67} & \pct{73} & \pct{0} & \textcolor{attack}{0.27} & \pct{52} & 7.4 \\
-agent v1 (per-service evidence, down-service rule, repeated-plan guard) & \pct{90} & \pct{78} & \pct{100} & \pct{0} & \textcolor{attack}{0.23} & \pct{70} & 4.0 \\
-agent v2 (containment gate, strict verify, log attribution) & \pct{93} & \pct{84} & \pct{93} & \textcolor{attack}{\pct{7}} & 0.00 & \pct{80} & 3.7 \\
-\rowcolor{groupfill}agent v3 (known-beacon verification) \textemdash\ \textbf{frozen} & \pct{90} & \pct{84} & \pct{100} & \pct{0} & 0.00 & \pct{77} & 4.0 \\
+runbook (P2, 3 seeds) & \pct{84} & \pct{84} & \pct{60} & \pct{0} & 0.03 & \pct{72} & 0 \\
+agent v0 (first full run) & \pct{70} & \pct{67} & \pct{73} & \pct{0} & \textcolor{attack}{0.27} & \pct{52} & 7.4 \\
+agent v1: per-service evidence, down-service rule, repeated-plan guard & \pct{90} & \pct{78} & \pct{100} & \pct{0} & \textcolor{attack}{0.23} & \pct{70} & 4.0 \\
+agent v2: containment gate, strict verify, log attribution & \pct{93} & \pct{84} & \pct{93} & \textcolor{attack}{\pct{7}} & 0.00 & \pct{80} & 3.7 \\
+\rowcolor{groupfill}agent v3: known-beacon verification \textemdash\ \textbf{frozen} & \pct{90} & \pct{84} & \pct{100} & \pct{0} & 0.00 & \pct{77} & 4.0 \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 \begin{designdecision}{stop tuning on dev at v3}
@@ -1369,23 +1375,23 @@ LLM; recording targets need Ollama at \code{localhost:11434} with \code{qwen2.5:
 (and \code{qwen2.5:1.5b} for the small-model run).
 
 \begin{tcolorbox}[enhanced,colback=keyfill,colframe=accent!60,boxrule=0.5pt,arc=2pt,left=6pt,right=6pt]
-\small\begin{verbatim}
-make setup           # venv, pinned deps, scenario generation, beacon detector training (~1 min)
-make test            # 108 tests, no LLM needed
-make lint            # ruff check + ruff format --check
-make smoke           # 5 dev scenarios from the replay cache, no LLM (< 60 s); CI runs this + floors
-make demo-live       # 5 real local processes + 3 concurrent faults + the agent (needs Ollama)
-make bench-heldout   # agent, runbook, single_shot, llm_only on held-out, 3 seeds, --final
-make bench-perturb   # 5 perturbation sets + the qwen2.5:1.5b run, --final
-make ablate          # no_verify, no_loop, no_beacon, no_safety on held-out, --final
-make report          # results/summary.md, docs/figures/*.png, site/data.json
-make all-final       # test + bench-heldout + bench-perturb + ablate + report (several hours)
+\scriptsize\begin{verbatim}
+make setup          # venv, pinned deps, scenarios, beacon detector training (~1 min)
+make test           # 108 tests, no LLM needed
+make lint           # ruff check + ruff format --check
+make smoke          # 5 dev scenarios from the replay cache, no LLM (< 60 s); CI adds floors
+make demo-live      # 5 real local processes + 3 concurrent faults + the agent (needs Ollama)
+make bench-heldout  # agent, runbook, single_shot, llm_only on held-out, 3 seeds, --final
+make bench-perturb  # 5 perturbation sets + the qwen2.5:1.5b run, --final
+make ablate         # no_verify, no_loop, no_beacon, no_safety on held-out, --final
+make report         # results/summary.md, docs/figures/*.png, site/data.json
+make all-final      # test + bench-heldout + bench-perturb + ablate + report (hours)
 
-# exact replay of any reported table from the committed cache, no model needed:
+# exact replay of a reported table from the committed cache, no model needed:
 python -m bench.runner --split heldout --config agent --seeds 3 --final --replay
 python -m bench.runner --split heldout --config do_nothing,random --seeds 3 --final
-python -m bench.rescore results/<run>.json          # re-score saved traces with the current scorer
-python -m http.server -d site 8000                  # leaderboard, charts, incident replay viewer
+python -m bench.rescore results/<run>.json   # re-score saved traces, current scorer
+python -m http.server -d site 8000           # leaderboard, charts, replay viewer
 \end{verbatim}
 \end{tcolorbox}
 
@@ -1393,6 +1399,7 @@ The held-out run log (\code{results/heldout\_runs.log}) records the UTC time, sp
 model and git revision of every non-dev run, including the two stopped \code{llm\_only} attempts.
 
 % =====================================================================
+\clearpage
 \section{Repository map}
 \label{app:map}
 % =====================================================================
