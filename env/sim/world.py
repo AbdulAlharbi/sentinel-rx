@@ -81,6 +81,9 @@ BASELINES: dict[str, dict[str, float]] = {
 POOL_SIZES: dict[str, int] = {"gateway": 1000, "api": 400, "db": 100, "cache": 500, "worker": 50}
 
 EXTERNAL_ALLOWLIST: frozenset[str] = frozenset({"updates.internal", "payments.example"})
+#: Services whose normal operation needs an external dependency (blocking their egress hurts).
+EXTERNAL_DEPS: dict[str, str] = {"api": "payments.example"}
+EGRESS_BLOCK_ERROR = 0.3
 MONITOR = "monitor"
 
 
@@ -204,6 +207,9 @@ class World:
                     m["error_rate"] += 0.7 * max(0.0, dm["error_rate"] - dbase["error_rate"])
                     m["latency_p50"] += 0.8 * max(0.0, dm["latency_p50"] - dbase["latency_p50"])
                     m["latency_p95"] += 0.8 * max(0.0, dm["latency_p95"] - dbase["latency_p95"])
+            if st.egress_blocked and svc in EXTERNAL_DEPS:
+                # legitimate outbound calls (payments) now fail: blocking egress is not free
+                m["error_rate"] += EGRESS_BLOCK_ERROR
             m["latency_p50"] = m["latency_p50"] * eff.latency_mult + eff.latency_add
             m["latency_p95"] = m["latency_p95"] * eff.latency_mult + eff.latency_add * 1.3
             m["error_rate"] = min(1.0, m["error_rate"] + eff.error_add)

@@ -7,10 +7,7 @@ from __future__ import annotations
 
 from typing import Any
 
-import numpy as np
-
 from env.types import RootCause
-from faults.registry import make_fault
 from scenarios.schema import Scenario
 
 SECURITY_TYPES = ("c2_beacon", "credential_stuffing")
@@ -18,6 +15,21 @@ SECURITY_TYPES = ("c2_beacon", "credential_stuffing")
 
 def _hyp_matches(h: dict[str, Any], gt: RootCause) -> bool:
     return h["service"] == gt.service and h["type"] == gt.type
+
+
+def action_effective(record: dict[str, Any]) -> bool:
+    """True if an applied action resolved or contained a fault.
+
+    Uses the simulator's ``effective`` flag when present; for traces recorded before the flag
+    existed it is derived from the fault notes (a note is only written when a fault reacted,
+    and the two non-progress reactions say so explicitly).
+    """
+    if "effective" in record:
+        return bool(record["effective"])
+    if record.get("harmful"):
+        return False
+    notes = record.get("notes") or []
+    return bool(notes) and not any("persist" in n or "re-established" in n for n in notes)
 
 
 def score_run(
@@ -52,26 +64,18 @@ def score_run(
     fault_recall = len(matched) / len(truths) if truths else 1.0
     precision = len(matched) / len(diagnosed) if diagnosed else 0.0
 
-    gt_actions = gt.get("actions", [])
-    applied_keys = [
-        f"{a['action']['name']}({fwd.get(a['action']['target'], a['action']['target'])})"
-        for a in gt_actions
-    ]
-    correct_keys: set[str] = set()
+    all_actions = gt.get("actions", [])
+    rolled_back = sum(1 for a in all_actions if a.get("undo"))
+    gt_actions = [a for a in all_actions if not a.get("undo")]
     fault_infos = {(f["target"], f["type"]): f for f in gt.get("faults", [])}
-    for spec in scenario.faults:
-        f = make_fault(spec, np.random.default_rng(0))
-        for seq in f.correct_sequences():
-            for key in seq:
-                name, tgt = key[:-1].split("(")
-                correct_keys.add(f"{name}({fwd.get(tgt, tgt)})")
+    effective = sum(1 for a in gt_actions if action_effective(a))
     harmful = sum(1 for a in gt_actions if a.get("harmful"))
     compromised = {fwd.get(f.target, f.target) for f in scenario.faults if f.type == "c2_beacon"}
     for a in gt_actions:
         tgt = fwd.get(a["action"]["target"], a["action"]["target"])
-        if a["action"]["name"] == "isolate_host" and tgt not in compromised:
-            harmful += 1
-    unnecessary = sum(1 for k in applied_keys if k not in correct_keys)
+        if a["action"]["name"] in ("isolate_host", "block_egress") and tgt not in compromised:
+            harmful += 1  # containment of an uncompromised host takes a healthy service offline
+    unnecessary = len(gt_actions) - effective
 
     beacons = [f for f in gt.get("faults", []) if f["type"] == "c2_beacon"]
     isolated_before_restart: bool | None = None
@@ -95,6 +99,9 @@ def score_run(
         "escalated": float(trace.get("escalated", False)),
         "harmful_actions": float(harmful),
         "unnecessary_actions": float(unnecessary),
+        "action_precision": (effective / len(gt_actions)) if gt_actions else None,
+        "effective_actions": float(effective),
+        "rolled_back_actions": float(rolled_back),
         "n_actions": float(len(gt_actions)),
         "isolated_before_restart": None
         if isolated_before_restart is None

@@ -74,6 +74,15 @@ PLAN_BAD_ORDER = json.dumps(
 )
 
 
+def test_credential_stuffing_never_unlocks_containment():
+    env = _demo_env()
+    s = SafetyLayer()
+    hyps = [Hypothesis("gateway", "credential_stuffing", 0.9, "likely")]
+    plan = [Action("block_egress", "gateway"), Action("rate_limit_auth", "gateway")]
+    d = s.screen(plan, hyps, set(), env.list_services(), {}, False)
+    assert [x.allowed for x in d] == [False, True]
+
+
 def test_loop_recovers_three_faults_with_safety_reordering():
     env = _demo_env()
     llm = FakeLLM([DIAG, PLAN_BAD_ORDER])
@@ -132,7 +141,7 @@ def test_safety_blocks_restart_before_containment_and_isolation_without_evidence
         Action("rm_rf", "db"),
         Action("restart_service", "zzz"),
     ]
-    d = s.screen(plan, hyps, set(), env.list_services(), {})
+    d = s.screen(plan, hyps, {"worker"}, env.list_services(), {})
     reasons = {x.action.key(): x.reason for x in d if not x.allowed}
     assert "restart_service(worker)" in reasons and "contain" in reasons["restart_service(worker)"]
     assert "isolate_host(api)" in reasons
@@ -146,7 +155,9 @@ def test_safety_rolls_back_regressions():
     # and isolating a healthy critical service regresses health -> rolled back
     hyps = [Hypothesis("api", "c2_beacon", 0.6, "likely")]
     d = s.screen([Action("isolate_host", "api")], hyps, set(), env.list_services(), {})
-    assert d[0].allowed
+    assert not d[0].allowed  # detector running, no beacon finding -> refused
+    d = s.screen([Action("isolate_host", "api")], hyps, set(), env.list_services(), {}, False)
+    assert d[0].allowed  # no detector: the hypothesis is all we have
     rec = s.execute(env, d[0])
     assert rec["result"] == "rolled_back"
     assert env.get_status()["api"].state == "up"

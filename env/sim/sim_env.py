@@ -12,9 +12,9 @@ from typing import Any
 
 import numpy as np
 
-from env.base import Env
+from env.base import Env, combine_health, service_health
 from env.sim.telemetry import normal_flows, normal_logs
-from env.sim.world import EXTERNAL_ALLOWLIST, World
+from env.sim.world import EXTERNAL_ALLOWLIST, EXTERNAL_DEPS, World
 from env.types import (
     ACTION_ALLOWLIST,
     Action,
@@ -83,17 +83,15 @@ class SimEnv(Env):
 
     def health_score(self) -> float:
         """Observable health from the latest tick (same formula as :meth:`Env.health_score`)."""
-        total = 0.0
+        scores = []
         for s in self.world.services:
             st = self.world.state[s]
-            if st.state != "up" or self.tick < st.down_until:
+            if st.state != "up" or self.tick < st.down_until or self.world.effects[s].down:
+                scores.append(0.0)
                 continue
             m = self.world.latest[s]
-            err = m["error_rate"]
-            p95 = m["latency_p95"]
-            lat_factor = 1.0 if p95 <= 400 else max(0.0, 1.0 - (p95 - 400) / 2000)
-            total += max(0.0, 1.0 - min(1.0, err)) * lat_factor
-        return total / len(self.world.services)
+            scores.append(service_health(m["error_rate"], m["latency_p95"]))
+        return combine_health(scores)
 
     def advance(self, ticks: int) -> None:
         """Advance the simulation by ``ticks``."""
@@ -187,15 +185,20 @@ class SimEnv(Env):
         notes: list[str] = []
         harmful_now = {k: v for f in self.faults for k, v in f.harmful_actions(w).items()}
         harm_reason = harmful_now.get(action.key())
+        state_before = [(f.resolved_at, getattr(f, "contained", None)) for f in self.faults]
         for f in self.faults:
             note = f.on_action(action, w, self.tick)
             if note:
                 notes.append(note)
+        state_after = [(f.resolved_at, getattr(f, "contained", None)) for f in self.faults]
+        effective = state_before != state_after  # resolved or contained something
         match action.name:
             case "restart_service":
                 st.down_until = self.tick + 2
-                if st.state == "isolated":
+                if st.state == "isolated" or st.egress_blocked:
+                    # a restart after containment is a rebuild: the clean host rejoins the network
                     st.state = "up"
+                    st.egress_blocked = False
                     notes.append("host rebuilt and rejoined the network")
                 st.conn_mult = 1.0
                 w.extra_logs.append(
@@ -222,8 +225,15 @@ class SimEnv(Env):
                 "action": action.to_dict(),
                 "notes": notes,
                 "harmful": harm_reason,
+                "effective": effective,
             }
         )
+        if action.name == "block_egress" and action.target in EXTERNAL_DEPS:
+            dep = EXTERNAL_DEPS[action.target]
+            self._logs.append(
+                LogLine(t, action.target, "ERROR", f"{dep} unreachable: egress blocked by policy")
+            )
+            self._sorted = False
         self.advance(ACTION_TICKS)
         return ActionResult(action, True, msg, t)
 

@@ -133,7 +133,7 @@ class CredentialStuffing(Fault):
         eff = world.effects[self.target]
         eff.cpu_add += 30.0
         eff.latency_mult *= 1.8
-        eff.error_add += 0.08
+        eff.error_add += 0.2  # auth backend saturated: legitimate logins time out
         n = int(self.params.get("burst", 6))
         for _ in range(n):
             octets = self.rng.integers([11, 0, 0, 1], [220, 255, 255, 254])

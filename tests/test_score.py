@@ -11,8 +11,15 @@ def _gt(actions, faults, recovered):
     return {"actions": actions, "faults": faults, "recovered": recovered}
 
 
-def _act(name, target, harmful=None):
-    return {"action": {"name": name, "target": target, "params": {}}, "harmful": harmful}
+def _act(name, target, harmful=None, effective=True, undo=False):
+    rec = {
+        "action": {"name": name, "target": target, "params": {}},
+        "harmful": harmful,
+        "effective": effective,
+    }
+    if undo:
+        rec["undo"] = True
+    return rec
 
 
 SC = make_scenario(
@@ -60,8 +67,10 @@ def test_false_recovery_and_harmful_actions_are_counted():
     faults = [dict(FAULTS[0]), dict(FAULTS[1], reinfections=1, resolved_at=None)]
     gt = _gt(
         [
-            _act("restart_service", "worker", harmful="restarted before containment"),
-            _act("flush_cache", "cache"),
+            _act(
+                "restart_service", "worker", harmful="restarted before containment", effective=False
+            ),
+            _act("flush_cache", "cache", effective=False),
         ],
         faults,
         False,
@@ -70,7 +79,7 @@ def test_false_recovery_and_harmful_actions_are_counted():
     assert s["top1"] == 0 and s["fault_recall"] == 0.0
     assert s["false_recovery"] == 1 and s["recovered"] == 0
     assert s["harmful_actions"] == 1
-    assert s["unnecessary_actions"] == 1  # flush_cache fixes nothing here
+    assert s["unnecessary_actions"] == 2  # neither action resolved anything
     assert s["isolated_before_restart"] == 0.0
 
 
@@ -139,3 +148,46 @@ def test_aggregate_breaks_down_by_n_faults():
     assert agg["n_runs"] == 2
     assert set(agg["by_n_faults"]) == {"1", "2"}
     assert agg["security"]["n_runs"] == 1
+
+
+def test_action_precision_and_rolled_back():
+    trace = {"final_hypotheses": [], "claimed_recovered": False, "steps": []}
+    gt = _gt(
+        [
+            _act("restart_service", "db", effective=False),
+            _act("block_egress", "worker"),
+            _act("restart_service", "worker"),
+            _act("rollback_config", "api", effective=False),
+            _act("block_egress", "worker", undo=True),
+        ],
+        FAULTS,
+        False,
+    )
+    s = score_run(trace, SC, gt)
+    assert s["n_actions"] == 4 and s["effective_actions"] == 2
+    assert abs(s["action_precision"] - 0.5) < 1e-9
+    assert s["unnecessary_actions"] == 2 and s["rolled_back_actions"] == 1
+    assert score_run(trace, SC, _gt([], FAULTS, False))["action_precision"] is None
+
+
+def test_containment_of_uncompromised_host_is_harmful():
+    trace = {"final_hypotheses": [], "claimed_recovered": False, "steps": []}
+    gt = _gt(
+        [_act("block_egress", "api", effective=False), _act("block_egress", "worker")],
+        FAULTS,
+        False,
+    )
+    s = score_run(trace, SC, gt)
+    assert s["harmful_actions"] == 1  # api is not the beaconing host; worker is
+
+
+def test_effective_is_derived_for_legacy_traces():
+    from bench.score import action_effective
+
+    assert action_effective({"notes": ["pool scaled"], "harmful": None})
+    assert not action_effective({"notes": [], "harmful": None})
+    assert not action_effective(
+        {"notes": ["restart re-applied config v2; errors persist"], "harmful": None}
+    )
+    assert not action_effective({"notes": ["implant re-established"], "harmful": "x"})
+    assert not action_effective({"notes": ["x"], "harmful": None, "effective": False})

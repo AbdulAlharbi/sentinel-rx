@@ -126,12 +126,22 @@ class BeaconDetector:
             )
         self.model = joblib.load(model_path)
         self.threshold = threshold
-        self.allowlisted_threshold = allowlisted_threshold  # allow-list = prior of legitimacy
+        # allow-listed or internal destinations need stronger evidence (prior of legitimacy)
+        self.allowlisted_threshold = allowlisted_threshold
 
     def detect(
-        self, flows: list[Flow], services: list[str], allowlist: set[str], monitor: str = "monitor"
+        self,
+        flows: list[Flow],
+        services: list[str],
+        allowlist: set[str],
+        monitor: str = "monitor",
+        min_p: float | None = None,
     ) -> list[BeaconFinding]:
-        """Return pairs with P(beacon) >= threshold, most suspicious first."""
+        """Return pairs with P(beacon) >= threshold, most suspicious first.
+
+        ``min_p`` raises the unknown-destination threshold (strict mode); allow-listed and
+        internal destinations then require p >= min_p + 0.2.
+        """
         pairs: dict[tuple[str, str], list[Flow]] = {}
         for f in flows:
             pairs.setdefault((f.src, f.dst), []).append(f)
@@ -150,8 +160,15 @@ class BeaconDetector:
             return []
         probs = self.model.predict_proba(np.vstack(rows))[:, 1]
         out = []
+        thr_unknown = self.threshold if min_p is None else max(self.threshold, min_p)
+        thr_strict = (
+            self.allowlisted_threshold
+            if min_p is None
+            else max(self.allowlisted_threshold, min_p + 0.2)
+        )
         for p, (src, dst, ts, fl) in zip(probs, keys, strict=True):
-            if p < (self.allowlisted_threshold if dst in allowlist else self.threshold):
+            strict_dst = dst in allowlist or dst in internal
+            if p < (thr_strict if strict_dst else thr_unknown):
                 continue
             iat = np.diff(np.sort(ts))
             med = float(np.median(iat)) if iat.size else 0.0

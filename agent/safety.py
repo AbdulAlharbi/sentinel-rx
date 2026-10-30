@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from agent.trace import Hypothesis
-from env.base import Env
+from env.base import Env, combine_health, service_health
 from env.types import ACTION_ALLOWLIST, CONTAINMENT_ACTIONS, Action
 
 REGRESSION_DROP = 0.15
@@ -53,19 +53,22 @@ class SafetyLayer:
         beacon_hosts: set[str],
         services: list[str],
         status: dict[str, str],
+        detector_enabled: bool = True,
     ) -> list[SafetyDecision]:
-        """Validate and reorder a plan. Returns decisions in execution order."""
+        """Validate and reorder a plan. Returns decisions in execution order.
+
+        Containment needs *outbound-compromise* evidence: a beacon finding from the detector
+        when the detector is running, otherwise an open ``c2_beacon`` hypothesis. An inbound
+        attack (credential stuffing) never unlocks containment.
+        """
         for st_name, st in status.items():
             if st in ("isolated",):
                 self.contained.add(st_name)
         if not self.enabled:
             return [SafetyDecision(a, True, "safety layer disabled") for a in plan]
         security = self._security_targets(hypotheses, beacon_hosts)
-        security_hyps = {
-            h.service
-            for h in hypotheses
-            if h.type in ("c2_beacon", "credential_stuffing") and h.status != "refuted"
-        }
+        c2_hyps = {h.service for h in hypotheses if h.type == "c2_beacon" and h.status != "refuted"}
+        containable = beacon_hosts if detector_enabled else (c2_hyps | beacon_hosts)
         ordered = sorted(plan, key=lambda a: 0 if a.name in CONTAINMENT_ACTIONS else 1)
         out: list[SafetyDecision] = []
         will_contain = set(self.contained)
@@ -74,10 +77,10 @@ class SafetyLayer:
                 out.append(SafetyDecision(a, False, "action not in allowlist"))
             elif a.target not in services:
                 out.append(SafetyDecision(a, False, f"unknown service {a.target!r}"))
-            elif a.name == "isolate_host" and a.target not in security_hyps | beacon_hosts:
+            elif a.name in CONTAINMENT_ACTIONS and a.target not in containable:
                 out.append(
                     SafetyDecision(
-                        a, False, "no security hypothesis implicates this host; refusing quarantine"
+                        a, False, "no beacon evidence on this host; refusing containment"
                     )
                 )
             elif (
@@ -149,13 +152,11 @@ def observable_health(env: Env, exclude: str | None = None) -> float:
     names = [n for n in status if n != exclude]
     if not names:
         return 1.0
-    total = 0.0
+    scores = []
     for n in names:
-        if status[n].state != "up":
-            continue
         m = latest.get(n, {})
-        err = m.get("error_rate") or 0.0
-        p95 = m.get("latency_p95") or 0.0
-        lat = 1.0 if p95 <= 400 else max(0.0, 1.0 - (p95 - 400) / 2000)
-        total += max(0.0, 1.0 - min(1.0, err)) * lat
-    return total / len(names)
+        if status[n].state != "up" or not m:
+            scores.append(0.0)
+            continue
+        scores.append(service_health(m.get("error_rate") or 0.0, m.get("latency_p95") or 0.0))
+    return combine_health(scores)

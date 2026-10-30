@@ -117,3 +117,13 @@ def test_full_recovery_of_three_faults(three_fault_env: SimEnv):
         env.apply_action(Action(*a))
     assert env.gt_recovered()
     assert env.health_score() > 0.95
+
+
+def test_restart_after_containment_rebuilds_and_lifts_the_block():
+    env = SimEnv(make_scenario([("c2_beacon", "api", 45, {"interval": 30})]))
+    env.apply_action(Action("block_egress", "api"))
+    assert env.get_status()["api"].egress_blocked
+    assert env.world.latest["api"]["error_rate"] > 0.2  # containment of api is not free
+    env.apply_action(Action("restart_service", "api"))
+    assert not env.get_status()["api"].egress_blocked
+    assert env.gt_recovered() and env.health_score() > 0.95

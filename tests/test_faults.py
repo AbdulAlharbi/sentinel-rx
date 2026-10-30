@@ -94,3 +94,41 @@ def test_every_fault_is_resolved_by_each_correct_sequence(ftype: str):
             name, tgt = key[:-1].split("(")
             env.apply_action(Action(name, tgt))
         assert env.gt_recovered(), f"{ftype}: {seq} should recover"
+
+
+@pytest.mark.parametrize("ftype", list(FAULT_CLASSES))
+def test_faults_persist_without_remediation(ftype: str):
+    from agent.detectors.evidence import EvidenceBuilder
+
+    target = VALID_TARGETS[ftype][0]
+    env = _env(ftype, target)
+    eb = EvidenceBuilder()
+    eb.build(env)  # remembers the pre-incident baseline, as the agent does
+    env.wait(3000)  # 300 ticks of doing nothing
+    assert not env.gt_all_faults_resolved()
+    assert not env.gt_recovered()
+    # the degradation stays observable to the verifier against the healthy baseline
+    assert eb.verify(env, since=env.now() - 200).problems()
+
+
+@pytest.mark.parametrize("ftype", list(FAULT_CLASSES))
+def test_wrong_target_or_wrong_action_never_resolves(ftype: str):
+    from env.types import ACTION_ALLOWLIST
+
+    target = VALID_TARGETS[ftype][0]
+    correct = {k for seq in _env(ftype, target).faults[0].correct_sequences() for k in seq}
+    for action in ACTION_ALLOWLIST:
+        for svc in ("gateway", "api", "db", "cache", "worker"):
+            if f"{action}({svc})" in correct:
+                continue
+            env = _env(ftype, target)
+            env.apply_action(Action(action, svc))
+            assert not env.gt_all_faults_resolved(), f"{ftype} resolved by {action}({svc})"
+            assert not env.action_log[-1]["effective"]
+
+
+def test_blocking_egress_of_a_service_with_external_deps_is_visible():
+    env = _env("memory_leak", "worker")
+    env.apply_action(Action("block_egress", "api"))
+    assert env.world.latest["api"]["error_rate"] > 0.2
+    assert env.get_logs("api", 60, grep="egress blocked")
