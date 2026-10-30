@@ -3,8 +3,9 @@ PY := .venv/bin/python
 PIP := .venv/bin/pip
 SEEDS ?= 3
 MODEL ?= qwen2.5:7b
+SPEED ?= 1
 
-.PHONY: setup test lint scenarios smoke bench-dev bench-heldout bench-perturb ablate replay-check report demo-live all-final clean
+.PHONY: setup test lint scenarios smoke bench-dev bench-heldout bench-perturb ablate replay-check report demo-live demo-video all-final clean
 
 setup:  ## create venv, install pinned deps, generate scenarios, train the beacon detector
 	python3.12 -m venv .venv
@@ -47,6 +48,9 @@ report:
 
 demo-live:
 	$(PY) -m env.live.demo --model $(MODEL)
+
+demo-video:  ## ~90 s narrated walkthrough for a screen recording: the recorded live run + a live replay check (no LLM)
+	$(PY) -m env.live.showcase --speed $(SPEED)
 
 all-final: test bench-heldout bench-perturb ablate report
 

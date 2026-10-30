@@ -156,6 +156,7 @@ with `qwen2.5:7b` (and `qwen2.5:1.5b` for the small-model run). Replay targets n
 make setup          # venv, pinned deps, scenario generation, beacon detector training (~1 min)
 make test           # 109 tests, no LLM needed
 make smoke          # 5 dev scenarios from the replay cache, no LLM (< 60 s); CI adds regression floors
+make demo-video     # ~1 min narrated tour: replays the recorded live run, re-checks the held-out runs (no LLM)
 make demo-live      # 5 real local processes + 3 concurrent faults + the agent (needs Ollama)
 make bench-heldout  # held-out agent + baselines, 3 seeds, --final (needs Ollama, ~2 h)
 make bench-perturb  # perturbation sets + the 1.5B-model run (needs Ollama, ~2 h)
