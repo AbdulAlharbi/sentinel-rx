@@ -34,11 +34,14 @@ PALETTE = {
     "no_loop": "#008300",
     "no_beacon": "#6250d6",
     "no_safety": "#e34948",
+    "do_nothing": "#9a9994",  # sanity floors in muted grey
+    "random": "#c3c2b7",
 }
 TEXT = "#0b0b0b"
 MUTED = "#52514e"
 GRID = "#e6e5e1"
 MAIN_CONFIGS = ("agent", "runbook", "single_shot", "llm_only")
+TABLE_CONFIGS = MAIN_CONFIGS + ("do_nothing", "random")
 PERTURBATIONS = (
     "noisy_logs",
     "missing_metrics",
