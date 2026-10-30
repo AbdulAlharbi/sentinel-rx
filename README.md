@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo/sentinel-rx-logo-dark-transparent.svg">
+    <img src="assets/logo/sentinel-rx-logo-light.svg" alt="Sentinel-RX" width="560">
+  </picture>
+</p>
+
 # Sentinel-RX — security-aware agentic recovery of a failing system
 
 [![CI](https://github.com/AbdulAlharbi/sentinel-rx/actions/workflows/ci.yml/badge.svg)](https://github.com/AbdulAlharbi/sentinel-rx/actions/workflows/ci.yml)
@@ -215,7 +222,8 @@ models/      beacon_rf.joblib + beacon_metrics.json
 cache/       committed LLM responses keyed by content hash (record/replay)
 results/     per-run JSON, traces/, summary.md, heldout_runs.log, demo_live_console.txt + trace
 docs/        DESIGN.md, RESULTS.md (dev iteration log + scorer audit), LIMITATIONS.md, JUDGING.md, figures/, literature_review.pdf, technical_report/ (brief + full report, .tex + .pdf)
-site/        static site (HUMAIN/PIF palette): impact, Judging Criteria, results, figures, replay viewer, reports; data.json from make report
+site/        static site (HUMAIN/PIF palette): impact, Judging Criteria, results, figures, replay viewer, reports; data.json from make report; logo/ (copies the site serves)
+assets/logo/ logo masters: icon (600×600), shield mark, wide logo for dark / light backgrounds, each as SVG + PNG
 tests/       108 tests;  .github/workflows/  ci.yml (lint, tests, replay smoke, floors) and pages.yml (deploys site/)
 ```
 
