@@ -213,6 +213,7 @@ class SentinelAgent(Agent):
         safety = SafetyLayer(enabled=self.safety_enabled, dry_run=self.dry_run)
         hyps: list[Hypothesis] = []
         confirmed: dict[tuple[str, str], Hypothesis] = {}
+        tried_keys: set[str] = set()
         history: list[dict[str, Any]] = []
         evidence: Evidence | None = None
         iterations = min(budget, self.max_iterations or budget)
@@ -222,16 +223,19 @@ class SentinelAgent(Agent):
                 if evidence is None:
                     evidence = eb.build(env)
                 ev_dict = evidence.to_dict()
+                prompt_ev = evidence.to_prompt()
                 beacon_hosts = {b.src for b in evidence.beacons}
                 beacon_intervals = [b.median_interval_s for b in evidence.beacons]
             else:
                 ev_dict = raw_summary(env)
+                prompt_ev = ev_dict
                 beacon_hosts, beacon_intervals = set(), []
             ev_dict["topology"] = env.get_topology()
+            prompt_ev["topology"] = ev_dict["topology"]
             it = trace.step("iteration", i=i, evidence=ev_dict)
             # 2. hypotheses + checks
             diag = self._json_call(
-                DIAGNOSE_PROMPT.format(evidence=dumps(ev_dict), history=render_history(history)),
+                DIAGNOSE_PROMPT.format(evidence=dumps(prompt_ev), history=render_history(history)),
                 HYPOTHESIS_SCHEMA,
                 trace,
                 "diagnose",
@@ -251,11 +255,29 @@ class SentinelAgent(Agent):
                 "plan",
             )
             hyps = self._parse_hypotheses(plan_obj, services) or hyps
-            plan = [
-                Action(str(p.get("action", "")), str(p.get("target", "")))
-                for p in (plan_obj.get("plan") or [])
-                if isinstance(p, dict)
-            ][:5]
+            plan = _parse_plan(plan_obj)
+            if plan and {a.key() for a in plan} <= tried_keys:
+                # identical to something already tried: ask once more with an explicit warning
+                warning = (
+                    f"\nWARNING: {sorted(a.key() for a in plan)} were already applied and did not "
+                    f"recover the system (remaining problems: "
+                    f"{history[-1]['verification'] if history else 'n/a'}). "
+                    "Propose DIFFERENT actions."
+                )
+                retry = self._json_call(
+                    PLAN_PROMPT.format(
+                        hypotheses=dumps([h.to_dict() for h in hyps]), checks=dumps(check_results)
+                    )
+                    + warning,
+                    PLAN_SCHEMA,
+                    trace,
+                    "plan_retry",
+                )
+                new_plan = _parse_plan(retry)
+                if new_plan and {a.key() for a in new_plan} - tried_keys:
+                    plan = new_plan
+                    hyps = self._parse_hypotheses(retry, services) or hyps
+                    it["replanned"] = True
             it["plan"] = [a.key() for a in plan]
             # 4. safety + act
             status = {k: v.state for k, v in env.get_status().items()}
@@ -292,6 +314,11 @@ class SentinelAgent(Agent):
                     "verification": "recovered" if not problems else "; ".join(problems[:4]),
                 }
             )
+            tried_keys |= {
+                f"{r['action']['name']}({r['action']['target']})"
+                for r in records
+                if r.get("result") == "applied"
+            }
             acted = {r["action"]["target"] for r in records if r.get("result") == "applied"}
             for h in hyps:
                 if h.service in acted and not any(h.service in p for p in problems):
@@ -343,6 +370,14 @@ class SentinelAgent(Agent):
             return []
         probs = [str(p) for p in (obj.get("problems") or [])][:4]
         return probs or ["model judged not recovered"]
+
+
+def _parse_plan(obj: dict[str, Any]) -> list[Action]:
+    return [
+        Action(str(p.get("action", "")), str(p.get("target", "")))
+        for p in (obj.get("plan") or [])
+        if isinstance(p, dict)
+    ][:5]
 
 
 def _r(v: Any) -> Any:
