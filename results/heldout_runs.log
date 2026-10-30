@@ -1,0 +1,15 @@
+2026-10-30T03:11:21.755392+00:00 split=heldout configs=runbook,do_nothing,random model=qwen2.5:7b tag= git=bb9d528
+2026-10-30T03:11:26.400899+00:00 split=heldout configs=agent model=qwen2.5:7b tag= git=bb9d528
+2026-10-30T04:14:54.013007+00:00 split=heldout configs=single_shot model=qwen2.5:7b tag= git=7ff5768
+2026-10-30T04:43:40.855384+00:00 split=heldout configs=llm_only model=qwen2.5:7b tag= git=7ff5768
+2026-10-30T05:14:51.394829+00:00 split=heldout configs=llm_only model=qwen2.5:7b tag= git=7ff5768
+2026-10-30T05:14:53+00:00 note: llm_only 3-seed run started 20261030T041454Z was stopped at 10/60 and restarted (1 seed first); completed calls are cached
+2026-10-30T06:49:22.713626+00:00 split=heldout configs=no_verify,no_loop,no_beacon,no_safety model=qwen2.5:7b tag= git=7ff5768
+2026-10-30T07:28:13.306286+00:00 split=heldout configs=agent model=qwen2.5:1.5b tag=small_model git=7ff5768
+2026-10-30T08:13:33.542558+00:00 split=perturbations/noisy_logs configs=agent model=qwen2.5:7b tag= git=7ff5768
+2026-10-30T08:32:45.440198+00:00 split=perturbations/missing_metrics configs=agent model=qwen2.5:7b tag= git=7ff5768
+2026-10-30T08:54:58.068838+00:00 split=perturbations/renamed_services configs=agent model=qwen2.5:7b tag= git=7ff5768
+2026-10-30T09:14:32.265229+00:00 split=perturbations/timestamp_jitter configs=agent model=qwen2.5:7b tag= git=7ff5768
+2026-10-30T09:23:50.160514+00:00 split=perturbations/unseen_fault configs=agent model=qwen2.5:7b tag= git=7ff5768
+2026-10-30T09:31:51.301246+00:00 split=heldout configs=llm_only model=qwen2.5:7b tag= git=7ff5768
+2026-10-30T09:32:26+00:00 note: extra llm_only 3-seed pass stopped at 10/60 (time budget); llm_only reported with 1 seed (n=20)

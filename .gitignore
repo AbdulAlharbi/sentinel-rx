@@ -32,3 +32,4 @@ docs/*.synctex.gz
 results/tmp_*
 results/*_smoke.json
 results/traces/*_smoke
+!results/heldout_runs.log
