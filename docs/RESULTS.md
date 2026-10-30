@@ -210,3 +210,33 @@ v2's containment gate (beacon evidence required) removed that. Files:
 `results/*_rescored.json`. v2's three `block_egress(api)` runs targeted a genuinely compromised
 api, so the new egress cost does not change their outcome, but under the new simulator a
 rebuild now lifts the block; v3 (next entry) is a full re-run on the audited simulator + scorer.
+
+## 2026-10-30 — P5 v3: known-beacon verification, on the audited simulator + scorer → FROZEN
+
+Command: `python -m bench.runner --split dev --config agent --seeds 1 --workers 3 --tag v3`
+Result file: `results/20261030T024539Z_dev_agent_v3.json` (n = 30; 25 min, 3 workers)
+
+| metric (audited scorer) | v2 (rescored) | **v3** |
+|---|---|---|
+| top-1 root cause | 93% [83, 100] | 90% [80, 100] |
+| per-fault recall | 84% [73, 94] | 84% [71, 94] |
+| recovered | 93% [83, 100] | **100% [100, 100]** |
+| false "recovered" claims | 7% [0, 17] | **0% [0, 0]** |
+| harmful actions / run | 0.00 | 0.00 |
+| unnecessary actions / run | 1.13 | 1.13 [0.57, 1.73] |
+| action precision | 80% [69, 89] | 77% [66, 87] |
+| isolated-before-restart | 100% | 100% |
+| LLM calls / run | 3.7 | 4.0 [3.2, 4.9] |
+| tokens / run | — | 5 581 |
+
+By concurrency (top-1 / recall / recovered): 1 fault 90% / 90% / 100%; 2 faults 83% / 79% / 100%;
+3 faults 100% / 83% / 100%. The two v2 false claims (`dev_2f_06`, `dev_3f_07`) are gone: the
+known-pair rule made verification fail until the api beacon was contained and the host rebuilt.
+
+Remaining top-1 misses are type confusions where the fix coincides (`dev_1f_03`, `dev_2f_09`:
+cache `latency_injection` labelled `cache_failure`, resolved by `restart_service(cache)`;
+`dev_2f_02`: gateway leak labelled `latency_injection`, resolved by restart). We stop iterating
+here: further prompt tuning on these would be fitting the taxonomy wording to dev.
+
+**Frozen as `v1-frozen`.** Everything after this tag is evaluation, live demo and documentation;
+no agent, detector, prompt, simulator or scorer code changes.
