@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.log
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+
+# Project
+results/tmp/
+env/live/_sandbox/
+*.sqlite3
+docs/*.aux
+docs/*.out
+docs/*.toc
+docs/*.fls
+docs/*.fdb_latexmk
+docs/*.synctex.gz
