@@ -26,5 +26,7 @@ jobs:
         run: .venv/bin/python -m pytest -q
       - name: Regression smoke (5 dev scenarios, replay cache only, no LLM)
         run: make smoke
-      - name: Smoke must recover every scenario (regression gate)
+      - name: Smoke regression gate (recovered and top-1 floors, zero false claims or harm)
         run: .venv/bin/python -m bench.smoke_gate
+      - name: Every committed held-out / perturbation result must replay exactly (no LLM)
+        run: make replay-check
