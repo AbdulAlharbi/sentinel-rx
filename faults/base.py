@@ -107,9 +107,11 @@ class Fault:
         """Emit an extra log line for this tick."""
         world.extra_logs.append(LogLine(world.time_of(tick), service or self.target, level, msg))
 
-    def flow(self, world: World, t: float, src: str, dst: str, nbytes: int) -> None:
+    def flow(
+        self, world: World, t: float, src: str, dst: str, nbytes: int, blocked: bool = False
+    ) -> None:
         """Emit an extra flow record."""
-        world.extra_flows.append(Flow(t, src, dst, nbytes))
+        world.extra_flows.append(Flow(t, src, dst, nbytes, blocked))
 
     def to_dict(self) -> dict[str, Any]:
         """Serialisable summary (ground truth; never shown to the agent)."""

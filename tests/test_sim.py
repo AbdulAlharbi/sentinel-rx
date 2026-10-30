@@ -90,7 +90,8 @@ def test_restart_before_containment_is_harmful_and_reinfects():
     assert beacons, "implant should re-establish after a naive restart"
     env.apply_action(Action("block_egress", "worker"))
     env.wait(200)
-    assert not [f for f in env.get_flows(200) if f.dst.startswith("203.")]
+    attempts = [f for f in env.get_flows(200) if f.dst.startswith("203.")]
+    assert attempts and all(f.blocked for f in attempts)  # contained but still observable
     env.apply_action(Action("restart_service", "worker"))
     assert env.action_log[-1]["harmful"] is None
     assert env.gt_recovered()

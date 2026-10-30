@@ -68,14 +68,18 @@ class C2Beacon(Fault):
             self.next_t = t0 + float(self.rng.uniform(0, self.interval))
         world.effects[self.target].cpu_add += 3.0
         while self.next_t < t1:
-            if not self.contained and world.status_state(self.target) == "up":
-                self.flow(
+            t_ev = round(self.next_t, 3)
+            if self.contained:
+                # the implant keeps trying; the firewall / host agent records denied attempts
+                self.flow(world, t_ev, self.target, self.dst, 0, blocked=True)
+                self.log(
                     world,
-                    round(self.next_t, 3),
-                    self.target,
-                    self.dst,
-                    int(self.rng.integers(180, 240)),
+                    tick,
+                    "WARN",
+                    f"egress denied by policy: connect {self.dst}:443 (implant still active)",
                 )
+            elif world.status_state(self.target) == "up":
+                self.flow(world, t_ev, self.target, self.dst, int(self.rng.integers(180, 240)))
             self.next_t += self.interval * (
                 1.0 + float(self.rng.uniform(-self.jitter, self.jitter))
             )

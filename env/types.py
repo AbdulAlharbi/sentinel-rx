@@ -93,6 +93,7 @@ class Flow:
     src: str
     dst: str
     nbytes: int
+    blocked: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         """JSON-serialisable form."""
