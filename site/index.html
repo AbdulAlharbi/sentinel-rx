@@ -59,7 +59,7 @@
       <span class="chip"><span class="pip"></span>harmful actions <b>0.00</b> / run</span>
       <span class="chip"><span class="pip"></span>top-1 root cause <b>92%</b></span>
       <span class="chip"><span class="pip"></span><b>6 103</b> tokens / incident</span>
-      <span class="chip"><span class="pip"></span><b>108</b> tests · replay cache · CI</span>
+      <span class="chip"><span class="pip"></span><b>109</b> tests · replay cache · CI</span>
     </div>
   </div>
 </section>
@@ -107,8 +107,8 @@
         and some “performance problems” are intrusions: a compromised host phoning home looks like a slow service, and an
         ops agent that restarts it destroys the evidence and re-infects the host. Sentinel-RX detects the beacon hidden among
         health checks and update polls, enforces <strong>contain before restart</strong>, and never claims recovery while a
-        beacon attempt remains. Over 27 held-out runs with a live C2 beacon it recovered <strong>100%</strong> with zero harmful
-        actions, where a single-shot LLM and a raw-telemetry agent were harmful 0.48 and 1.11 times per run.</p>
+        beacon attempt remains. Over 27 held-out runs with a security fault (21 with a live C2 beacon) it recovered <strong>100%</strong> with zero harmful
+        actions, where a single-shot LLM and a raw-telemetry agent were harmful 0.48 and 1.11 times per run (27 and 9 runs).</p>
       </article>
       <article class="card gap">
         <h3>On the research gap — five gaps, five measured answers</h3>
@@ -119,7 +119,7 @@
           <li><b>G2</b><span>Security hidden inside ops incidents → beacon detector + contain-before-restart, 100% isolated-before-restart</span></li>
           <li><b>G3</b><span>Verification of recovery → false “recovered” as a headline metric: 0% vs 70% single-shot</span></li>
           <li><b>G4</b><span>Cost of the agent → 6 103 tokens/incident vs 35 018 for the raw-telemetry twin</span></li>
-          <li><b>G5</b><span>Robustness → 95–100% recovery under 4 perturbations and an unseen fault type</span></li>
+          <li><b>G5</b><span>Robustness → 95–100% recovery under 4 perturbations; an unseen fault type is not named but is localized and recovered</span></li>
         </ul>
       </article>
     </div>
@@ -139,16 +139,16 @@
         <p>20 held-out scenarios never used in development, 3 seeds (<b>n=60</b>): top-1 root cause <b>92%</b>, per-fault recall <b>82%</b>, recovered <b>100%</b>, false “recovered” <b>0%</b>, harmful actions <b>0.00</b>/run. Runbook recovers 45%, single-shot LLM 30%.</p>
         <div class="where">results/*_heldout_agent.json · heldout_runs.log</div></div>
       <div class="crit"><div class="n">02</div><h3>Robustness &amp; Adaptation</h3>
-        <p>Recovery stays <b>95–100%</b> under noisy logs, missing metrics, renamed services and timestamp jitter; an unseen fault type is recovered <b>100%</b>; a 1.5B model keeps <b>0%</b> false claims. The same agent runs unchanged on five real processes.</p>
+        <p>Recovery stays <b>95–100%</b> under noisy logs, missing metrics, renamed services and timestamp jitter; an unseen fault type is never named but its service is found (<b>94%</b>) and every run recovers; a 1.5B model keeps <b>0%</b> false claims. The same agent runs unchanged on five real processes.</p>
         <div class="where">env/perturb.py · make bench-perturb · make demo-live</div></div>
       <div class="crit"><div class="n">03</div><h3>Evaluation &amp; Iteration</h3>
-        <p>Four dev iterations with before/after numbers (top-1 70→90%, recovered 73→100%), a mid-development scorer audit that re-scored every run, do-nothing and random sanity floors, four ablations, <b>108</b> tests and CI with regression floors.</p>
+        <p>Four dev iterations with before/after numbers (top-1 70→90%, recovered 73→100%), a mid-development scorer audit that re-scored every run, do-nothing and random sanity floors, four ablations, <b>109</b> tests, and CI that replays every committed held-out result and fails on any difference.</p>
         <div class="where">docs/RESULTS.md · bench/smoke_gate.py · .github/workflows/ci.yml</div></div>
       <div class="crit"><div class="n">04</div><h3>Technical Judgment &amp; Creativity</h3>
         <p>Hybrid design measured against its raw-telemetry twin (<b>5.7×</b> fewer tokens, <b>2.9×</b> more recoveries); a RandomForest beacon detector on scale-invariant timing features (AP <b>0.999</b>); contain-before-restart; transactional rollback; a verification gate with a known-beacon rule.</p>
         <div class="where">docs/DESIGN.md · agent/detectors/ · agent/safety.py</div></div>
       <div class="crit"><div class="n">05</div><h3>Engineering Quality</h3>
-        <p>One <code>make</code> target per step, pinned dependencies, ruff-clean typed modules under 400 lines, one <code>Env</code> interface for simulator and live system, a content-addressed LLM cache so <code>make smoke</code> and CI need no model, one branch per phase merged with <code>--no-ff</code>.</p>
+        <p>One <code>make</code> target per step, pinned dependencies, ruff-clean typed modules, one <code>Env</code> interface for simulator and live system, a content-addressed LLM cache so CI replays all 508 held-out and perturbation runs with no model, one branch per phase merged with <code>--no-ff</code>.</p>
         <div class="where">Makefile · env/base.py · agent/llm.py · cache/</div></div>
       <div class="crit"><div class="n">06</div><h3>Communication</h3>
         <p>This page, a 6-page brief, a 27-page technical report, a literature review with a gap analysis the design answers point by point, README with real console output, DESIGN / RESULTS / LIMITATIONS, and an incident replay viewer.</p>
@@ -336,7 +336,9 @@ flowchart TB
       <div class="honest">
         <h3 style="color:var(--sand)">Known gaps, stated at the same confidence</h3>
         <ul>
-          <li><b>The simulator is small and hand-written.</b> Five services, nine known fault types with scripted symptoms that match the taxonomy the agent is told; the unseen fault type is the only open-world test.</li>
+          <li><b>The simulator is small and hand-written.</b> Five services, nine known fault types with scripted symptoms that match the taxonomy the agent is told, and the prompt's fix for each type comes from the simulator's own accepted remedies (the runbook baseline hard-codes the same knowledge). So this measures diagnosis under concurrent faults, safe ordering and verified recovery, not discovering new remedies.</li>
+          <li><b>The unseen fault type is recovered, not identified.</b> The agent never names <code>dns_failure</code> (recall on it 0/8); it localizes the service and a restart, one of its accepted fixes, clears it.</li>
+          <li><b>Top-1 counts a hit on any injected fault.</b> It gets easier as faults stack; per-fault recall (82%) is the stricter diagnosis number.</li>
           <li><b>One seed for the secondary arms.</b> <code>llm_only</code>, perturbations, ablations and the small-model run use one seed (n = 20); their deltas are directional. The 3-seed <code>llm_only</code> pass was stopped twice for time and both attempts are in the run log.</li>
           <li><b>Synthetic beacon training data.</b> No real captures; a real deployment would retrain on NetFlow or Zeek data and face evasion.</li>
           <li><b>Replay is exact, re-recording is not.</b> Ollama decoding is not bit-stable even at temperature 0, so a fresh recording is a new experiment.</li>
@@ -392,7 +394,7 @@ flowchart TB
     </div>
     <pre class="sh"><span class="c"># install and verify, no LLM needed</span>
 <span class="p">$</span> make setup          <span class="c"># venv, pinned deps, scenarios, beacon detector training (~1 min)</span>
-<span class="p">$</span> make test           <span class="c"># 108 tests</span>
+<span class="p">$</span> make test           <span class="c"># 109 tests</span>
 <span class="p">$</span> make smoke          <span class="c"># 5 dev scenarios from the replay cache (&lt; 60 s); CI adds regression floors</span>
 
 <span class="c"># exact replay of the headline table from the committed cache</span>

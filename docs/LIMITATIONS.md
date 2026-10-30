@@ -8,11 +8,25 @@ Each item names the file that embodies the limitation so it can be checked.
   fault types with scripted symptom signatures (`env/sim/world.py`, `faults/`). Real incidents
   have messier, partially-overlapping signatures. The held-out split tests unseen *combinations*
   and one unseen *type*, not unseen symptom vocabularies.
-* **Fault symptoms are consistent with the taxonomy in the prompt.** The agent is told what a
-  memory leak or a beacon looks like (`agent/prompts.py::fault_taxonomy`). This is the same
-  knowledge an SRE runbook encodes, but it means the benchmark measures evidence integration and
-  planning more than open-world discovery. The `unseen_fault` perturbation (dns_failure) is the
-  only test of a fault the taxonomy does not describe.
+* **The prompt carries the simulator's fix table.** `agent/prompts.py::fault_taxonomy` builds
+  each fault's "Fix:" line by calling that fault class's own `correct_sequences()`, the same
+  sequences the simulator accepts as resolving the fault, and describes each fault's symptoms.
+  This is what an SRE runbook encodes, and the rule-based runbook baseline is hand-coded with the
+  same symptom-to-fix knowledge (`agent/runbook.py::_rules`), which is why it is the main
+  comparison: with the remedies
+  known, the benchmark measures *diagnosis under concurrent, confounded faults, safe ordering and
+  verified recovery*, not the discovery of new remedies. On held-out the runbook diagnoses almost
+  as well (top-1 87 %) but recovers 45 %; the gap is the loop, the ordering and the verifier.
+* **The unseen fault type is recovered, not identified.** `dns_failure` is not in the taxonomy,
+  so the agent cannot name it: per-fault recall on it is 0/8 and the 62 % top-1 on that split
+  comes from the *known* co-fault. It does localize the faulty service (localization 94 %) and
+  recovers 8/8, partly because `restart_service` is one of its accepted fixes
+  (`faults/security.py::DnsFailure.correct_sequences`), as it is for 6 of the 10 fault types.
+  Read it as "degrades safely on an unknown fault", not "diagnoses unknown faults".
+* **Top-1 counts a hit on any injected fault.** `bench/score.py` scores the top hypothesis as
+  correct when it matches *any* of the scenario's faults (service + type), so top-1 gets easier
+  as faults stack (agent 75 / 93 / 100 % at 1 / 2 / 3 faults). Per-fault recall (82 %), which
+  needs every fault found, is the stricter diagnosis number.
 * **Ground-truth recovery is defined by the simulator** (`SimEnv.gt_recovered`): all injected
   faults resolved, all services up, observable health ≥ 0.9 for 2 ticks. Partial mitigations
   (e.g. containing a beacon without eradicating it) count as *not recovered* by design.
@@ -32,6 +46,16 @@ Each item names the file that embodies the limitation so it can be checked.
 * **Local 7B model.** qwen2.5:7b mis-attributes facts between services and ignores status
   fields unless they are spelled out (see docs/RESULTS.md v0 → v1). Prompt grouping and the
   repeated-plan guard mitigate this; a stronger model would need fewer guard-rails.
+* **One perturbation was re-recorded.** The timestamp-jitter wrapper salted its noise with
+  Python's `hash()` of a string, which is randomised per process, so its prompts (and the LLM
+  cache keys) changed on every run and the published jitter result could not be replayed. It
+  now uses a stable CRC32 salt (`env/perturb.py::_stable_salt`,
+  `tests/test_runner.py::test_jitter_is_identical_across_processes`) and that one 20-run split
+  was recorded again; the superseded file stays in `results/` and both runs are in
+  `results/heldout_runs.log`. CI now replays every committed held-out and perturbation result
+  and fails on any difference (`bench/replay_check.py`), which is how this was found.
+* **`meta.git` in a results file is the commit at the time the file was written**, i.e. at the
+  end of the run; `results/heldout_runs.log` records the commit at the start.
 * **Replay is exact, re-recording is not.** Cached responses make every number reproducible
   with `--replay`. Re-running against Ollama can produce slightly different completions
   (batched decoding is not bit-stable even at temperature 0), so a fresh recording is a new
@@ -43,14 +67,15 @@ Each item names the file that embodies the limitation so it can be checked.
   use 3 seed offsets per scenario (60 runs each). **llm_only, the perturbation runs, the
   ablations and the smaller-model run use 1 seed** (20 runs each; 8 for the unseen fault type)
   to keep the laptop time budget; their CIs are wide and their deltas should be read as
-  directional. llm_only's 3-seed pass was started twice and stopped (10/60 both times; see
+  directional. Their deltas are paired: each is compared with the full agent on the same seed
+  (`bench/report.py::_paired`), not with the 3-seed mean. llm_only's 3-seed pass was started twice and stopped (10/60 both times; see
   `results/heldout_runs.log`) because its raw-telemetry prompts make it ~5× slower than the
   agent. The exact wall-clock of every command is recorded in `results/*.json`
   (`meta.elapsed_s`): agent held-out 63 min, single_shot 29 min, llm_only (1 seed) 95 min,
   ablations 39 min in total (no_beacon 32, no_safety 6.5; no_verify and no_loop replay the
   agent's first-iteration cache entries in seconds), smaller model 45 min, perturbations 78 min
   in total (19 / 22 / 20 / 9 / 8), dev iterations 25–53 min each.
-* **Recording time.** The brief asked for benchmark commands under 15 minutes; with a 7B model
+* **Recording time.** Our own build constraint was benchmark commands under 15 minutes; with a 7B model
   at ~20 tokens/s the held-out commands exceed that and we chose fewer seeds over fewer
   scenarios. `make smoke` and CI run from the cache in under a minute.
 * **Dev baselines.** Only the runbook was run on dev with 3 seeds; LLM baselines were measured
@@ -74,10 +99,14 @@ Each item names the file that embodies the limitation so it can be checked.
 * **Rollback is best-effort.** Containment, rate limiting and pool scaling are reversible;
   restarts, config rollbacks, disk clears and cache flushes are not, and the record says so
   (`agent/safety.py::SafetyLayer.execute`).
-* **The evidence gate trusts the LLM's hypothesis list.** A wrong `c2_beacon` hypothesis on an
-  innocent host *would* unlock containment of that host; the regression check catches the
-  availability loss (`tests/test_agent.py::test_safety_rolls_back_regressions`) but not a
-  silent `block_egress` on a host that needs no egress.
+* **The evidence gate trusts the beacon detector.** With the detector on, containment
+  (`isolate_host`, `block_egress`) needs a detector beacon finding on that host
+  (`agent/safety.py::SafetyLayer.screen`); an LLM hypothesis alone is not enough. A detector
+  false positive would therefore unlock containment of an innocent host. The regression check
+  catches the availability loss of an isolation
+  (`tests/test_agent.py::test_safety_rolls_back_regressions`) but not a silent `block_egress` on
+  a host that needs no egress. With the detector off (`llm_only`, `no_beacon`), an open
+  `c2_beacon` hypothesis is accepted instead.
 
 ## Scope
 

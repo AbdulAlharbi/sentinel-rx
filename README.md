@@ -10,7 +10,7 @@
 [![CI](https://github.com/AbdulAlharbi/sentinel-rx/actions/workflows/ci.yml/badge.svg)](https://github.com/AbdulAlharbi/sentinel-rx/actions/workflows/ci.yml)
 [![pages](https://github.com/AbdulAlharbi/sentinel-rx/actions/workflows/pages.yml/badge.svg)](https://AbdulAlharbi.github.io/sentinel-rx/)
 ![python](https://img.shields.io/badge/python-3.12-blue)
-![tests](https://img.shields.io/badge/tests-108%20passed-brightgreen)
+![tests](https://img.shields.io/badge/tests-109%20passed-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
 
 **Humain Hackathon, Challenge 1: Agentic Recovery of a Failing System.**
@@ -60,8 +60,8 @@ flowchart LR
   maps to a metric this benchmark reports: **G1** concurrent faults (recovery flat at 100 % from 1
   to 3 faults), **G2** security inside ops incidents (100 % isolated-before-restart), **G3** false
   "recovered" claims (0 % vs 70 % for a single-shot LLM), **G4** agent cost (6 103 tokens/incident
-  vs 35 018 for the raw-telemetry twin), **G5** robustness (95–100 % recovery under perturbations
-  and an unseen fault).
+  vs 35 018 for the raw-telemetry twin), **G5** robustness (95–100 % recovery under four perturbations;
+  an unseen fault type is not named but is localized and recovered).
 
 ## The challenge, line by line
 
@@ -121,17 +121,17 @@ Details and file-level pointers in [`docs/JUDGING.md`](docs/JUDGING.md).
 | Criterion | Evidence |
 |---|---|
 | Task Performance | table above: 20 unseen scenarios × 3 seeds; split guard `bench/runner.py:201`; every held-out run logged in `results/heldout_runs.log` |
-| Robustness & Adaptation | recovery 95–100 % under noisy logs, missing metrics, renamed services, timestamp jitter; unseen fault type recovered 100 %; 1.5B model keeps 0 % false claims; same agent on simulator and live processes |
-| Evaluation & Iteration | `docs/RESULTS.md`: v0→v3 with before/after numbers and a mid-development scorer audit; do_nothing/random sanity floors; 4 ablations; 108 tests; CI with replay smoke + regression floors |
+| Robustness & Adaptation | recovery 95–100 % under noisy logs, missing metrics, renamed services, timestamp jitter; an unseen fault type is never named but its service is localized (94 %) and all 8 runs recover; 1.5B model keeps 0 % false claims; same agent on simulator and live processes |
+| Evaluation & Iteration | `docs/RESULTS.md`: v0→v3 with before/after numbers and a mid-development scorer audit; do_nothing/random sanity floors; 4 ablations; 109 tests; CI replays every committed held-out result and diffs it |
 | Technical Judgment & Creativity | hybrid detectors + LLM measured against its raw-telemetry twin; beacon RandomForest on scale-invariant timing features; contain-before-restart; transactional rollback; verification gate with a known-beacon rule; `docs/DESIGN.md` |
-| Engineering Quality | one `make` target per step, pinned deps, ruff-clean typed modules < 400 lines, one `Env` interface, content-addressed LLM cache, one branch per phase merged `--no-ff` |
+| Engineering Quality | one `make` target per step, pinned deps, ruff-clean typed modules (all but the report generator under 400 lines), one `Env` interface, content-addressed LLM cache, one branch per phase merged `--no-ff` |
 | Communication | this README, the [site](https://AbdulAlharbi.github.io/sentinel-rx/), the [brief](docs/technical_report/sentinel_rx_brief.pdf), the [full report](docs/technical_report/sentinel_rx_technical_report.pdf), the [literature review](docs/literature_review.pdf), DESIGN / RESULTS / LIMITATIONS, an incident replay viewer |
 
 ## Design decisions
 
 | Requirement | Design decision | Why | Proof |
 |---|---|---|---|
-| Identify | Observe step runs four deterministic detectors and hands the LLM a per-service ranked evidence list, never raw telemetry | 4 000 flows + 2 000 log lines do not fit a 7B context; ranked evidence does (~600 tokens) | `agent/detectors/evidence.py:71` (`to_prompt`), `tests/test_detectors.py::test_evidence_is_compact_and_quiet_after_recovery` |
+| Identify | Observe step runs four deterministic detectors and hands the LLM a per-service ranked evidence list, never raw telemetry | 4 000 flows + 2 000 log lines do not fit a 7B context; ranked evidence does (1 157 prompt tokens per call, measured) | `agent/detectors/evidence.py:71` (`to_prompt`), `tests/test_detectors.py::test_evidence_is_compact_and_quiet_after_recovery` |
 | Diagnose | LLM returns ranked hypotheses + up to 3 targeted checks (strict JSON, one auto-repair); dependency ranker discounts symptoms explained by an unhealthy dependency | separates cause from victim, the main failure of threshold runbooks | `agent/detectors/ranker.py:38`, `agent/loop.py:75` (`_json_call`), `tests/test_detectors.py::test_ranker_prefers_downstream_cause_over_upstream_symptom` |
 | Recover | Ordered plan from an 8-action allowlist, executed through the safety layer; history of applied actions and remaining problems fed back; repeated plans are re-asked once | small models repeat themselves; the guard halved LLM calls (docs/RESULTS.md v0→v1) | `agent/loop.py` (repeated-plan guard), `agent/prompts.py` |
 | Verify | Recovery may only be claimed when `Evidence.problems()` is empty: post-action telemetry vs the remembered healthy baseline, no beacon attempt, every service up | gap G3: an agent must not grade its own work | `agent/detectors/evidence.py:185` (`verify`), `:134` (`problems`), `tests/test_detectors.py::test_verify_fails_while_fault_persists` |
@@ -153,7 +153,7 @@ with `qwen2.5:7b` (and `qwen2.5:1.5b` for the small-model run). Replay targets n
 
 ```bash
 make setup          # venv, pinned deps, scenario generation, beacon detector training (~1 min)
-make test           # 108 tests, no LLM needed
+make test           # 109 tests, no LLM needed
 make smoke          # 5 dev scenarios from the replay cache, no LLM (< 60 s); CI adds regression floors
 make demo-live      # 5 real local processes + 3 concurrent faults + the agent (needs Ollama)
 make bench-heldout  # held-out agent + baselines, 3 seeds, --final (needs Ollama, ~2 h)
@@ -224,7 +224,7 @@ results/     per-run JSON, traces/, summary.md, heldout_runs.log, demo_live_cons
 docs/        DESIGN.md, RESULTS.md (dev iteration log + scorer audit), LIMITATIONS.md, JUDGING.md, figures/, literature_review.pdf, technical_report/ (brief + full report, .tex + .pdf)
 site/        static site (HUMAIN/PIF palette): impact, Judging Criteria, results, figures, replay viewer, reports; data.json from make report; logo/ (copies the site serves)
 assets/logo/ logo masters: icon (600×600), shield mark, wide logo for dark / light backgrounds, each as SVG + PNG
-tests/       108 tests;  .github/workflows/  ci.yml (lint, tests, replay smoke, floors) and pages.yml (deploys site/)
+tests/       109 tests;  .github/workflows/  ci.yml (lint, tests, replay smoke, floors, full replay check) and pages.yml (deploys site/)
 ```
 
 Data flow: `scenarios/` define faults → `env/sim` (or `env/live`) injects them and exposes telemetry
@@ -242,13 +242,14 @@ passes through `agent/llm.py` and its cache, so the whole chain replays offline.
   `tests/test_scenarios.py` checks the committed YAML; the runner refuses non-dev splits without
   `--final` and logs every such run with its git revision.
 * **Perturbations** (`env/perturb.py`): noisy logs (30 % dropped, 80 % noise lines incl. spurious
-  ERRORs), missing metrics (a third of series), renamed services, ±2 s timestamp jitter, unseen
-  fault type; plus a smaller model.
+  ERRORs), missing metrics (a third of series), renamed services, timestamp jitter (Gaussian, σ = 2 s),
+  unseen fault type; plus a smaller model.
 * **Baselines**: `runbook` (static rules, including a naive "unknown egress → block" rule so it is
   not strawmanned on security), `single_shot`, `llm_only` (full loop, raw telemetry, LLM-judged
   verification), `do_nothing` and `random` (sanity floors: any scenario they recover is a broken check).
 * **Ablations**: `no_verify`, `no_loop`, `no_beacon`, `no_safety`.
-* **Metrics** (`bench/score.py`): top-1/top-3 root cause (service + type), per-fault recall,
+* **Metrics** (`bench/score.py`): top-1/top-3 root cause (service + type; a hit on any injected
+  fault, so it gets easier as faults stack), per-fault recall (every fault must be found),
   recovered (hidden ground truth: all faults resolved, all services up, health ≥ 0.9 for 2 ticks),
   false recovery (claimed ∧ ¬recovered), harmful actions (restart before containment; containment
   of an uncompromised host), unnecessary actions (applied − effective), action precision, rolled-back
@@ -270,12 +271,12 @@ passes through `agent/llm.py` and its cache, so the whole chain replays offline.
 | unseen_fault (dns_failure) | 62% | 100% | 0% | 0.00 | 8 |
 | smaller LLM (qwen2.5:1.5b) | 40% | 50% | 0% | 0.00 | 20 |
 
-| ablation (1 seed, delta vs full agent) | top-1 | recovered | false "recovered" | harmful / run | LLM calls |
+| ablation (1 seed, delta vs full agent on the same seed) | top-1 | recovered | false "recovered" | harmful / run | LLM calls |
 |---|---|---|---|---|---|
-| no_verify | 80% (−12) | 20% (−80) | 80% (+80) | 0.00 | 2.0 |
-| no_loop | 80% (−12) | 20% (−80) | 0% | 0.00 | 2.0 |
-| no_beacon | 85% (−7) | 50% (−50) | 35% (+35) | 0.05 (+0.05) | 6.2 |
-| no_safety | 90% (−2) | 100% (0) | 0% | 0.60 (+0.60) | 4.8 |
+| no_verify | 80% (−10) | 20% (−80) | 80% (+80) | 0.00 | 2.0 |
+| no_loop | 80% (−10) | 20% (−80) | 0% | 0.00 | 2.0 |
+| no_beacon | 85% (−5) | 50% (−50) | 35% (+35) | 0.05 (+0.05) | 6.2 |
+| no_safety | 90% (0) | 100% (0) | 0% | 0.60 (+0.60) | 4.8 |
 
 Each component protects a different metric: without verification the same actions end in a false
 claim 80 % of the time; without the loop only one plan is ever tried; without the beacon detector
@@ -286,17 +287,20 @@ these deltas are directional (`docs/LIMITATIONS.md`).
 
 ## Testing and CI
 
-`pytest -q`: 108 tests, no LLM required, about a minute. `tests/test_sim.py` (determinism,
+`pytest -q`: 109 tests, no LLM required, about a minute. `tests/test_sim.py` (determinism,
 propagation, wrong fixes never resolve, reinfection), `test_faults.py` (symptoms, persistence,
 wrong target never resolves), `test_scenarios.py` (split disjointness against the committed YAML),
 `test_detectors.py` (anomalies, templates, ranker, beacon vs health checks, scale invariance,
 verification gate), `test_agent.py` (loop with a scripted LLM, safety decisions, rollback, dry-run,
 cache record/replay), `test_score.py` (hand-made traces, action precision, bootstrap CIs),
-`test_runner.py` (held-out guard, perturbation wrappers), `test_live_env.py` (real processes:
+`test_runner.py` (held-out guard, perturbation wrappers, cross-process determinism), `test_live_env.py` (real processes:
 beacon contained, restart-without-containment re-infects, cleanup).
 
-CI (`.github/workflows/ci.yml`): ruff + format check, pytest, `make smoke` from the cache, and
-`bench/smoke_gate.py` floors (recovered ≥ 0.8, top-1 ≥ 0.8, false recovery = 0, harmful = 0).
+CI (`.github/workflows/ci.yml`): ruff + format check, pytest, `make smoke` from the cache,
+`bench/smoke_gate.py` floors (recovered ≥ 0.8, top-1 ≥ 0.8, false recovery = 0, harmful = 0), and
+`make replay-check` (`bench/replay_check.py`): every committed held-out and perturbation result
+(16 files, 508 runs) is replayed from the cache and compared run by run with the committed scores,
+so a published number cannot silently stop being reproducible. It takes about 30 s and needs no LLM.
 `pages.yml` deploys `site/` to GitHub Pages on every push to `main`.
 
 ## Extending

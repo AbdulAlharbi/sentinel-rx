@@ -194,10 +194,10 @@ verified against telemetry, and the benchmark reports false recovery as a headli
 criterion & evidence (every number is from \code{results/}, held-out split unless stated) \\
 \midrule
 Task performance & 20 held-out scenarios never used in development, 3 seeds ($n=60$): top-1 root cause \pct{92} [83, 98], per-fault recall \pct{82}, recovered \pct{100} [100, 100], false ``recovered'' \pct{0}, harmful actions 0.00 per run, action precision \pct{81}. Runbook: \pct{45} recovered. Single-shot LLM: \pct{30} recovered, \pct{70} false claims. Recovery is flat at \pct{100} from one to three concurrent faults (\cref{tab:heldout}). \\
-Robustness \& adaptation & Recovery stays \pct{95}--\pct{100} under noisy logs, missing metrics, renamed services and timestamp jitter; an \emph{unseen} fault type is still recovered \pct{100} (top-1 \pct{62}); a 1.5B model keeps \pct{0} false claims and 0 harm. Same agent runs unchanged on the simulator and on five real processes (\cref{sec:results}). \\
-Evaluation \& iteration & Four dev iterations with before/after numbers (top-1 70 $\to$ 90\,\%, recovered 73 $\to$ 100\,\%, calls 7.4 $\to$ 4.0); a mid-development \emph{scorer audit} that found two lenient spots, fixed them and re-scored every earlier run; do-nothing and random sanity floors (\pct{0} recovered); four ablations that locate each guarantee in one component; 108 tests; CI with a replay smoke run and regression floors (\cref{sec:honest}). \\
+Robustness \& adaptation & Recovery stays \pct{95}--\pct{100} under noisy logs, missing metrics, renamed services and timestamp jitter; an \emph{unseen} fault type is never named but its service is localized (\pct{94}) and all 8 runs recover; a 1.5B model keeps \pct{0} false claims and 0 harm. Same agent runs unchanged on the simulator and on five real processes (\cref{sec:results}). \\
+Evaluation \& iteration & Four dev iterations with before/after numbers (top-1 70 $\to$ 90\,\%, recovered 73 $\to$ 100\,\%, calls 7.4 $\to$ 4.0); a mid-development \emph{scorer audit} that found two lenient spots, fixed them and re-scored every earlier run; do-nothing and random sanity floors (\pct{0} recovered); four ablations that locate each guarantee in one component; 109 tests; CI that replays every held-out result (\cref{sec:honest}). \\
 Technical judgment \& creativity & Hybrid design (detectors compress, LLM integrates) measured against its raw-telemetry twin; a RandomForest beacon detector on scale-invariant timing features with destination knowledge as a prior (AP 0.999, 0 false positives on health checks and update polls); contain-before-restart ordering; transactional rollback; a verification gate with a remembered healthy baseline and a known-beacon rule; health $=\tfrac12\overline{h}+\tfrac12\min h$ so one sick service cannot hide (\cref{sec:design}). \\
-Engineering quality & One \code{make} target per step; pinned dependencies; typed, ruff-clean modules under 400 lines; one \code{Env} interface for simulator and live system; content-addressed LLM cache so \code{make smoke} and CI need no model; one git branch per phase merged with \code{--no-ff}; a run log with git revision for every held-out run (\cref{sec:repro}). \\
+Engineering quality & One \code{make} target per step; pinned dependencies; typed, ruff-clean modules; one \code{Env} interface for simulator and live system; content-addressed LLM cache, and CI replays every committed held-out result and diffs it run by run, with no model; one git branch per phase merged with \code{--no-ff}; a run log with git revision for every held-out run (\cref{sec:repro}). \\
 Communication & README with real console output, a static site with leaderboard, charts and an incident replay viewer, DESIGN / RESULTS / LIMITATIONS documents, a literature review with a gap analysis the design answers point by point, the full technical report, and this brief. \\
 \bottomrule
 \end{tabularx}
@@ -278,7 +278,7 @@ forbade anyway.
           label={[grouplbl,anchor=north west]south west:Detector layer (deterministic, no LLM)}] (det) {};
   \end{scope}
   % ---- evidence, LLM, safety (left column) ----
-  \node[output,minimum width=52mm] (ev) at (4,-5.6) {ranked evidence, grouped per service\\($\approx$1.5k prompt tokens per call)};
+  \node[output,minimum width=52mm] (ev) at (4,-5.6) {ranked evidence, grouped per service\\($\approx$1.2k prompt tokens per call, measured)};
   \draw[flow] (rk) -- (ev);
   \draw[flow] (bc.south) -- (ev.east);
   \node[llm,minimum width=52mm] (llm) at (4,-7.1) {LLM reasoning (qwen2.5:7b via Ollama)\\call 1: hypotheses + checks \quad call 2: ordered plan};
@@ -345,15 +345,15 @@ random & 0 & 0 & 0 & 10 \ci{3}{18} & 3.45 \ci{2.92}{3.98} & 5 \ci{4}{7} & 0 & 0 
 misses are type confusions where the fix coincides (a cache latency injection labelled
 \code{cache\_failure}, resolved by a restart), counted as diagnosis misses but not recovery misses.
 
-\paragraph{Security.} In the 27 held-out runs containing a C2 beacon the agent recovered \pct{100},
+\paragraph{Security.} In the 27 held-out runs with a security fault (21 with a C2 beacon) the agent recovered \pct{100},
 never restarted a compromised host before containing it and never contained an uncompromised one.
-single\_shot and llm\_only did so routinely (0.48 and 1.11 harmful actions per run); a random walk over
+single\_shot (27 runs) and llm\_only (9 runs, 1 seed) did so routinely (0.48 and 1.11 harmful actions per run); a random walk over
 the same eight actions is harmful 3.04 times per run. The action space is dangerous by default; the
 safety layer, not the model, makes it safe.
 
 \begin{table}[H]
 \centering\footnotesize
-\caption{Robustness (agent, held-out variants, 1 seed) and ablations (held-out, 1 seed, $n=20$; deltas vs.\ the full agent).}
+\caption{Robustness (agent, held-out variants, 1 seed) and ablations (held-out, 1 seed, $n=20$; deltas vs.\ the full agent on the same seed).}
 \label{tab:robab}
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{l r r r r}
@@ -364,16 +364,18 @@ variant & top-1 & recovered & false ``rec.'' & harmful / run \\
 noisy logs (+\pct{80} benign lines) & \pct{95} & \pct{100} & \pct{0} & 0.00 \\
 missing metrics & \pct{90} & \pct{95} & \pct{0} & 0.00 \\
 renamed services & \pct{90} & \pct{100} & \pct{0} & 0.00 \\
-timestamp jitter ($\pm2$\,s) & \pct{90} & \pct{100} & \pct{0} & 0.00 \\
-unseen fault type (dns\_failure, $n=8$) & \pct{62} & \pct{100} & \pct{0} & 0.00 \\
+timestamp jitter ($\sigma=2$\,s) & \pct{90} & \pct{100} & \pct{0} & 0.00 \\
+unseen fault type (dns\_failure, $n=8$)\textsuperscript{*} & \pct{62} & \pct{100} & \pct{0} & 0.00 \\
 smaller model (qwen2.5:1.5b) & \pct{40} & \pct{50} & \pct{0} & 0.00 \\
 \midrule
-ablation: no verification gate & \pct{80} ($-12$) & \pct{20} ($-80$) & \pct{80} ($+80$) & 0.00 \\
-ablation: no loop (one iteration) & \pct{80} ($-12$) & \pct{20} ($-80$) & \pct{0} & 0.00 \\
-ablation: no beacon detector & \pct{85} ($-7$) & \pct{50} ($-50$) & \pct{35} ($+35$) & 0.05 \\
-ablation: no safety layer & \pct{90} ($-2$) & \pct{100} ($0$) & \pct{0} & 0.60 ($+0.60$) \\
+ablation: no verification gate & \pct{80} ($-10$) & \pct{20} ($-80$) & \pct{80} ($+80$) & 0.00 \\
+ablation: no loop (one iteration) & \pct{80} ($-10$) & \pct{20} ($-80$) & \pct{0} & 0.00 \\
+ablation: no beacon detector & \pct{85} ($-5$) & \pct{50} ($-50$) & \pct{35} ($+35$) & 0.05 \\
+ablation: no safety layer & \pct{90} ($0$) & \pct{100} ($0$) & \pct{0} & 0.60 ($+0.60$) \\
 \bottomrule
 \end{tabular}
+
+\smallskip\raggedright\footnotesize\textsuperscript{*}The unseen type is never named (recall on it 0/8); top-1 here is the known co-fault. Its service is localized in \pct{94} of cases and every run recovers.
 \end{table}
 
 \begin{keyfinding}{each component protects a different metric}
@@ -464,8 +466,7 @@ since the services started (\code{results/demo\_live\_trace.json}).}
   \item \textbf{Sanity floors.} do\_nothing and random are permanent baselines: any scenario they
         ``recover'' is a broken check. They recover \pct{0} on held-out and \pct{0}--\pct{1} on dev.
   \item \textbf{Scorer audit.} Mid-development the recovery metric was challenged. Tests now prove
-        that no fault clears on its own in 300 ticks and none is resolved by any action on the wrong
-        target or any wrong action on the right target ($8\times5\times10$). Two lenient spots were
+        no fault clears on its own or via a wrong action or target. Two lenient spots were
         found and fixed: the observable health formula let one sick service hide behind four healthy
         ones (now $\tfrac12\overline{h}+\tfrac12\min h$), and containment of an uncompromised host was
         not counted as harmful. Re-scoring showed that agent v0 and v1 were \emph{not} harmless
@@ -473,9 +474,9 @@ since the services started (\code{results/demo\_live\_trace.json}).}
         Pre-audit numbers are kept, labelled, in \code{docs/RESULTS.md}.
   \item \textbf{Iteration log.} v0 $\to$ v3 on dev: top-1 70 $\to$ 90\,\%, recovered 73 $\to$ 100\,\%,
         false claims 0\,\% throughout, calls 7.4 $\to$ 4.0, each change named with its before/after numbers.
-  \item \textbf{Regression checks.} 108 tests (simulator, faults, scenarios, detectors, agent with a
-        scripted LLM, scorer, runner, live environment); CI runs ruff, the tests, a replay smoke run and
-        floors (recovered $\ge0.8$, top-1 $\ge0.8$, false recovery $=0$, harmful $=0$).
+  \item \textbf{Regression checks.} 109 tests; CI runs ruff, the tests, a replay smoke run with
+        floors, and replays all 16 committed held-out and perturbation results (508 runs) from the
+        cache, failing on any difference.
 \end{itemize}
 
 % =====================================================================
@@ -489,7 +490,7 @@ Python 3.12, no Docker. Replay targets need no model; recording targets need Oll
 \begin{tcolorbox}[enhanced,colback=keyfill,colframe=accent!60,boxrule=0.5pt,arc=2pt,left=6pt,right=6pt]
 \scriptsize\begin{verbatim}
 make setup           # venv, pinned deps, scenarios, beacon detector training (~1 min)
-make test            # 108 tests, no LLM needed
+make test            # 109 tests, no LLM needed
 make smoke           # 5 dev scenarios from the replay cache, no LLM (< 60 s)
 make demo-live       # 5 real local processes + 3 concurrent faults + the agent (needs Ollama)
 make all-final       # held-out + perturbations + ablations + report (needs Ollama; hours)
@@ -504,21 +505,19 @@ python -m http.server -d site 8000     # leaderboard, charts, incident replay vi
 
 \begin{limitation}{what this does not show}
 The simulator is small and hand-written (five services, nine known fault types with scripted
-symptoms that match the taxonomy the agent is told), so the benchmark measures evidence
-integration and planning more than open-world discovery; the unseen fault type is the only
-exception. The beacon detector was trained on synthetic timings, not real captures. llm\_only,
-perturbations, ablations and the small-model run use one seed (the 3-seed llm\_only pass was
-stopped twice at 10/60 for time; both attempts are in the run log), so their deltas are
-directional. Replay is exact but re-recording with Ollama is not bit-stable. Rollback is
-best-effort (restarts and rollbacks are irreversible, and recorded as such). No multi-step attacks,
-network partitions or multi-cluster topologies. Isolation and egress blocking in the live
-environment are flags inside the process, not real network policy.
+symptoms that match the taxonomy the agent is told), and the prompt's ``Fix:'' line for each
+fault type is generated from the simulator's own accepted remedies, the same knowledge the
+runbook baseline hard-codes. The benchmark therefore measures diagnosis under concurrent faults,
+safe ordering and verified recovery, not the discovery of new remedies. The unseen fault type is
+recovered but never named. Top-1 counts a hit on any injected fault; per-fault recall is stricter. The beacon detector was trained on synthetic timings, not real captures. llm\_only,
+perturbations, ablations and the small-model run use one seed, so their deltas are directional. Replay is exact; re-recording with Ollama is not bit-stable. Rollback is best-effort.
+No multi-step attacks, network partitions or multi-cluster topologies; live isolation and egress
+blocking are flags inside the process, not real network policy.
 \end{limitation}
 
-\paragraph{Path to production.} Swap the telemetry adapters (NetFlow/Zeek, Prometheus, a log
-store) behind the same interface; retrain the beacon model on real captures; map the eight actions to
-existing runbook automations behind the same safety layer with human approval for irreversible ones;
-keep the verification gate as the only path to ``resolved''; keep the replay cache as the audit log.
+\paragraph{Path to production.} Swap in real telemetry adapters (NetFlow/Zeek, Prometheus, logs);
+retrain the beacon model on real captures; map the eight actions to existing automations behind the
+same safety layer, with human approval for irreversible ones.
 
 \begin{thebibliography}{9}
 \small

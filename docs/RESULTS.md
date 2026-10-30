@@ -70,7 +70,7 @@ Failure analysis (traces in `results/traces/20261030T003921Z_dev_agent_v0/`):
 4. `dev_3f_02`: the 128 `authentication failed ... from <ip>` lines on gateway were never
    mapped to `credential_stuffing` (same flat-list problem; the signature was the 2nd log item).
 
-Changes for v1 (commits `4d90332`, `17797cd`):
+Changes for v1 (commits `c75e251`, `7ee9afa`):
 
 * `Evidence.to_prompt()` groups everything **per service**, ranked by root-cause score, intrinsic
   metrics first; `down_services` is an explicit top-level field; the system prompt states that a
@@ -114,7 +114,7 @@ Remaining failure analysis (`results/traces/20261030T013252Z_dev_agent_v1/`):
    `cache_failure` but fixed by `restart_service(cache)`) count as top-1 misses but not as
    recovery misses — the metric definitions keep these separate on purpose.
 
-Changes for v2 (commit `94737f0`):
+Changes for v2 (commit `c7672d8`):
 
 * Containment (`isolate_host`, `block_egress`) requires a **beacon finding** from the detector;
   only when the detector is disabled (ablation / llm_only) does a `c2_beacon` hypothesis suffice;
@@ -240,3 +240,30 @@ here: further prompt tuning on these would be fitting the taxonomy wording to de
 
 **Frozen as `v1-frozen`.** Everything after this tag is evaluation, live demo and documentation;
 no agent, detector, prompt, simulator or scorer code changes.
+
+## 2026-10-30 — Post-freeze reproducibility check (no agent, detector, prompt, simulator or scorer change)
+
+A pre-submission review replayed every committed held-out and perturbation result from a fresh
+GitHub clone with `--replay`. 15 of 16 result files reproduced every per-run score exactly (only
+wall-clock differs). `perturbations/timestamp_jitter` did not: the jitter wrapper salted its noise
+with `hash((src, dst))`, and Python randomises string hashes per process, so the jittered flow
+times, the prompts and therefore the cache keys changed on every run.
+
+* Fix: `env/perturb.py::_stable_salt` (CRC32). Regression test
+  `tests/test_runner.py::test_jitter_is_identical_across_processes` runs the wrapper under three
+  `PYTHONHASHSEED`s; it fails on the old code and passes on the new.
+* That one split (20 runs) was re-recorded with qwen2.5:7b (`results/heldout_runs.log`, 16:13:59).
+  Result: top-1 90 %, per-fault recall 83 %, recovered 100 %, false recovery 0 %, harmful 0.00 —
+  the same published numbers. The superseded file `20261030T091432Z_...timestamp_jitter_agent.json`
+  is kept.
+* New CI step `make replay-check` (`bench/replay_check.py`): all 16 committed held-out and
+  perturbation results (508 runs) are replayed from the cache and compared run by run with the
+  committed scores; any difference fails the build. Runs in about 30 s with no LLM.
+* Reporting fix: ablation and perturbation deltas are now paired (each 1-seed arm vs the full agent
+  on the same seed, `bench/report.py::_paired`) instead of vs the 3-seed mean. Ablation top-1
+  deltas change from −12 / −12 / −7 / −2 to −10 / −10 / −5 / 0; recovered, false-recovery and
+  harmful deltas are unchanged.
+* The same review tightened several claims (see `docs/LIMITATIONS.md`): the prompt's fix table is
+  generated from the simulator's own accepted remedies; the unseen fault type is recovered and
+  localized but never named; top-1 counts a hit on any injected fault; the security subset is 27
+  runs with a security fault, 21 of them with a C2 beacon.

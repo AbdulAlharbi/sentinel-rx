@@ -11,7 +11,7 @@ copied from that file (held-out, qwen2.5:7b, 3 seeds; llm_only, ablations and pe
 | investigate potential problems | `agent/loop.py` Observe step + up to 3 targeted checks per iteration (`_run_check`) |
 | analyze logs and system metrics | `agent/detectors/metrics.py`, `logs.py`, `beacon.py` (flows) |
 | identify likely causes | ranked hypotheses with confidence; `agent/detectors/ranker.py` separates cause from symptom; top-1 92%, recall 82% held-out |
-| recommend or carry out corrective actions | ordered plan from the 8-action allowlist through `agent/safety.py`; `--dry-run` recommends only; recovered 100%, harmful 0.00/run |
+| recommend or carry out corrective actions | ordered plan from the 8-action allowlist executed through `agent/safety.py` (carry out); a dry-run mode (`build_agent(..., dry_run=True)`) logs the screened plan instead of acting (recommend); recovered 100%, harmful 0.00/run |
 | verify that the system has recovered | `agent/detectors/evidence.py::verify` + `Evidence.problems()`; claims scored against hidden ground truth; false recovery 0% |
 | multiple issues at once | 1–3 concurrent faults per scenario, security faults hidden inside ops incidents; recovered 100% at every concurrency level |
 
@@ -21,16 +21,16 @@ copied from that file (held-out, qwen2.5:7b, 3 seeds; llm_only, ablations and pe
 |---|---|
 | Strict dev/held-out split: held-out fault combinations, type multisets (multi-fault) and seeds never appear in dev; `dns_failure` only in `perturbations/unseen_fault` | `scenarios/generate.py`, asserted by `tests/test_scenarios.py::test_heldout_is_disjoint_from_dev` and `test_unseen_fault_only_in_unseen_split` against the committed YAML |
 | Held-out never used for tuning: the runner exits unless `--final` is passed and appends every held-out run to a committed log | `bench/runner.py::guard_heldout`, `results/heldout_runs.log`, `tests/test_runner.py::test_heldout_requires_final` |
-| Headline numbers only on held-out, 20 scenarios × 3 seeds, 95 % bootstrap CIs | `make bench-heldout` → `results/*_heldout_*.json`; table in `results/summary.md` and README §4 |
+| Headline numbers only on held-out, 20 scenarios × 3 seeds, 95 % bootstrap CIs | `make bench-heldout` → `results/*_heldout_*.json`; table in `results/summary.md` and the README headline table |
 | Headline (held-out): agent top-1 92% [83, 98], per-fault recall 82% [74, 89], recovered 100% [100, 100], false recovery 0% [0, 0], harmful/run 0.00; runbook recovered 45% [32, 58]; single_shot false recovery 70% [58, 80] | `results/summary.md` |
 
 ## 2. Robustness & adaptation
 
 | evidence | where |
 |---|---|
-| Perturbation suite on held-out variants: noisy logs (30 % dropped + 80 % noise lines incl. spurious ERRORs), missing metrics (a third of series are `None`), renamed services, ±2 s timestamp jitter, unseen fault type | `env/perturb.py`, `scenarios/perturbations/*`, `make bench-perturb` |
+| Perturbation suite on held-out variants: noisy logs (30 % dropped + 80 % noise lines incl. spurious ERRORs), missing metrics (a third of series are `None`), renamed services, timestamp jitter (Gaussian, σ = 2 s), unseen fault type | `env/perturb.py`, `scenarios/perturbations/*`, `make bench-perturb` |
 | Smaller LLM run (qwen2.5:1.5b) with identical prompts/cache policy | `make bench-perturb` second line → `results/*_heldout_agent_small_model.json` |
-| Per-perturbation table + figure: recovered stays 95–100% under noisy logs, missing metrics, renamed services, timestamp jitter and the unseen fault type (top-1 drops to 62% there); the 1.5B model drops to 50% recovered but keeps 0% false claims and 0 harmful actions | `results/summary.md` "Robustness", `docs/figures/robustness-drop.png` |
+| Per-perturbation table + figure: recovered stays 95–100% under noisy logs, missing metrics, renamed services and timestamp jitter; the unseen fault type is never named (recall on it 0/8) but its service is localized (94%) and all 8 runs recover; the 1.5B model drops to 50% recovered but keeps 0% false claims and 0 harmful actions | `results/summary.md` "Robustness", `docs/figures/robustness-drop.png` |
 | Same agent on a simulator and on a live system of five real processes | `env/sim/sim_env.py`, `env/live/live_env.py`, `make demo-live`, `tests/test_live_env.py` |
 | Detectors are relative (baseline vs recent) and scale-invariant, so renamed services / different time scales need no changes | `agent/detectors/metrics.py::robust_z`, `tests/test_detectors.py::test_beacon_features_are_scale_invariant`, `tests/test_runner.py::test_renamed_services_round_trip` |
 
@@ -39,10 +39,10 @@ copied from that file (held-out, qwen2.5:7b, 3 seeds; llm_only, ablations and pe
 | evidence | where |
 |---|---|
 | Baselines: runbook (rules), single_shot (one LLM call), llm_only (loop without detectors), do_nothing and random (sanity floors) | `bench/configs.py`, `agent/runbook.py`, `agent/baselines.py` |
-| Ablations: no_verify (recovered −80 pts, false claims +80), no_loop (recovered −80), no_beacon (recovered −50, false claims +35), no_safety (harmful +0.60/run) | `bench/configs.py::build_agent`, `make ablate`, `docs/figures/ablation-deltas.png`, `results/summary.md` |
+| Ablations, each compared with the full agent on the same seed: no_verify (recovered −80 pts, false claims +80), no_loop (recovered −80), no_beacon (recovered −50, false claims +35), no_safety (harmful +0.60/run) | `bench/configs.py::build_agent`, `make ablate`, `docs/figures/ablation-deltas.png`, `results/summary.md` |
 | Iteration log with before/after numbers for every change on dev, incl. a scorer audit that re-scored earlier runs | `docs/RESULTS.md` (v0 → v1 → v2 → audit → v3) |
-| 108 tests (`pytest -q`): determinism, fault symptoms, persistence, detectors, scorer hand-made cases, safety layer, replay cache, heldout guard, live env | `tests/` |
-| CI: ruff + pytest + `make smoke` (replay) + regression floors on every push/PR | `.github/workflows/ci.yml`, `bench/smoke_gate.py` |
+| 109 tests (`pytest -q`): determinism (incl. across processes), fault symptoms, persistence, detectors, scorer hand-made cases, safety layer, replay cache, heldout guard, live env | `tests/` |
+| CI: ruff + pytest + `make smoke` (replay) + regression floors + `make replay-check`, which replays all 16 committed held-out / perturbation results (508 runs) and fails on any per-run difference | `.github/workflows/ci.yml`, `bench/smoke_gate.py`, `bench/replay_check.py` |
 | Record/replay LLM cache keyed by hash(model, system, prompt, options); `--replay` forbids live calls; full benchmark reproduces with no LLM | `agent/llm.py`, `cache/`, `tests/test_agent.py::test_llm_cache_record_and_replay` |
 | Fixed seeds everywhere (simulator, scenario generation, RF training, bootstrap) | `env/sim/sim_env.py::reset`, `scenarios/generate.py`, `agent/detectors/beacon_train.py`, `bench/aggregate.py::bootstrap_ci` |
 
@@ -54,7 +54,7 @@ copied from that file (held-out, qwen2.5:7b, 3 seeds; llm_only, ablations and pe
 | Security-aware recovery: beacon detector (RandomForest on scale-invariant timing + destination knowledge, must not flag health checks / update polls), contain-before-restart enforced, restart-before-containment counted harmful and re-infects | `agent/detectors/beacon.py`, `models/beacon_metrics.json`, `agent/safety.py`, `faults/security.py::C2Beacon.on_action`, `tests/test_sim.py::test_restart_before_containment_is_harmful_and_reinfects` |
 | Verification gate against false "recovered" claims: post-action telemetry vs remembered healthy baseline; contained implants stay observable (denied-egress flows); known beacon pairs cannot hide in short windows | `agent/detectors/evidence.py::EvidenceBuilder.verify`, `tests/test_detectors.py::test_verify_is_not_fooled_by_containment_alone` |
 | Transactional rollback and evidence-gated containment | `agent/safety.py::SafetyLayer.execute`, `tests/test_agent.py::test_safety_rolls_back_regressions` |
-| Every trade-off written down | `docs/DESIGN.md` |
+| Every trade-off written down, and what the benchmark does not show (incl. that the prompt's fix table mirrors the simulator's remedies) | `docs/DESIGN.md`, `docs/LIMITATIONS.md` |
 
 ## 5. Engineering quality
 
@@ -62,15 +62,15 @@ copied from that file (held-out, qwen2.5:7b, 3 seeds; llm_only, ablations and pe
 |---|---|
 | One-command targets | `Makefile`: setup, test, lint, smoke, bench-dev, bench-heldout, bench-perturb, ablate, report, demo-live, all-final |
 | Pinned dependencies, Python 3.12 | `pyproject.toml`, `requirements.lock` |
-| Typed, documented, small modules (ruff with pydocstyle; every file < 400 lines) | `ruff check .` clean; `pyproject.toml [tool.ruff]` |
-| Reproducible with no LLM installed | `make smoke` (replay) in CI |
-| Clean git history: one branch per phase merged with `--no-ff`, conventional commits, no history rewriting | `git log --graph --oneline` |
+| Typed, documented modules (ruff with pydocstyle; all but the report generator under 400 lines) | `ruff check .` clean; `pyproject.toml [tool.ruff]` |
+| Reproducible with no LLM installed | `make smoke` and `make replay-check` (replay) in CI |
+| Git history: one branch per phase merged with `--no-ff`, branches kept, conventional commits | `git log --graph --oneline` |
 
 ## 6. Communication
 
 | evidence | where |
 |---|---|
-| README with pitch, flowchart, held-out table + figures, requirements → decisions table, criteria mapping, quick start with real console output, sequence/state diagrams, methodology, testing, extending, layout, verified/known gaps, limitations | `README.md` |
+| README with pitch, flowchart, held-out table + figures, requirements → decisions table, criteria mapping, quick start with real console output, configuration, repository layout and data flow, methodology, testing, extending, layout, verified/known gaps, limitations | `README.md` |
 | Static site (HUMAIN/PIF palette): impact at local and global level, the six Judging Criteria each with evidence, interactive results, every figure, live-demo excerpt, incident replay viewer, links to the reports | `site/`, deployed by `.github/workflows/pages.yml` |
 | Technical brief (6 pages) and full technical report (27 pages, equations, algorithms, six TikZ diagrams) | `docs/technical_report/sentinel_rx_brief.pdf`, `docs/technical_report/sentinel_rx_technical_report.pdf` (LaTeX sources alongside) |
 | Literature review with the gap analysis G1–G5 the design answers | `docs/literature_review.pdf` |
