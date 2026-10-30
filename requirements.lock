@@ -1,0 +1,9 @@
+# Exact versions installed and tested on macOS (M4), Python 3.12. Generated from `pip freeze`.
+numpy==2.5.4
+scikit-learn==1.9.1
+scipy==1.18.1
+joblib==1.6.0
+PyYAML==6.0.3
+matplotlib==3.11.2
+pytest==9.2.0
+ruff==0.17.3
