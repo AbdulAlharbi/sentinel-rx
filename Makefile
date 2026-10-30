@@ -4,7 +4,7 @@ PIP := .venv/bin/pip
 SEEDS ?= 3
 MODEL ?= qwen2.5:7b
 
-.PHONY: setup test lint scenarios smoke bench-dev bench-heldout bench-perturb ablate report demo-live all-final clean
+.PHONY: setup test lint scenarios smoke bench-dev bench-heldout bench-perturb ablate replay-check report demo-live all-final clean
 
 setup:  ## create venv, install pinned deps, generate scenarios, train the beacon detector
 	python3.12 -m venv .venv
@@ -38,6 +38,9 @@ bench-perturb:
 
 ablate:
 	$(PY) -m bench.runner --split heldout --config no_verify,no_loop,no_beacon,no_safety --seeds 1 --final --model $(MODEL)
+
+replay-check:  ## replay every committed held-out / perturbation result from the cache and diff it
+	$(PY) -m bench.replay_check
 
 report:
 	$(PY) -m bench.report

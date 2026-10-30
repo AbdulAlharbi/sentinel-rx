@@ -80,8 +80,9 @@ become `other` (that is how an unseen fault type is reported).
 ## 5. Safety layer (`agent/safety.py`)
 
 1. **Allowlist** of 8 actions on known services (the env enforces it too).
-2. **Evidence gate**: containment (`isolate_host`, `block_egress`) is refused unless a security
-   hypothesis or a beacon finding implicates that host — the LLM once blocked egress on an
+2. **Evidence gate**: containment (`isolate_host`, `block_egress`) is refused unless there is
+   outbound-compromise evidence on that host: a detector beacon finding when the detector runs,
+   an open `c2_beacon` hypothesis only when it is off (§8b). The LLM once blocked egress on an
    innocent gateway during development (docs/RESULTS.md).
 3. **Contain-before-restart**: plans are reordered so containment comes first; a restart of a
    host with an open beacon hypothesis is blocked until it is contained.
@@ -166,7 +167,7 @@ the process *with the implant re-injected* (persistence), mirroring the simulato
 * No vector memory / RAG over runbooks: the fault taxonomy fits in ~400 tokens of system prompt.
 * No fine-tuning: the point is that a 7B local model plus good evidence beats a bigger raw dump.
 * No multi-agent orchestration: one loop, two calls per iteration, inspectable trace.
-* No Docker: a hard constraint of the brief; stdlib processes are also faster to boot (~1 s).
+* No Docker: one of our own build constraints (a fanless laptop); stdlib processes are also faster to boot (~1 s).
 
 ## 10. Figures and palette
 

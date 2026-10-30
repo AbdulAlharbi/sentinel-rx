@@ -24,7 +24,7 @@ Model: qwen2.5:7b; files: 20261030T031126Z_heldout_agent.json, 20261030T031121Z_
 | do_nothing | 0% / 0% | 0% / 0% | 0% / 0% |
 | random | 0% / 0% | 0% / 0% | 0% / 0% |
 
-## Robustness (agent, held-out variants, 1 seed)
+## Robustness (agent, held-out variants, 1 seed; change vs the agent on the same seed)
 
 | perturbation | top-1 | recovered | false recovery | harmful / run | change in recovered (pts) | n |
 |---|---|---|---|---|---|---|
@@ -35,14 +35,14 @@ Model: qwen2.5:7b; files: 20261030T031126Z_heldout_agent.json, 20261030T031121Z_
 | unseen_fault | 62% | 100% | 0% | 0.00 | -0 | 8 |
 | smaller LLM (qwen2.5:1.5b) | 40% | 50% | 0% | 0.00 | -50 | 20 |
 
-## Ablations (held-out, 1 seed; delta = ablated - full agent)
+## Ablations (held-out, 1 seed; delta = ablated - full agent on the same seed)
 
 | ablation | top-1 | recovered | false recovery | harmful / run | unnecessary / run | LLM calls | n |
 |---|---|---|---|---|---|---|---|
-| no_verify | 80% (-12) | 20% (-80) | 80% (+80) | 0.00 (+0.00) | 0.60 (-0.58) | 2.0 | 20 |
-| no_loop | 80% (-12) | 20% (-80) | 0% (+0) | 0.00 (+0.00) | 0.60 (-0.58) | 2.0 | 20 |
-| no_beacon | 85% (-7) | 50% (-50) | 35% (+35) | 0.05 (+0.05) | 2.75 (+1.57) | 6.2 | 20 |
-| no_safety | 90% (-2) | 100% (+0) | 0% (+0) | 0.60 (+0.60) | 2.05 (+0.87) | 4.8 | 20 |
+| no_verify | 80% (-10) | 20% (-80) | 80% (+80) | 0.00 (+0.00) | 0.60 (-0.40) | 2.0 | 20 |
+| no_loop | 80% (-10) | 20% (-80) | 0% (+0) | 0.00 (+0.00) | 0.60 (-0.40) | 2.0 | 20 |
+| no_beacon | 85% (-5) | 50% (-50) | 35% (+35) | 0.05 (+0.05) | 2.75 (+1.75) | 6.2 | 20 |
+| no_safety | 90% (+0) | 100% (+0) | 0% (+0) | 0.60 (+0.60) | 2.05 (+1.05) | 4.8 | 20 |
 
 ## Beacon detector
 

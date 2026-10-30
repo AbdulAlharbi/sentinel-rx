@@ -13,3 +13,6 @@
 2026-10-30T09:23:50.160514+00:00 split=perturbations/unseen_fault configs=agent model=qwen2.5:7b tag= git=7ff5768
 2026-10-30T09:31:51.301246+00:00 split=heldout configs=llm_only model=qwen2.5:7b tag= git=7ff5768
 2026-10-30T09:32:26+00:00 note: extra llm_only 3-seed pass stopped at 10/60 (time budget); llm_only reported with 1 seed (n=20)
+2026-10-30T16:13:59.131918+00:00 split=perturbations/timestamp_jitter configs=agent model=qwen2.5:7b tag= git=72a2d16
+2026-10-30T16:20:00+00:00 note: correction to the 05:14:53 note: the stopped llm_only 3-seed run is trace dir 20261030T044340Z_heldout_llm_only (20261030T041454Z is the single_shot run)
+2026-10-30T16:20:00+00:00 note: the 16:13:59 timestamp_jitter run re-records that split after a reproducibility fix (env/perturb.py: stable CRC32 salt instead of per-process str hash(); uncommitted at run time, committed on branch p14-repro-check). It supersedes 20261030T091432Z, whose prompts could not be replayed. Agent, detectors and scorer unchanged (v1-frozen). Same top-1 90%, recovered 100%, false recovery 0%, harmful 0.00.

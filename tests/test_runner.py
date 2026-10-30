@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -63,6 +66,29 @@ def test_noisy_logs_and_jitter_are_deterministic():
     j1, j2 = TimestampJitter(SimEnv(sc), sc.seed), TimestampJitter(SimEnv(sc), sc.seed)
     assert [f.to_dict() for f in j1.get_flows(300)] == [f.to_dict() for f in j2.get_flows(300)]
     assert [f.t for f in j1.get_flows(300)] != [f.t for f in j1.inner.get_flows(300)]
+
+
+def test_jitter_is_identical_across_processes():
+    """Replay needs the same prompt in every process; str hashing differs per PYTHONHASHSEED."""
+    code = (
+        "from env.perturb import TimestampJitter; from env.sim.sim_env import SimEnv; "
+        "from tests.conftest import make_scenario; "
+        "sc = make_scenario([('c2_beacon', 'worker', 40, {})]); "
+        "print([f.t for f in TimestampJitter(SimEnv(sc), sc.seed).get_flows(600)])"
+    )
+    root = Path(__file__).resolve().parents[1]
+    outs = {
+        subprocess.run(
+            [sys.executable, "-c", code],
+            cwd=root,
+            env={**os.environ, "PYTHONHASHSEED": seed},
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+        for seed in ("1", "2", "3")
+    }
+    assert len(outs) == 1 and len(next(iter(outs))) > 10
 
 
 def test_every_committed_scenario_runs_in_sim():

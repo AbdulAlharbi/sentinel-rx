@@ -1,8 +1,8 @@
 """Safety layer between the planner and the environment.
 
 * allowlist: only known actions on known services;
-* evidence gate: never contain (isolate / block egress) a host that no security hypothesis or
-  beacon finding implicates;
+* evidence gate: contain (isolate / block egress) a host only on outbound-compromise evidence:
+  a beacon finding when the detector runs, an open c2_beacon hypothesis only when it is off;
 * ordering: while a beacon hypothesis is open, a restart of that host is blocked until the host
   is contained (block_egress / isolate_host); plans are reordered so containment comes first;
 * dry-run mode: log instead of act;
