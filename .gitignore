@@ -27,4 +27,9 @@ docs/*.toc
 docs/*.fls
 docs/*.fdb_latexmk
 docs/*.synctex.gz
+
+# scratch logs of long runs
+results/tmp_*
+results/*_smoke.json
+results/traces/*_smoke
 !results/heldout_runs.log

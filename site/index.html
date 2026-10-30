@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sentinel-RX</title>
+<meta name="description" content="Security-aware agentic recovery of a failing system: held-out results, robustness, ablations and an incident replay viewer.">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Hackathon challenge: Agentic Recovery of a Failing System</p>
+    <h1>Sentinel-RX</h1>
+    <p class="lede">A security-aware agent that identifies, diagnoses, recovers and <em>verifies</em> the recovery of a failing enterprise system, plus a reproducible benchmark that proves it on unseen incidents. 100% local, 100% free: a 7B model via Ollama, no Docker, no cloud.</p>
+    <nav class="links" id="links">
+      <a href="https://github.com/AbdulAlharbi/sentinel-rx">Repository</a>
+      <a href="literature_review.pdf">Literature review (PDF)</a>
+      <a href="#replay">Incident replay</a>
+      <a href="#video">Video</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+<section id="problem">
+  <h2>The problem</h2>
+  <p>State-of-the-art agents solve roughly 11% of realistic incidents (OpenRCA, ITBench), and no AIOps benchmark tests a security threat hidden inside an operational failure. Five gaps from the literature review drive the design: <strong>G1</strong> concurrent faults, <strong>G2</strong> security incidents inside ops incidents, <strong>G3</strong> false "recovered" claims, <strong>G4</strong> the cost of the agent itself, <strong>G5</strong> robustness on unseen combinations and degraded telemetry.</p>
+</section>
+
+<section id="approach">
+  <h2>Approach</h2>
+  <svg class="diagram" viewBox="0 0 980 190" role="img" aria-label="Pipeline: telemetry to detectors to LLM hypotheses to checks to safety gate to action to verify">
+    <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--muted)"/></marker></defs>
+    <g class="box" transform="translate(10,40)"><rect width="130" height="70" rx="8"/><text x="65" y="30">telemetry</text><text x="65" y="50" class="sub">metrics · logs · flows</text></g>
+    <g class="box" transform="translate(170,40)"><rect width="150" height="70" rx="8"/><text x="75" y="30">4 detectors</text><text x="75" y="50" class="sub">z-score · templates · dep-ranker · beacon RF</text></g>
+    <g class="box llm" transform="translate(350,40)"><rect width="140" height="70" rx="8"/><text x="70" y="30">LLM hypotheses</text><text x="70" y="50" class="sub">+ targeted checks</text></g>
+    <g class="box llm" transform="translate(520,40)"><rect width="110" height="70" rx="8"/><text x="55" y="30">LLM plan</text><text x="55" y="50" class="sub">ordered actions</text></g>
+    <g class="box safe" transform="translate(660,40)"><rect width="130" height="70" rx="8"/><text x="65" y="30">safety gate</text><text x="65" y="50" class="sub">allowlist · contain-first · rollback</text></g>
+    <g class="box" transform="translate(820,40)"><rect width="150" height="70" rx="8"/><text x="75" y="30">verify</text><text x="75" y="50" class="sub">vs. healthy baseline</text></g>
+    <g class="arrows"><path d="M140,75 L168,75"/><path d="M320,75 L348,75"/><path d="M490,75 L518,75"/><path d="M630,75 L658,75"/><path d="M790,75 L818,75"/><path d="M895,110 C895,160 80,160 75,112" class="loop"/></g>
+    <text x="490" y="175" class="sub center">not recovered → loop with history (step budget) · recovered only when verification passes · otherwise escalate with the trace</text>
+  </svg>
+  <ul class="pillars">
+    <li><strong>Hybrid.</strong> Cheap deterministic detectors turn 4 000 flow records and 2 000 log lines into a ~600-token ranked evidence list; the LLM reasons over that, never over raw telemetry.</li>
+    <li><strong>Security-aware.</strong> A RandomForest beacon detector finds C2 call-backs hidden among health checks and update polls; the safety layer enforces <em>contain before restart</em>.</li>
+    <li><strong>Verification gate.</strong> "Recovered" may only be claimed when post-action telemetry matches the pre-incident baseline and no (blocked) beacon attempts remain.</li>
+    <li><strong>Reproducible.</strong> Seeded simulator, strict dev/held-out split enforced in code, record/replay LLM cache, bootstrap CIs over seeds. The same agent runs on a live system of five real processes.</li>
+  </ul>
+</section>
+
+<section id="results">
+  <h2>Held-out leaderboard</h2>
+  <p class="note" id="results-meta"></p>
+  <div class="table-wrap"><table id="leaderboard"></table></div>
+  <div class="charts">
+    <figure><canvas id="chart-config"></canvas><figcaption>Held-out results by configuration (mean, 95% bootstrap CI over scenario × seed runs).</figcaption></figure>
+    <figure><canvas id="chart-nfaults"></canvas><figcaption>Recovery rate by number of concurrent faults.</figcaption></figure>
+  </div>
+</section>
+
+<section id="robustness">
+  <h2>Robustness &amp; adaptation</h2>
+  <p>The same agent, same prompts, same cache policy, on held-out variants with degraded telemetry, renamed services, an unseen fault type, and a smaller LLM.</p>
+  <div class="charts">
+    <figure><canvas id="chart-robust"></canvas><figcaption>Recovered and top-1 under each perturbation vs. the clean held-out split.</figcaption></figure>
+    <figure><canvas id="chart-ablate"></canvas><figcaption>Ablations: change vs. the full agent when a component is removed.</figcaption></figure>
+  </div>
+  <div class="table-wrap"><table id="robust-table"></table></div>
+</section>
+
+<section id="cost">
+  <h2>Cost of the agent</h2>
+  <div class="charts">
+    <figure><canvas id="chart-cost"></canvas><figcaption>LLM tokens per incident vs. recovery rate (held-out).</figcaption></figure>
+    <figure><div id="beacon-card" class="card"></div></figure>
+  </div>
+</section>
+
+<section id="replay">
+  <h2>Incident replay viewer</h2>
+  <p>Step through a recorded held-out trace: what the detectors ranked, what the model hypothesised, which checks it ran, what the safety layer allowed, blocked or rolled back, and what verification said.</p>
+  <div class="replay-controls">
+    <label>Trace <select id="trace-select"></select></label>
+    <button id="prev">◀ prev</button><span id="step-label"></span><button id="next">next ▶</button>
+  </div>
+  <div id="replay-body" class="card"></div>
+</section>
+
+<section id="video">
+  <h2>Video &amp; slides</h2>
+  <p>3.5-minute walkthrough: <span class="placeholder">[video link placeholder — see docs/VIDEO_SCRIPT.md]</span>. Slide content: <a href="https://github.com/AbdulAlharbi/sentinel-rx/blob/main/docs/SLIDES.md">docs/SLIDES.md</a>.</p>
+</section>
+</main>
+<footer class="wrap"><p id="footer-meta">Generated from site/data.json by <code>make report</code>.</p></footer>
+<script src="app.js"></script>
+</body>
+</html>

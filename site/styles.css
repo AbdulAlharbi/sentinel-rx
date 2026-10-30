@@ -1,0 +1,53 @@
+:root {
+  --bg: #fcfcfb; --surface: #ffffff; --text: #0b0b0b; --muted: #52514e; --grid: #e6e5e1; --line: #d9d8d3;
+  --agent: #2a78d6; --runbook: #eb6834; --single: #1baf7a; --llmonly: #eda100;
+  --accent: #2a78d6; --accent-soft: #e4eefb; --safe-soft: #fdece6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #1a1a19; --surface: #232322; --text: #f0efec; --muted: #c3c2b7; --grid: #3a3a38; --line: #44443f; --accent: #3987e5; --accent-soft: #1f2e44; --safe-soft: #3d2a22; }
+}
+:root[data-theme="dark"] { --bg: #1a1a19; --surface: #232322; --text: #f0efec; --muted: #c3c2b7; --grid: #3a3a38; --line: #44443f; --accent: #3987e5; --accent-soft: #1f2e44; --safe-soft: #3d2a22; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 -apple-system, "Segoe UI", Inter, Roboto, sans-serif; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+.hero { padding: 48px 0 32px; border-bottom: 1px solid var(--line); background: var(--surface); }
+.eyebrow { color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-size: 12px; margin: 0 0 8px; }
+h1 { font-size: 40px; margin: 0 0 12px; }
+h2 { font-size: 24px; margin: 40px 0 12px; }
+.lede { font-size: 18px; max-width: 760px; }
+.links a { display: inline-block; margin: 8px 12px 0 0; padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; color: var(--text); text-decoration: none; }
+.links a:hover { border-color: var(--accent); color: var(--accent); }
+.diagram { width: 100%; height: auto; display: block; margin: 12px 0; }
+.diagram .box rect { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+.diagram .box.llm rect { fill: var(--accent-soft); stroke: var(--accent); }
+.diagram .box.safe rect { fill: var(--safe-soft); stroke: var(--runbook); }
+.diagram text { fill: var(--text); font-size: 13px; text-anchor: middle; font-weight: 600; }
+.diagram text.sub { fill: var(--muted); font-size: 10px; font-weight: 400; }
+.diagram .arrows path { stroke: var(--muted); stroke-width: 1.5; fill: none; marker-end: url(#arr); }
+.diagram .arrows path.loop { stroke-dasharray: 4 4; }
+.pillars { padding-left: 18px; } .pillars li { margin: 6px 0; }
+.charts { display: grid; grid-template-columns: 1fr; gap: 20px; }
+@media (min-width: 820px) { .charts { grid-template-columns: 1fr 1fr; } }
+figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+figcaption { color: var(--muted); font-size: 13px; margin-top: 8px; }
+.table-wrap { overflow-x: auto; margin: 12px 0 20px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; background: var(--surface); }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--grid); text-align: left; white-space: nowrap; }
+th { color: var(--muted); font-weight: 600; }
+td.best { font-weight: 700; color: var(--accent); }
+.note { color: var(--muted); font-size: 13px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+.replay-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 10px 0; }
+.replay-controls button { padding: 6px 12px; border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 6px; cursor: pointer; }
+.replay-controls select { padding: 6px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--text); max-width: 100%; }
+.step h3 { margin: 0 0 6px; font-size: 16px; }
+.step h4 { margin: 12px 0 4px; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.step ul { margin: 0; padding-left: 18px; }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; margin-right: 6px; border: 1px solid var(--line); }
+.tag.ok { border-color: var(--single); color: var(--single); }
+.tag.bad { border-color: var(--runbook); color: var(--runbook); }
+.tag.warn { border-color: var(--llmonly); color: var(--llmonly); }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+pre { background: var(--bg); border: 1px solid var(--grid); border-radius: 6px; padding: 8px; overflow-x: auto; max-height: 260px; }
+.placeholder { color: var(--muted); font-style: italic; }
+footer { color: var(--muted); font-size: 13px; padding: 30px 0; }
