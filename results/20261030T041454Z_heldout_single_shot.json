@@ -1,0 +1,2752 @@
+{
+ "meta": {
+  "split": "heldout",
+  "config": "single_shot",
+  "model": "qwen2.5:7b",
+  "replay": false,
+  "seeds": 3,
+  "budget": 8,
+  "tag": "",
+  "git": "7ff5768",
+  "timestamp": "20261030T041454Z",
+  "n_scenarios": 20,
+  "elapsed_s": 1726.7,
+  "trace_dir": "results/traces/20261030T041454Z_heldout_single_shot"
+ },
+ "summary": {
+  "n_runs": 60,
+  "metrics": {
+   "top1": {
+    "mean": 0.6333333333333333,
+    "ci_lo": 0.5,
+    "ci_hi": 0.75,
+    "n": 60
+   },
+   "top3": {
+    "mean": 0.7833333333333333,
+    "ci_lo": 0.6666666666666666,
+    "ci_hi": 0.8833333333333333,
+    "n": 60
+   },
+   "fault_recall": {
+    "mean": 0.49999999999999994,
+    "ci_lo": 0.41111111111111115,
+    "ci_hi": 0.5916666666666667,
+    "n": 60
+   },
+   "recovered": {
+    "mean": 0.3,
+    "ci_lo": 0.2,
+    "ci_hi": 0.4166666666666667,
+    "n": 60
+   },
+   "false_recovery": {
+    "mean": 0.7,
+    "ci_lo": 0.5833333333333334,
+    "ci_hi": 0.8,
+    "n": 60
+   },
+   "harmful_actions": {
+    "mean": 0.26666666666666666,
+    "ci_lo": 0.15,
+    "ci_hi": 0.38333333333333336,
+    "n": 60
+   },
+   "unnecessary_actions": {
+    "mean": 1.8833333333333333,
+    "ci_lo": 1.7,
+    "ci_hi": 2.0670833333333314,
+    "n": 60
+   },
+   "action_precision": {
+    "mean": 0.36527777777777776,
+    "ci_lo": 0.3013888888888888,
+    "ci_hi": 0.43055555555555547,
+    "n": 60
+   },
+   "rolled_back_actions": {
+    "mean": 0.0,
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "n": 60
+   },
+   "n_actions": {
+    "mean": 2.9166666666666665,
+    "ci_lo": 2.816666666666667,
+    "ci_hi": 3.0166666666666666,
+    "n": 60
+   },
+   "isolated_before_restart": {
+    "mean": 0.38095238095238093,
+    "ci_lo": 0.19047619047619047,
+    "ci_hi": 0.5714285714285714,
+    "n": 21
+   },
+   "llm_calls": {
+    "mean": 1.0,
+    "ci_lo": 1.0,
+    "ci_hi": 1.0,
+    "n": 60
+   },
+   "tokens": {
+    "mean": 2421.3,
+    "ci_lo": 2402.4991666666665,
+    "ci_hi": 2440.484583333333,
+    "n": 60
+   },
+   "wall_seconds": {
+    "mean": 84.8063748465002,
+    "ci_lo": 82.05986710334116,
+    "ci_hi": 87.45288283672654,
+    "n": 60
+   },
+   "steps": {
+    "mean": 1.0,
+    "ci_lo": 1.0,
+    "ci_hi": 1.0,
+    "n": 60
+   },
+   "time_to_recovery_s": {
+    "mean": 61.666666666666664,
+    "ci_lo": 53.333333333333336,
+    "ci_hi": 70.0,
+    "n": 18
+   }
+  },
+  "by_n_faults": {
+   "1": {
+    "top1": {
+     "mean": 0.5,
+     "ci_lo": 0.25,
+     "ci_hi": 0.75
+    },
+    "fault_recall": {
+     "mean": 0.5833333333333334,
+     "ci_lo": 0.3333333333333333,
+     "ci_hi": 0.8333333333333334
+    },
+    "recovered": {
+     "mean": 0.75,
+     "ci_lo": 0.5,
+     "ci_hi": 1.0
+    },
+    "false_recovery": {
+     "mean": 0.25,
+     "ci_lo": 0.0,
+     "ci_hi": 0.5
+    },
+    "n_runs": 12
+   },
+   "2": {
+    "top1": {
+     "mean": 0.6666666666666666,
+     "ci_lo": 0.48148148148148145,
+     "ci_hi": 0.8518518518518519
+    },
+    "fault_recall": {
+     "mean": 0.5185185185185185,
+     "ci_lo": 0.37037037037037035,
+     "ci_hi": 0.6666666666666666
+    },
+    "recovered": {
+     "mean": 0.3333333333333333,
+     "ci_lo": 0.14814814814814814,
+     "ci_hi": 0.5185185185185185
+    },
+    "false_recovery": {
+     "mean": 0.6666666666666666,
+     "ci_lo": 0.48148148148148145,
+     "ci_hi": 0.8518518518518519
+    },
+    "n_runs": 27
+   },
+   "3": {
+    "top1": {
+     "mean": 0.6666666666666666,
+     "ci_lo": 0.47619047619047616,
+     "ci_hi": 0.8571428571428571
+    },
+    "fault_recall": {
+     "mean": 0.42857142857142855,
+     "ci_lo": 0.365079365079365,
+     "ci_hi": 0.4920634920634921
+    },
+    "recovered": {
+     "mean": 0.0,
+     "ci_lo": 0.0,
+     "ci_hi": 0.0
+    },
+    "false_recovery": {
+     "mean": 1.0,
+     "ci_lo": 1.0,
+     "ci_hi": 1.0
+    },
+    "n_runs": 21
+   }
+  },
+  "security": {
+   "n_runs": 27,
+   "recovered": 0.14814814814814814,
+   "isolated_before_restart": 0.38095238095238093,
+   "harmful_actions": 0.48148148148148145
+  }
+ },
+ "scores": [
+  {
+   "scenario_id": "heldout_1f_00",
+   "n_faults": 1,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 1.0,
+   "fault_precision": 0.3333333333333333,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 30.0,
+   "llm_calls": 1.0,
+   "tokens": 2370.0,
+   "tokens_in": 2037.0,
+   "tokens_out": 333.0,
+   "llm_seconds": 29.788,
+   "wall_seconds": 29.79720683400228,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "api",
+     "latency_injection"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_1f_00",
+   "n_faults": 1,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 1.0,
+   "fault_precision": 0.5,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 1.0,
+   "action_precision": 0.5,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 2.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 30.0,
+   "llm_calls": 1.0,
+   "tokens": 2255.0,
+   "tokens_in": 2038.0,
+   "tokens_out": 217.0,
+   "llm_seconds": 85.103,
+   "wall_seconds": 85.10967700000037,
+   "env_calls": 6.0,
+   "fault_infos": [
+    [
+     "api",
+     "latency_injection"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_1f_00",
+   "n_faults": 1,
+   "has_security": false,
+   "top1": 0.0,
+   "top3": 1.0,
+   "fault_recall": 1.0,
+   "fault_precision": 0.3333333333333333,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 60.0,
+   "llm_calls": 1.0,
+   "tokens": 2400.0,
+   "tokens_in": 2038.0,
+   "tokens_out": 362.0,
+   "llm_seconds": 63.93,
+   "wall_seconds": 63.93916187499417,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "api",
+     "latency_injection"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_1f_01",
+   "n_faults": 1,
+   "has_security": false,
+   "top1": 0.0,
+   "top3": 0.0,
+   "fault_recall": 0.0,
+   "fault_precision": 0.0,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 3.0,
+   "action_precision": 0.0,
+   "effective_actions": 0.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2387.0,
+   "tokens_in": 2035.0,
+   "tokens_out": 352.0,
+   "llm_seconds": 84.17,
+   "wall_seconds": 84.17883858300047,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "bad_config_deploy"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_1f_01",
+   "n_faults": 1,
+   "has_security": false,
+   "top1": 0.0,
+   "top3": 0.0,
+   "fault_recall": 0.0,
+   "fault_precision": 0.0,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 3.0,
+   "action_precision": 0.0,
+   "effective_actions": 0.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2376.0,
+   "tokens_in": 2038.0,
+   "tokens_out": 338.0,
+   "llm_seconds": 78.256,
+   "wall_seconds": 78.26435924999532,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "bad_config_deploy"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_1f_01",
+   "n_faults": 1,
+   "has_security": false,
+   "top1": 0.0,
+   "top3": 0.0,
+   "fault_recall": 0.0,
+   "fault_precision": 0.0,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 3.0,
+   "action_precision": 0.0,
+   "effective_actions": 0.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2362.0,
+   "tokens_in": 2030.0,
+   "tokens_out": 332.0,
+   "llm_seconds": 84.896,
+   "wall_seconds": 84.90363562499988,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "bad_config_deploy"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_1f_02",
+   "n_faults": 1,
+   "has_security": false,
+   "top1": 0.0,
+   "top3": 0.0,
+   "fault_recall": 0.0,
+   "fault_precision": 0.0,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 90.0,
+   "llm_calls": 1.0,
+   "tokens": 2381.0,
+   "tokens_in": 2063.0,
+   "tokens_out": 318.0,
+   "llm_seconds": 83.516,
+   "wall_seconds": 83.5239563750074,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_1f_02",
+   "n_faults": 1,
+   "has_security": false,
+   "top1": 0.0,
+   "top3": 0.0,
+   "fault_recall": 0.0,
+   "fault_precision": 0.0,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 30.0,
+   "llm_calls": 1.0,
+   "tokens": 2455.0,
+   "tokens_in": 2067.0,
+   "tokens_out": 388.0,
+   "llm_seconds": 86.976,
+   "wall_seconds": 86.98470212500251,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_1f_02",
+   "n_faults": 1,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 1.0,
+   "fault_precision": 0.3333333333333333,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 90.0,
+   "llm_calls": 1.0,
+   "tokens": 2367.0,
+   "tokens_in": 2070.0,
+   "tokens_out": 297.0,
+   "llm_seconds": 85.68,
+   "wall_seconds": 85.68733749999956,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_1f_03",
+   "n_faults": 1,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 1.0,
+   "fault_precision": 0.5,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 1.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 60.0,
+   "llm_calls": 1.0,
+   "tokens": 2252.0,
+   "tokens_in": 2011.0,
+   "tokens_out": 241.0,
+   "llm_seconds": 80.868,
+   "wall_seconds": 80.87538295899867,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "cache",
+     "process_crash"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_1f_03",
+   "n_faults": 1,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 1.0,
+   "fault_precision": 0.5,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 1.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 60.0,
+   "llm_calls": 1.0,
+   "tokens": 2262.0,
+   "tokens_in": 2020.0,
+   "tokens_out": 242.0,
+   "llm_seconds": 72.184,
+   "wall_seconds": 72.19071429199539,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "cache",
+     "process_crash"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_1f_03",
+   "n_faults": 1,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 1.0,
+   "fault_precision": 0.5,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 1.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 60.0,
+   "llm_calls": 1.0,
+   "tokens": 2275.0,
+   "tokens_in": 2015.0,
+   "tokens_out": 260.0,
+   "llm_seconds": 69.756,
+   "wall_seconds": 69.76373979200434,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "cache",
+     "process_crash"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_00",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.5,
+   "fault_precision": 0.3333333333333333,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2425.0,
+   "tokens_in": 2124.0,
+   "tokens_out": 301.0,
+   "llm_seconds": 74.084,
+   "wall_seconds": 74.09309445800318,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "credential_stuffing"
+    ],
+    [
+     "worker",
+     "disk_full"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_00",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.5,
+   "fault_precision": 0.3333333333333333,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2454.0,
+   "tokens_in": 2125.0,
+   "tokens_out": 329.0,
+   "llm_seconds": 79.879,
+   "wall_seconds": 79.88967666600365,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "credential_stuffing"
+    ],
+    [
+     "worker",
+     "disk_full"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_00",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 1.0,
+   "fault_precision": 1.0,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 0.0,
+   "action_precision": 1.0,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 2.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 60.0,
+   "llm_calls": 1.0,
+   "tokens": 2377.0,
+   "tokens_in": 2134.0,
+   "tokens_out": 243.0,
+   "llm_seconds": 79.772,
+   "wall_seconds": 79.77883137499157,
+   "env_calls": 6.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "credential_stuffing"
+    ],
+    [
+     "worker",
+     "disk_full"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_01",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.5,
+   "fault_precision": 0.3333333333333333,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 1.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 0.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2385.0,
+   "tokens_in": 2047.0,
+   "tokens_out": 338.0,
+   "llm_seconds": 81.488,
+   "wall_seconds": 81.49760362500092,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "api",
+     "c2_beacon"
+    ],
+    [
+     "worker",
+     "disk_full"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_01",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.5,
+   "fault_precision": 0.3333333333333333,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 1.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 0.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2395.0,
+   "tokens_in": 2047.0,
+   "tokens_out": 348.0,
+   "llm_seconds": 82.0,
+   "wall_seconds": 82.0092211250012,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "api",
+     "c2_beacon"
+    ],
+    [
+     "worker",
+     "disk_full"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_01",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.5,
+   "fault_precision": 0.3333333333333333,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 1.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 0.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2390.0,
+   "tokens_in": 2045.0,
+   "tokens_out": 345.0,
+   "llm_seconds": 87.513,
+   "wall_seconds": 87.51941566599999,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "api",
+     "c2_beacon"
+    ],
+    [
+     "worker",
+     "disk_full"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_02",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 0.0,
+   "top3": 1.0,
+   "fault_recall": 0.5,
+   "fault_precision": 0.3333333333333333,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 1.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 0.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2464.0,
+   "tokens_in": 2146.0,
+   "tokens_out": 318.0,
+   "llm_seconds": 87.043,
+   "wall_seconds": 87.05237070799922,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "api",
+     "c2_beacon"
+    ],
+    [
+     "cache",
+     "cache_failure"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_02",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 0.0,
+   "top3": 0.0,
+   "fault_recall": 0.0,
+   "fault_precision": 0.0,
+   "localized": 0.5,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 1.0,
+   "unnecessary_actions": 3.0,
+   "action_precision": 0.0,
+   "effective_actions": 0.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 0.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2500.0,
+   "tokens_in": 2140.0,
+   "tokens_out": 360.0,
+   "llm_seconds": 88.563,
+   "wall_seconds": 88.57169283300755,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "api",
+     "c2_beacon"
+    ],
+    [
+     "cache",
+     "cache_failure"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_02",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 0.0,
+   "top3": 0.0,
+   "fault_recall": 0.0,
+   "fault_precision": 0.0,
+   "localized": 0.5,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 3.0,
+   "action_precision": 0.0,
+   "effective_actions": 0.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 1.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2460.0,
+   "tokens_in": 2146.0,
+   "tokens_out": 314.0,
+   "llm_seconds": 87.433,
+   "wall_seconds": 87.44091408299573,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "api",
+     "c2_beacon"
+    ],
+    [
+     "cache",
+     "cache_failure"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_03",
+   "n_faults": 2,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 1.0,
+   "fault_precision": 0.6666666666666666,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 1.0,
+   "action_precision": 0.6666666666666666,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 90.0,
+   "llm_calls": 1.0,
+   "tokens": 2414.0,
+   "tokens_in": 2054.0,
+   "tokens_out": 360.0,
+   "llm_seconds": 89.395,
+   "wall_seconds": 89.40502025000751,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "bad_config_deploy"
+    ],
+    [
+     "worker",
+     "disk_full"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_03",
+   "n_faults": 2,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 1.0,
+   "fault_precision": 0.6666666666666666,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 1.0,
+   "action_precision": 0.6666666666666666,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 90.0,
+   "llm_calls": 1.0,
+   "tokens": 2414.0,
+   "tokens_in": 2055.0,
+   "tokens_out": 359.0,
+   "llm_seconds": 88.904,
+   "wall_seconds": 88.91546925000148,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "bad_config_deploy"
+    ],
+    [
+     "worker",
+     "disk_full"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_03",
+   "n_faults": 2,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.5,
+   "fault_precision": 0.3333333333333333,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2419.0,
+   "tokens_in": 2059.0,
+   "tokens_out": 360.0,
+   "llm_seconds": 90.532,
+   "wall_seconds": 90.53970620800101,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "bad_config_deploy"
+    ],
+    [
+     "worker",
+     "disk_full"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_04",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.5,
+   "fault_precision": 0.3333333333333333,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 1.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 0.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2382.0,
+   "tokens_in": 2053.0,
+   "tokens_out": 329.0,
+   "llm_seconds": 88.566,
+   "wall_seconds": 88.57602354200208,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "worker",
+     "c2_beacon"
+    ],
+    [
+     "api",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_04",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.5,
+   "fault_precision": 0.3333333333333333,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 1.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 0.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2392.0,
+   "tokens_in": 2053.0,
+   "tokens_out": 339.0,
+   "llm_seconds": 87.095,
+   "wall_seconds": 87.10388858300576,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "worker",
+     "c2_beacon"
+    ],
+    [
+     "api",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_04",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.5,
+   "fault_precision": 0.3333333333333333,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 1.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 0.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2392.0,
+   "tokens_in": 2050.0,
+   "tokens_out": 342.0,
+   "llm_seconds": 86.473,
+   "wall_seconds": 86.48291974999302,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "worker",
+     "c2_beacon"
+    ],
+    [
+     "api",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_05",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 1.0,
+   "fault_precision": 1.0,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 0.0,
+   "action_precision": 1.0,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 2.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 60.0,
+   "llm_calls": 1.0,
+   "tokens": 2381.0,
+   "tokens_in": 2159.0,
+   "tokens_out": 222.0,
+   "llm_seconds": 81.255,
+   "wall_seconds": 81.26077441699454,
+   "env_calls": 6.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "credential_stuffing"
+    ],
+    [
+     "worker",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_05",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 1.0,
+   "fault_precision": 1.0,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 0.0,
+   "action_precision": 1.0,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 2.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 60.0,
+   "llm_calls": 1.0,
+   "tokens": 2371.0,
+   "tokens_in": 2155.0,
+   "tokens_out": 216.0,
+   "llm_seconds": 75.118,
+   "wall_seconds": 75.13135945799877,
+   "env_calls": 6.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "credential_stuffing"
+    ],
+    [
+     "worker",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_05",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 1.0,
+   "fault_precision": 1.0,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 0.0,
+   "action_precision": 1.0,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 2.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 60.0,
+   "llm_calls": 1.0,
+   "tokens": 2377.0,
+   "tokens_in": 2159.0,
+   "tokens_out": 218.0,
+   "llm_seconds": 68.305,
+   "wall_seconds": 68.31339745900186,
+   "env_calls": 6.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "credential_stuffing"
+    ],
+    [
+     "worker",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_06",
+   "n_faults": 2,
+   "has_security": false,
+   "top1": 0.0,
+   "top3": 0.0,
+   "fault_recall": 0.0,
+   "fault_precision": 0.0,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 3.0,
+   "action_precision": 0.0,
+   "effective_actions": 0.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2369.0,
+   "tokens_in": 2064.0,
+   "tokens_out": 305.0,
+   "llm_seconds": 72.299,
+   "wall_seconds": 72.30857233300048,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "api",
+     "bad_config_deploy"
+    ],
+    [
+     "cache",
+     "latency_injection"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_06",
+   "n_faults": 2,
+   "has_security": false,
+   "top1": 0.0,
+   "top3": 0.0,
+   "fault_recall": 0.0,
+   "fault_precision": 0.0,
+   "localized": 0.5,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.0,
+   "effective_actions": 0.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 2.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2280.0,
+   "tokens_in": 2064.0,
+   "tokens_out": 216.0,
+   "llm_seconds": 71.563,
+   "wall_seconds": 71.57041079198825,
+   "env_calls": 6.0,
+   "fault_infos": [
+    [
+     "api",
+     "bad_config_deploy"
+    ],
+    [
+     "cache",
+     "latency_injection"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_06",
+   "n_faults": 2,
+   "has_security": false,
+   "top1": 0.0,
+   "top3": 0.0,
+   "fault_recall": 0.0,
+   "fault_precision": 0.0,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 3.0,
+   "action_precision": 0.0,
+   "effective_actions": 0.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2367.0,
+   "tokens_in": 2062.0,
+   "tokens_out": 305.0,
+   "llm_seconds": 76.161,
+   "wall_seconds": 76.16908129199874,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "api",
+     "bad_config_deploy"
+    ],
+    [
+     "cache",
+     "latency_injection"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_07",
+   "n_faults": 2,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 1.0,
+   "fault_precision": 0.6666666666666666,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 1.0,
+   "action_precision": 0.6666666666666666,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 60.0,
+   "llm_calls": 1.0,
+   "tokens": 2435.0,
+   "tokens_in": 2131.0,
+   "tokens_out": 304.0,
+   "llm_seconds": 76.744,
+   "wall_seconds": 76.75136799999746,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "cache",
+     "cache_failure"
+    ],
+    [
+     "api",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_07",
+   "n_faults": 2,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 1.0,
+   "fault_precision": 0.6666666666666666,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 1.0,
+   "action_precision": 0.6666666666666666,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 60.0,
+   "llm_calls": 1.0,
+   "tokens": 2442.0,
+   "tokens_in": 2135.0,
+   "tokens_out": 307.0,
+   "llm_seconds": 82.481,
+   "wall_seconds": 82.48736608400941,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "cache",
+     "cache_failure"
+    ],
+    [
+     "api",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_07",
+   "n_faults": 2,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 1.0,
+   "fault_precision": 0.5,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.5,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 4.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 60.0,
+   "llm_calls": 1.0,
+   "tokens": 2515.0,
+   "tokens_in": 2133.0,
+   "tokens_out": 382.0,
+   "llm_seconds": 87.52,
+   "wall_seconds": 87.53053162500146,
+   "env_calls": 8.0,
+   "fault_infos": [
+    [
+     "cache",
+     "cache_failure"
+    ],
+    [
+     "api",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_08",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 0.0,
+   "top3": 0.0,
+   "fault_recall": 0.0,
+   "fault_precision": 0.0,
+   "localized": 0.5,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 3.0,
+   "action_precision": 0.0,
+   "effective_actions": 0.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 1.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2364.0,
+   "tokens_in": 2046.0,
+   "tokens_out": 318.0,
+   "llm_seconds": 87.998,
+   "wall_seconds": 88.0071619579976,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "bad_config_deploy"
+    ],
+    [
+     "api",
+     "c2_beacon"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_08",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 0.0,
+   "top3": 0.0,
+   "fault_recall": 0.0,
+   "fault_precision": 0.0,
+   "localized": 0.5,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 3.0,
+   "action_precision": 0.0,
+   "effective_actions": 0.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 1.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2375.0,
+   "tokens_in": 2042.0,
+   "tokens_out": 333.0,
+   "llm_seconds": 88.994,
+   "wall_seconds": 89.00197766600468,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "bad_config_deploy"
+    ],
+    [
+     "api",
+     "c2_beacon"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_2f_08",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 0.0,
+   "top3": 0.0,
+   "fault_recall": 0.0,
+   "fault_precision": 0.0,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 1.0,
+   "unnecessary_actions": 3.0,
+   "action_precision": 0.0,
+   "effective_actions": 0.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 0.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2401.0,
+   "tokens_in": 2043.0,
+   "tokens_out": 358.0,
+   "llm_seconds": 87.131,
+   "wall_seconds": 87.14017062500352,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "bad_config_deploy"
+    ],
+    [
+     "api",
+     "c2_beacon"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_00",
+   "n_faults": 3,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.3333333333333333,
+   "fault_precision": 0.3333333333333333,
+   "localized": 0.6666666666666666,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 1.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2553.0,
+   "tokens_in": 2165.0,
+   "tokens_out": 388.0,
+   "llm_seconds": 91.819,
+   "wall_seconds": 91.82815287499398,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "worker",
+     "c2_beacon"
+    ],
+    [
+     "cache",
+     "cache_failure"
+    ],
+    [
+     "db",
+     "disk_full"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_00",
+   "n_faults": 3,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.3333333333333333,
+   "fault_precision": 0.3333333333333333,
+   "localized": 0.6666666666666666,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 1.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2547.0,
+   "tokens_in": 2159.0,
+   "tokens_out": 388.0,
+   "llm_seconds": 96.318,
+   "wall_seconds": 96.32651570899179,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "worker",
+     "c2_beacon"
+    ],
+    [
+     "cache",
+     "cache_failure"
+    ],
+    [
+     "db",
+     "disk_full"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_00",
+   "n_faults": 3,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.3333333333333333,
+   "fault_precision": 0.3333333333333333,
+   "localized": 0.6666666666666666,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 1.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2554.0,
+   "tokens_in": 2166.0,
+   "tokens_out": 388.0,
+   "llm_seconds": 98.901,
+   "wall_seconds": 98.91069829200569,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "worker",
+     "c2_beacon"
+    ],
+    [
+     "cache",
+     "cache_failure"
+    ],
+    [
+     "db",
+     "disk_full"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_01",
+   "n_faults": 3,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.3333333333333333,
+   "fault_precision": 0.3333333333333333,
+   "localized": 0.3333333333333333,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2441.0,
+   "tokens_in": 2083.0,
+   "tokens_out": 358.0,
+   "llm_seconds": 96.81,
+   "wall_seconds": 96.81784970899753,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "bad_config_deploy"
+    ],
+    [
+     "db",
+     "disk_full"
+    ],
+    [
+     "cache",
+     "latency_injection"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_01",
+   "n_faults": 3,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.3333333333333333,
+   "fault_precision": 0.3333333333333333,
+   "localized": 0.3333333333333333,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2433.0,
+   "tokens_in": 2078.0,
+   "tokens_out": 355.0,
+   "llm_seconds": 94.102,
+   "wall_seconds": 94.109723415997,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "bad_config_deploy"
+    ],
+    [
+     "db",
+     "disk_full"
+    ],
+    [
+     "cache",
+     "latency_injection"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_01",
+   "n_faults": 3,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.3333333333333333,
+   "fault_precision": 0.3333333333333333,
+   "localized": 0.3333333333333333,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2437.0,
+   "tokens_in": 2078.0,
+   "tokens_out": 359.0,
+   "llm_seconds": 91.875,
+   "wall_seconds": 91.8855479999911,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "bad_config_deploy"
+    ],
+    [
+     "db",
+     "disk_full"
+    ],
+    [
+     "cache",
+     "latency_injection"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_02",
+   "n_faults": 3,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.6666666666666666,
+   "fault_precision": 0.6666666666666666,
+   "localized": 0.6666666666666666,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 1.0,
+   "action_precision": 0.6666666666666666,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2542.0,
+   "tokens_in": 2154.0,
+   "tokens_out": 388.0,
+   "llm_seconds": 94.333,
+   "wall_seconds": 94.34200716599298,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "cache",
+     "cache_failure"
+    ],
+    [
+     "db",
+     "disk_full"
+    ],
+    [
+     "api",
+     "latency_injection"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_02",
+   "n_faults": 3,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.6666666666666666,
+   "fault_precision": 0.6666666666666666,
+   "localized": 0.6666666666666666,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 1.0,
+   "action_precision": 0.6666666666666666,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2548.0,
+   "tokens_in": 2156.0,
+   "tokens_out": 392.0,
+   "llm_seconds": 97.291,
+   "wall_seconds": 97.3001179999992,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "cache",
+     "cache_failure"
+    ],
+    [
+     "db",
+     "disk_full"
+    ],
+    [
+     "api",
+     "latency_injection"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_02",
+   "n_faults": 3,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.6666666666666666,
+   "fault_precision": 0.6666666666666666,
+   "localized": 0.6666666666666666,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 1.0,
+   "action_precision": 0.6666666666666666,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2504.0,
+   "tokens_in": 2157.0,
+   "tokens_out": 347.0,
+   "llm_seconds": 97.42,
+   "wall_seconds": 97.43010537499504,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "cache",
+     "cache_failure"
+    ],
+    [
+     "db",
+     "disk_full"
+    ],
+    [
+     "api",
+     "latency_injection"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_03",
+   "n_faults": 3,
+   "has_security": false,
+   "top1": 0.0,
+   "top3": 1.0,
+   "fault_recall": 0.3333333333333333,
+   "fault_precision": 0.3333333333333333,
+   "localized": 0.6666666666666666,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2450.0,
+   "tokens_in": 2154.0,
+   "tokens_out": 296.0,
+   "llm_seconds": 91.792,
+   "wall_seconds": 91.80099454200536,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "cache",
+     "cache_failure"
+    ],
+    [
+     "db",
+     "latency_injection"
+    ],
+    [
+     "api",
+     "process_crash"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_03",
+   "n_faults": 3,
+   "has_security": false,
+   "top1": 0.0,
+   "top3": 1.0,
+   "fault_recall": 0.3333333333333333,
+   "fault_precision": 0.3333333333333333,
+   "localized": 0.6666666666666666,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2446.0,
+   "tokens_in": 2151.0,
+   "tokens_out": 295.0,
+   "llm_seconds": 85.815,
+   "wall_seconds": 85.82306720800989,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "cache",
+     "cache_failure"
+    ],
+    [
+     "db",
+     "latency_injection"
+    ],
+    [
+     "api",
+     "process_crash"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_03",
+   "n_faults": 3,
+   "has_security": false,
+   "top1": 0.0,
+   "top3": 1.0,
+   "fault_recall": 0.3333333333333333,
+   "fault_precision": 0.3333333333333333,
+   "localized": 0.6666666666666666,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2469.0,
+   "tokens_in": 2144.0,
+   "tokens_out": 325.0,
+   "llm_seconds": 84.226,
+   "wall_seconds": 84.2361869590095,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "cache",
+     "cache_failure"
+    ],
+    [
+     "db",
+     "latency_injection"
+    ],
+    [
+     "api",
+     "process_crash"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_04",
+   "n_faults": 3,
+   "has_security": true,
+   "top1": 0.0,
+   "top3": 1.0,
+   "fault_recall": 0.3333333333333333,
+   "fault_precision": 0.3333333333333333,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 1.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 0.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2487.0,
+   "tokens_in": 2168.0,
+   "tokens_out": 319.0,
+   "llm_seconds": 85.552,
+   "wall_seconds": 85.56197249999968,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "api",
+     "c2_beacon"
+    ],
+    [
+     "cache",
+     "cache_failure"
+    ],
+    [
+     "db",
+     "latency_injection"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_04",
+   "n_faults": 3,
+   "has_security": true,
+   "top1": 0.0,
+   "top3": 1.0,
+   "fault_recall": 0.3333333333333333,
+   "fault_precision": 0.3333333333333333,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 1.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.0,
+   "effective_actions": 0.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 2.0,
+   "isolated_before_restart": 0.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2448.0,
+   "tokens_in": 2166.0,
+   "tokens_out": 282.0,
+   "llm_seconds": 85.043,
+   "wall_seconds": 85.0541440419911,
+   "env_calls": 6.0,
+   "fault_infos": [
+    [
+     "api",
+     "c2_beacon"
+    ],
+    [
+     "cache",
+     "cache_failure"
+    ],
+    [
+     "db",
+     "latency_injection"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_04",
+   "n_faults": 3,
+   "has_security": true,
+   "top1": 0.0,
+   "top3": 1.0,
+   "fault_recall": 0.3333333333333333,
+   "fault_precision": 0.3333333333333333,
+   "localized": 0.6666666666666666,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 1.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 0.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2490.0,
+   "tokens_in": 2170.0,
+   "tokens_out": 320.0,
+   "llm_seconds": 84.832,
+   "wall_seconds": 84.84185620798962,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "api",
+     "c2_beacon"
+    ],
+    [
+     "cache",
+     "cache_failure"
+    ],
+    [
+     "db",
+     "latency_injection"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_05",
+   "n_faults": 3,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.6666666666666666,
+   "fault_precision": 0.6666666666666666,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 1.0,
+   "action_precision": 0.6666666666666666,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2437.0,
+   "tokens_in": 2106.0,
+   "tokens_out": 331.0,
+   "llm_seconds": 85.117,
+   "wall_seconds": 85.12633495799673,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "api",
+     "bad_config_deploy"
+    ],
+    [
+     "db",
+     "disk_full"
+    ],
+    [
+     "gateway",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_05",
+   "n_faults": 3,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.3333333333333333,
+   "fault_precision": 0.3333333333333333,
+   "localized": 0.6666666666666666,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2463.0,
+   "tokens_in": 2104.0,
+   "tokens_out": 359.0,
+   "llm_seconds": 89.341,
+   "wall_seconds": 89.35093066601257,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "api",
+     "bad_config_deploy"
+    ],
+    [
+     "db",
+     "disk_full"
+    ],
+    [
+     "gateway",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_05",
+   "n_faults": 3,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.6666666666666666,
+   "fault_precision": 0.6666666666666666,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 1.0,
+   "action_precision": 0.6666666666666666,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2495.0,
+   "tokens_in": 2105.0,
+   "tokens_out": 390.0,
+   "llm_seconds": 93.386,
+   "wall_seconds": 93.39453287501237,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "api",
+     "bad_config_deploy"
+    ],
+    [
+     "db",
+     "disk_full"
+    ],
+    [
+     "gateway",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_06",
+   "n_faults": 3,
+   "has_security": true,
+   "top1": 0.0,
+   "top3": 1.0,
+   "fault_recall": 0.6666666666666666,
+   "fault_precision": 0.5,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 1.0,
+   "unnecessary_actions": 3.0,
+   "action_precision": 0.25,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 4.0,
+   "isolated_before_restart": 0.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2583.0,
+   "tokens_in": 2088.0,
+   "tokens_out": 495.0,
+   "llm_seconds": 103.232,
+   "wall_seconds": 103.24207408299844,
+   "env_calls": 8.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "bad_config_deploy"
+    ],
+    [
+     "api",
+     "c2_beacon"
+    ],
+    [
+     "worker",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_06",
+   "n_faults": 3,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.3333333333333333,
+   "fault_precision": 0.3333333333333333,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 1.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2444.0,
+   "tokens_in": 2093.0,
+   "tokens_out": 351.0,
+   "llm_seconds": 102.381,
+   "wall_seconds": 102.3899410830054,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "bad_config_deploy"
+    ],
+    [
+     "api",
+     "c2_beacon"
+    ],
+    [
+     "worker",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 1,
+   "config": "single_shot"
+  },
+  {
+   "scenario_id": "heldout_3f_06",
+   "n_faults": 3,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.3333333333333333,
+   "fault_precision": 0.3333333333333333,
+   "localized": 1.0,
+   "recovered": 0.0,
+   "false_recovery": 1.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.3333333333333333,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": 1.0,
+   "steps": 1.0,
+   "time_to_recovery_s": null,
+   "llm_calls": 1.0,
+   "tokens": 2425.0,
+   "tokens_in": 2090.0,
+   "tokens_out": 335.0,
+   "llm_seconds": 98.833,
+   "wall_seconds": 98.84300508300657,
+   "env_calls": 7.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "bad_config_deploy"
+    ],
+    [
+     "api",
+     "c2_beacon"
+    ],
+    [
+     "worker",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 2,
+   "config": "single_shot"
+  }
+ ]
+}

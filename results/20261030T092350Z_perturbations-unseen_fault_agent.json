@@ -1,0 +1,501 @@
+{
+ "meta": {
+  "split": "perturbations/unseen_fault",
+  "config": "agent",
+  "model": "qwen2.5:7b",
+  "replay": false,
+  "seeds": 1,
+  "budget": 8,
+  "tag": "",
+  "git": "7ff5768",
+  "timestamp": "20261030T092350Z",
+  "n_scenarios": 8,
+  "elapsed_s": 481.0,
+  "trace_dir": "results/traces/20261030T092350Z_perturbations-unseen_fault_agent"
+ },
+ "summary": {
+  "n_runs": 8,
+  "metrics": {
+   "top1": {
+    "mean": 0.625,
+    "ci_lo": 0.25,
+    "ci_hi": 0.875,
+    "n": 8
+   },
+   "top3": {
+    "mean": 0.625,
+    "ci_lo": 0.25,
+    "ci_hi": 0.875,
+    "n": 8
+   },
+   "fault_recall": {
+    "mean": 0.3125,
+    "ci_lo": 0.125,
+    "ci_hi": 0.4375,
+    "n": 8
+   },
+   "recovered": {
+    "mean": 1.0,
+    "ci_lo": 1.0,
+    "ci_hi": 1.0,
+    "n": 8
+   },
+   "false_recovery": {
+    "mean": 0.0,
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "n": 8
+   },
+   "harmful_actions": {
+    "mean": 0.0,
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "n": 8
+   },
+   "unnecessary_actions": {
+    "mean": 1.625,
+    "ci_lo": 1.0,
+    "ci_hi": 2.125,
+    "n": 8
+   },
+   "action_precision": {
+    "mean": 0.5854166666666667,
+    "ci_lo": 0.4583333333333333,
+    "ci_hi": 0.7291666666666666,
+    "n": 8
+   },
+   "rolled_back_actions": {
+    "mean": 0.0,
+    "ci_lo": 0.0,
+    "ci_hi": 0.0,
+    "n": 8
+   },
+   "n_actions": {
+    "mean": 3.5,
+    "ci_lo": 2.625,
+    "ci_hi": 4.25,
+    "n": 8
+   },
+   "isolated_before_restart": {
+    "mean": 1.0,
+    "ci_lo": 1.0,
+    "ci_hi": 1.0,
+    "n": 1
+   },
+   "llm_calls": {
+    "mean": 3.75,
+    "ci_lo": 2.75,
+    "ci_hi": 4.75,
+    "n": 8
+   },
+   "tokens": {
+    "mean": 5373.25,
+    "ci_lo": 3917.8625,
+    "ci_hi": 6940.73125,
+    "n": 8
+   },
+   "wall_seconds": {
+    "mean": 176.33960239075168,
+    "ci_lo": 123.47956630858339,
+    "ci_hi": 234.58134691236137,
+    "n": 8
+   },
+   "steps": {
+    "mean": 1.875,
+    "ci_lo": 1.375,
+    "ci_hi": 2.375,
+    "n": 8
+   },
+   "time_to_recovery_s": {
+    "mean": 168.75,
+    "ci_lo": 90.0,
+    "ci_hi": 277.5,
+    "n": 8
+   }
+  },
+  "by_n_faults": {
+   "1": {
+    "top1": {
+     "mean": 0.0,
+     "ci_lo": 0.0,
+     "ci_hi": 0.0
+    },
+    "fault_recall": {
+     "mean": 0.0,
+     "ci_lo": 0.0,
+     "ci_hi": 0.0
+    },
+    "recovered": {
+     "mean": 1.0,
+     "ci_lo": 1.0,
+     "ci_hi": 1.0
+    },
+    "false_recovery": {
+     "mean": 0.0,
+     "ci_lo": 0.0,
+     "ci_hi": 0.0
+    },
+    "n_runs": 2
+   },
+   "2": {
+    "top1": {
+     "mean": 0.8333333333333334,
+     "ci_lo": 0.5,
+     "ci_hi": 1.0
+    },
+    "fault_recall": {
+     "mean": 0.4166666666666667,
+     "ci_lo": 0.25,
+     "ci_hi": 0.5
+    },
+    "recovered": {
+     "mean": 1.0,
+     "ci_lo": 1.0,
+     "ci_hi": 1.0
+    },
+    "false_recovery": {
+     "mean": 0.0,
+     "ci_lo": 0.0,
+     "ci_hi": 0.0
+    },
+    "n_runs": 6
+   }
+  },
+  "security": {
+   "n_runs": 2,
+   "recovered": 1.0,
+   "isolated_before_restart": 1.0,
+   "harmful_actions": 0.0
+  }
+ },
+ "scores": [
+  {
+   "scenario_id": "unseen_00",
+   "n_faults": 1,
+   "has_security": false,
+   "top1": 0.0,
+   "top3": 0.0,
+   "fault_recall": 0.0,
+   "fault_precision": 0.0,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 3.0,
+   "action_precision": 0.25,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 4.0,
+   "isolated_before_restart": null,
+   "steps": 2.0,
+   "time_to_recovery_s": 180.0,
+   "llm_calls": 4.0,
+   "tokens": 5587.0,
+   "tokens_in": 4813.0,
+   "tokens_out": 774.0,
+   "llm_seconds": 155.478,
+   "wall_seconds": 155.6179780829989,
+   "env_calls": 41.0,
+   "fault_infos": [
+    [
+     "api",
+     "dns_failure"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "agent"
+  },
+  {
+   "scenario_id": "unseen_01",
+   "n_faults": 1,
+   "has_security": false,
+   "top1": 0.0,
+   "top3": 0.0,
+   "fault_recall": 0.0,
+   "fault_precision": 0.0,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 0.0,
+   "action_precision": 1.0,
+   "effective_actions": 1.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 1.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 30.0,
+   "llm_calls": 2.0,
+   "tokens": 2541.0,
+   "tokens_in": 2165.0,
+   "tokens_out": 376.0,
+   "llm_seconds": 79.908,
+   "wall_seconds": 80.03766754199751,
+   "env_calls": 18.0,
+   "fault_infos": [
+    [
+     "worker",
+     "dns_failure"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "agent"
+  },
+  {
+   "scenario_id": "unseen_02",
+   "n_faults": 2,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.5,
+   "fault_precision": 0.5,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.5,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 4.0,
+   "isolated_before_restart": null,
+   "steps": 3.0,
+   "time_to_recovery_s": 240.0,
+   "llm_calls": 6.0,
+   "tokens": 8784.0,
+   "tokens_in": 7682.0,
+   "tokens_out": 1102.0,
+   "llm_seconds": 288.428,
+   "wall_seconds": 288.56465362499875,
+   "env_calls": 51.0,
+   "fault_infos": [
+    [
+     "api",
+     "dns_failure"
+    ],
+    [
+     "worker",
+     "memory_leak"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "agent"
+  },
+  {
+   "scenario_id": "unseen_03",
+   "n_faults": 2,
+   "has_security": false,
+   "top1": 0.0,
+   "top3": 0.0,
+   "fault_recall": 0.0,
+   "fault_precision": 0.0,
+   "localized": 0.5,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.5,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 4.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 60.0,
+   "llm_calls": 2.0,
+   "tokens": 3331.0,
+   "tokens_in": 2646.0,
+   "tokens_out": 685.0,
+   "llm_seconds": 102.029,
+   "wall_seconds": 102.08262504200684,
+   "env_calls": 34.0,
+   "fault_infos": [
+    [
+     "db",
+     "db_conn_exhaustion"
+    ],
+    [
+     "api",
+     "dns_failure"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "agent"
+  },
+  {
+   "scenario_id": "unseen_04",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.5,
+   "fault_precision": 0.5,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.6,
+   "effective_actions": 3.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 5.0,
+   "isolated_before_restart": 1.0,
+   "steps": 3.0,
+   "time_to_recovery_s": 480.0,
+   "llm_calls": 6.0,
+   "tokens": 8265.0,
+   "tokens_in": 7154.0,
+   "tokens_out": 1111.0,
+   "llm_seconds": 300.81300000000005,
+   "wall_seconds": 300.92558891700173,
+   "env_calls": 56.0,
+   "fault_infos": [
+    [
+     "worker",
+     "c2_beacon"
+    ],
+    [
+     "api",
+     "dns_failure"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "agent"
+  },
+  {
+   "scenario_id": "unseen_05",
+   "n_faults": 2,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.5,
+   "fault_precision": 0.5,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 2.0,
+   "action_precision": 0.5,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 4.0,
+   "isolated_before_restart": null,
+   "steps": 2.0,
+   "time_to_recovery_s": 150.0,
+   "llm_calls": 4.0,
+   "tokens": 6345.0,
+   "tokens_in": 5374.0,
+   "tokens_out": 971.0,
+   "llm_seconds": 201.279,
+   "wall_seconds": 201.34838941700582,
+   "env_calls": 43.0,
+   "fault_infos": [
+    [
+     "cache",
+     "cache_failure"
+    ],
+    [
+     "api",
+     "dns_failure"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "agent"
+  },
+  {
+   "scenario_id": "unseen_06",
+   "n_faults": 2,
+   "has_security": true,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.5,
+   "fault_precision": 0.5,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 1.0,
+   "action_precision": 0.6666666666666666,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 2.0,
+   "time_to_recovery_s": 150.0,
+   "llm_calls": 4.0,
+   "tokens": 5126.0,
+   "tokens_in": 4442.0,
+   "tokens_out": 684.0,
+   "llm_seconds": 192.23299999999998,
+   "wall_seconds": 192.31076620800013,
+   "env_calls": 37.0,
+   "fault_infos": [
+    [
+     "gateway",
+     "credential_stuffing"
+    ],
+    [
+     "api",
+     "dns_failure"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "agent"
+  },
+  {
+   "scenario_id": "unseen_07",
+   "n_faults": 2,
+   "has_security": false,
+   "top1": 1.0,
+   "top3": 1.0,
+   "fault_recall": 0.5,
+   "fault_precision": 0.3333333333333333,
+   "localized": 1.0,
+   "recovered": 1.0,
+   "false_recovery": 0.0,
+   "claimed_recovered": 1.0,
+   "escalated": 0.0,
+   "harmful_actions": 0.0,
+   "unnecessary_actions": 1.0,
+   "action_precision": 0.6666666666666666,
+   "effective_actions": 2.0,
+   "rolled_back_actions": 0.0,
+   "n_actions": 3.0,
+   "isolated_before_restart": null,
+   "steps": 1.0,
+   "time_to_recovery_s": 60.0,
+   "llm_calls": 2.0,
+   "tokens": 3007.0,
+   "tokens_in": 2472.0,
+   "tokens_out": 535.0,
+   "llm_seconds": 89.779,
+   "wall_seconds": 89.82915029200376,
+   "env_calls": 29.0,
+   "fault_infos": [
+    [
+     "db",
+     "disk_full"
+    ],
+    [
+     "api",
+     "dns_failure"
+    ]
+   ],
+   "seed_offset": 0,
+   "config": "agent"
+  }
+ ]
+}

@@ -27,3 +27,4 @@ docs/*.toc
 docs/*.fls
 docs/*.fdb_latexmk
 docs/*.synctex.gz
+!results/heldout_runs.log
