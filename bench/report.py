@@ -9,6 +9,7 @@ import json
 import shutil
 import subprocess
 from pathlib import Path
+from statistics import fmean
 from typing import Any
 
 import matplotlib
@@ -94,6 +95,19 @@ def _m(res: dict[str, Any], metric: str) -> dict[str, float]:
     return res["summary"]["metrics"][metric]
 
 
+def _paired(base: dict[str, Any], other: dict[str, Any], metric: str) -> float:
+    """Mean of ``metric`` over the base runs whose seed offsets ``other`` also used.
+
+    Ablations, perturbations and the smaller model ran 1 seed; comparing them with the 3-seed
+    agent mean would mix seed noise into the delta, so they are compared seed for seed.
+    """
+    seeds = {s["seed_offset"] for s in other["scores"]}
+    vals = [
+        s[metric] for s in base["scores"] if s["seed_offset"] in seeds and s[metric] is not None
+    ]
+    return fmean(vals) if vals else float("nan")
+
+
 def fig_results_by_config(
     res: dict, metrics=("top1", "fault_recall", "recovered", "false_recovery")
 ) -> str | None:
@@ -177,9 +191,9 @@ def fig_robustness(res: dict, config: str = "agent") -> tuple[str | None, list[d
                 "perturbation": p,
                 **{
                     m: {
-                        "clean": _m(base, m)["mean"],
+                        "clean": _paired(base, r, m),
                         "perturbed": _m(r, m)["mean"],
-                        "drop": _m(base, m)["mean"] - _m(r, m)["mean"],
+                        "drop": _paired(base, r, m) - _m(r, m)["mean"],
                     }
                     for m in (
                         "top1",
@@ -199,9 +213,9 @@ def fig_robustness(res: dict, config: str = "agent") -> tuple[str | None, list[d
                 "perturbation": f"smaller LLM ({small['meta']['model']})",
                 **{
                     m: {
-                        "clean": _m(base, m)["mean"],
+                        "clean": _paired(base, small, m),
                         "perturbed": _m(small, m)["mean"],
-                        "drop": _m(base, m)["mean"] - _m(small, m)["mean"],
+                        "drop": _paired(base, small, m) - _m(small, m)["mean"],
                     }
                     for m in (
                         "top1",
@@ -260,7 +274,7 @@ def fig_robustness(res: dict, config: str = "agent") -> tuple[str | None, list[d
 
 
 def fig_ablations(res: dict) -> tuple[str | None, list[dict[str, Any]]]:
-    """Agent minus each ablation (held-out, 1 seed)."""
+    """Each ablation minus the full agent on the same seed (held-out, 1 seed)."""
     base = res.get(("heldout", "agent", ""))
     rows = []
     if base is None:
@@ -274,9 +288,9 @@ def fig_ablations(res: dict) -> tuple[str | None, list[dict[str, Any]]]:
                 "ablation": a,
                 **{
                     m: {
-                        "agent": _m(base, m)["mean"],
+                        "agent": _paired(base, r, m),
                         "ablated": _m(r, m)["mean"],
-                        "delta": _m(r, m)["mean"] - _m(base, m)["mean"],
+                        "delta": _m(r, m)["mean"] - _paired(base, r, m),
                     }
                     for m in (
                         "top1",
@@ -441,7 +455,7 @@ def summary_md(res: dict, robustness: list, ablations: list, beacon: dict | None
         lines.append("")
     if robustness:
         lines += [
-            "## Robustness (agent, held-out variants, 1 seed)",
+            "## Robustness (agent, held-out variants, 1 seed; change vs the agent on the same seed)",
             "",
             "| perturbation | top-1 | recovered | false recovery | harmful / run | change in recovered (pts) | n |",
             "|---|---|---|---|---|---|---|",
@@ -453,7 +467,7 @@ def summary_md(res: dict, robustness: list, ablations: list, beacon: dict | None
         lines.append("")
     if ablations:
         lines += [
-            "## Ablations (held-out, 1 seed; delta = ablated - full agent)",
+            "## Ablations (held-out, 1 seed; delta = ablated - full agent on the same seed)",
             "",
             "| ablation | top-1 | recovered | false recovery | harmful / run | unnecessary / run | LLM calls | n |",
             "|---|---|---|---|---|---|---|---|",
