@@ -12,6 +12,19 @@ from typing import Any
 from env.types import Action, ActionResult, Flow, LogLine, MetricSample, ServiceStatus
 
 
+def service_health(error_rate: float, latency_p95: float) -> float:
+    """Per-service health in [0, 1] from error rate and p95 latency."""
+    lat_factor = 1.0 if latency_p95 <= 400 else max(0.0, 1.0 - (latency_p95 - 400) / 2000)
+    return max(0.0, 1.0 - min(1.0, error_rate)) * lat_factor
+
+
+def combine_health(scores: list[float]) -> float:
+    """System health = 0.5 * mean + 0.5 * min of per-service scores."""
+    if not scores:
+        return 0.0
+    return 0.5 * (sum(scores) / len(scores)) + 0.5 * min(scores)
+
+
 class Env(ABC):
     """Observation + actuation interface of a running (possibly failing) system."""
 
@@ -70,10 +83,12 @@ class Env(ABC):
         return set()
 
     def health_score(self) -> float:
-        """Observable health in [0, 1] computed from the latest metrics and status.
+        """Observable health in [0, 1] from the latest metrics and status.
 
-        This is deliberately *observable* information only: it is used by the safety layer
-        to detect regressions after an action and by the verify step; it is not ground truth.
+        ``0.5 * mean + 0.5 * min`` over per-service scores, so one badly degraded service
+        cannot hide behind four healthy ones. Observable information only: it is used by the
+        safety layer to detect regressions and by naive baselines to claim recovery; it is never
+        ground truth.
         """
         status = self.get_status()
         latest: dict[str, MetricSample] = {}
@@ -81,15 +96,13 @@ class Env(ABC):
             latest[sample.service] = sample
         if not status:
             return 0.0
-        total = 0.0
+        scores = []
         for name, st in status.items():
-            if st.state != "up":
-                continue
             sample = latest.get(name)
-            if sample is None:
+            if st.state != "up" or sample is None:
+                scores.append(0.0)
                 continue
             err = sample.values.get("error_rate") or 0.0
             p95 = sample.values.get("latency_p95") or 0.0
-            lat_factor = 1.0 if p95 <= 400 else max(0.0, 1.0 - (p95 - 400) / 2000)
-            total += max(0.0, 1.0 - min(1.0, err)) * lat_factor
-        return total / len(status)
+            scores.append(service_health(err, p95))
+        return combine_health(scores)

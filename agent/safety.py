@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from agent.trace import Hypothesis
-from env.base import Env
+from env.base import Env, combine_health, service_health
 from env.types import ACTION_ALLOWLIST, CONTAINMENT_ACTIONS, Action
 
 REGRESSION_DROP = 0.15
@@ -152,13 +152,11 @@ def observable_health(env: Env, exclude: str | None = None) -> float:
     names = [n for n in status if n != exclude]
     if not names:
         return 1.0
-    total = 0.0
+    scores = []
     for n in names:
-        if status[n].state != "up":
-            continue
         m = latest.get(n, {})
-        err = m.get("error_rate") or 0.0
-        p95 = m.get("latency_p95") or 0.0
-        lat = 1.0 if p95 <= 400 else max(0.0, 1.0 - (p95 - 400) / 2000)
-        total += max(0.0, 1.0 - min(1.0, err)) * lat
-    return total / len(names)
+        if status[n].state != "up" or not m:
+            scores.append(0.0)
+            continue
+        scores.append(service_health(m.get("error_rate") or 0.0, m.get("latency_p95") or 0.0))
+    return combine_health(scores)

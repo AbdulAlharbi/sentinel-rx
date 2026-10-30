@@ -11,6 +11,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+import numpy as np
+
 from agent.detectors.beacon import BeaconDetector, BeaconFinding
 from agent.detectors.logs import (
     LogBaseline,
@@ -163,6 +165,7 @@ class EvidenceBuilder:
         self.beacon = BeaconDetector() if use_beacon else None
         self._metric_baseline: list[MetricSample] | None = None
         self._log_baseline: LogBaseline | None = None
+        self.known_beacons: set[tuple[str, str]] = set()
 
     def build(self, env: Env, window: float | None = None) -> Evidence:
         """Run all detectors on the last ``window`` seconds (incident view)."""
@@ -175,7 +178,9 @@ class EvidenceBuilder:
             self._log_baseline = log_baseline(lines, now, w)
         metrics = detect_metric_anomalies(samples)
         logs = detect_log_signatures(lines, now, w)
-        return self._assemble(env, now, metrics, logs, env.get_flows(w))
+        ev = self._assemble(env, now, metrics, logs, env.get_flows(w))
+        self.known_beacons |= {(b.src, b.dst) for b in ev.beacons}
+        return ev
 
     def verify(self, env: Env, since: float) -> Evidence:
         """Compare everything observed after ``since`` against the stored healthy baseline."""
@@ -201,6 +206,19 @@ class EvidenceBuilder:
             if self.beacon
             else []
         )
+        if strict and self.known_beacons:
+            # pairs flagged during the incident stay suspicious: any un-blocked flow on them
+            # means the implant is still talking, however few events the short window holds
+            found = {(b.src, b.dst) for b in beacons}
+            for src, dst in sorted(self.known_beacons):
+                live = [f for f in flows if f.src == src and f.dst == dst]
+                if live and (src, dst) not in found:
+                    ts = np.asarray([f.t for f in live])
+                    iat = np.diff(np.sort(ts)) if ts.size > 1 else np.asarray([0.0])
+                    blocked = float(np.mean([f.blocked for f in live]))
+                    beacons.append(
+                        BeaconFinding(src, dst, 1.0, len(live), float(np.median(iat)), 0.0, blocked)
+                    )
         ranked = rank_services(
             env.get_topology(),
             env.get_status(),

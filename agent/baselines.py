@@ -1,7 +1,8 @@
-"""single_shot baseline: one LLM call on a raw telemetry summary, act, declare victory."""
+"""Non-agent baselines: single_shot (one LLM call), do_nothing and random actions."""
 
 from __future__ import annotations
 
+import random
 import time
 
 from agent.base import Agent
@@ -9,10 +10,11 @@ from agent.llm import LLMClient, parse_json
 from agent.loop import SentinelAgent
 from agent.prompts import PLAN_SCHEMA, SYSTEM, dumps
 from agent.raw import raw_summary
+from agent.safety import observable_health
 from agent.schema import validate
 from agent.trace import RunTrace
 from env.base import Env
-from env.types import Action
+from env.types import ACTION_ALLOWLIST, Action
 
 SINGLE_SHOT_PROMPT = """Telemetry summary:
 {summary}
@@ -84,5 +86,71 @@ class SingleShotAgent(Agent):
             u.tokens_out,
             u.seconds,
         )
+        trace.wall_seconds = time.perf_counter() - t0
+        return trace
+
+
+class DoNothingAgent(Agent):
+    """Observes, acts never, and claims recovery iff observable health looks fine.
+
+    Any scenario this baseline "recovers" is a scenario where the recovery check is broken.
+    """
+
+    name = "do_nothing"
+
+    def run(self, env: Env, budget: int = 8) -> RunTrace:
+        """Wait out the budget without acting."""
+        t0 = time.perf_counter()
+        trace = RunTrace(config=self.name, scenario_id="", seed_offset=0)
+        for i in range(budget):
+            env.wait(60.0)
+            trace.step("iteration", i=i, health=round(env.health_score(), 3))
+        trace.claimed_recovered = observable_health(env) >= 0.9
+        trace.escalated = not trace.claimed_recovered
+        trace.wall_seconds = time.perf_counter() - t0
+        return trace
+
+
+class RandomAgent(Agent):
+    """Applies 1-3 random allowlisted actions on random services per iteration.
+
+    Claims recovery as soon as observable health is >= 0.9 (naive verification). Measures how
+    much of "recovery" a small action space gives away for free.
+    """
+
+    name = "random"
+
+    def __init__(self, seed: int = 0) -> None:
+        self.seed = seed
+
+    def run(self, env: Env, budget: int = 8) -> RunTrace:
+        """Random walk over the allowlist."""
+        t0 = time.perf_counter()
+        rng = random.Random(self.seed)
+        trace = RunTrace(config=self.name, scenario_id="", seed_offset=0)
+        services = env.list_services()
+        for i in range(budget):
+            actions = [
+                Action(rng.choice(ACTION_ALLOWLIST), rng.choice(services))
+                for _ in range(rng.randint(1, 3))
+            ]
+            records = []
+            for a in actions:
+                r = env.apply_action(a)
+                records.append(
+                    {
+                        "action": a.to_dict(),
+                        "allowed": True,
+                        "applied": r.applied,
+                        "message": r.message,
+                        "result": "applied" if r.applied else "rejected",
+                    }
+                )
+            trace.actions.extend(records)
+            trace.step("iteration", i=i, plan=[a.key() for a in actions], actions=records)
+            if observable_health(env) >= 0.9:
+                trace.claimed_recovered = True
+                break
+        trace.escalated = not trace.claimed_recovered
         trace.wall_seconds = time.perf_counter() - t0
         return trace

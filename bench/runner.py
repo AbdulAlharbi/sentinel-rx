@@ -97,7 +97,7 @@ def run_one(
     env = wrap(sim, pert_name, scenario.seed)
     name_map = env.fwd if isinstance(env, RenamedServices) else None
     probe = ProbeEnv(env, scenario.seed, sim)
-    agent = build_agent(config, model=model, replay=replay)
+    agent = build_agent(config, model=model, replay=replay, seed=scenario.seed + seed_offset)
     t_start = sim.now()
     t0 = time.perf_counter()
     trace = agent.run(probe, budget)

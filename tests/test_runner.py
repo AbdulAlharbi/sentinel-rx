@@ -69,3 +69,16 @@ def test_every_committed_scenario_runs_in_sim():
     for sc in load_split("dev")[:5] + load_split("heldout")[:3]:
         env = SimEnv(sc)
         assert env.health_score() < 0.99 or sc.n_faults == 0
+
+
+def test_do_nothing_and_random_baselines_run(tmp_path: Path):
+    paths = runner.run_split(
+        "dev", ["do_nothing", "random"], 1, "none", True, 4, 2, "t", 1, out_dir=tmp_path
+    )
+    import json
+
+    for p in paths:
+        d = json.loads(p.read_text())
+        assert d["summary"]["n_runs"] == 2
+    dn = json.loads(paths[0].read_text())
+    assert dn["summary"]["metrics"]["recovered"]["mean"] == 0.0
