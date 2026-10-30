@@ -157,6 +157,7 @@ def fig_by_n_faults(res: dict) -> str | None:
         ax.set_xlabel("concurrent faults", color=MUTED)
         _style(ax, title + " by number of concurrent faults", "% of runs")
         ax.set_ylim(0, 105)
+        ax.tick_params(labelleft=True)
     axes[0].legend(frameon=False, fontsize=9)
     return _save(fig, "accuracy-by-number-of-concurrent-faults.png")
 
@@ -405,14 +406,14 @@ def summary_md(res: dict, robustness: list, ablations: list, beacon: dict | None
         lines += [
             "## Held-out (headline)",
             "",
-            "| config | top-1 | top-3 | per-fault recall | recovered | false recovery | harmful / run | unnecessary / run | isolate-before-restart | LLM calls | tokens | n |",
-            "|---|---|---|---|---|---|---|---|---|---|---|---|",
+            "| config | top-1 | top-3 | per-fault recall | recovered | false recovery | harmful / run | unnecessary / run | action precision | isolate-before-restart | LLM calls | tokens | n |",
+            "|---|---|---|---|---|---|---|---|---|---|---|---|---|",
         ]
         for c in configs:
             r = res[("heldout", c, "")]
             m = r["summary"]["metrics"]
             lines.append(
-                f"| {c} | {fmt(m['top1'])} | {fmt(m['top3'])} | {fmt(m['fault_recall'])} | {fmt(m['recovered'])} | {fmt(m['false_recovery'])} | {fmt(m['harmful_actions'], False)} | {fmt(m['unnecessary_actions'], False)} | {fmt(m['isolated_before_restart'])} | {m['llm_calls']['mean']:.1f} | {m['tokens']['mean']:.0f} | {r['summary']['n_runs']} |"
+                f"| {c} | {fmt(m['top1'])} | {fmt(m['top3'])} | {fmt(m['fault_recall'])} | {fmt(m['recovered'])} | {fmt(m['false_recovery'])} | {fmt(m['harmful_actions'], False)} | {fmt(m['unnecessary_actions'], False)} | {fmt(m['action_precision'])} | {fmt(m['isolated_before_restart'])} | {m['llm_calls']['mean']:.1f} | {m['tokens']['mean']:.0f} | {r['summary']['n_runs']} |"
             )
         lines += [
             "",
@@ -442,12 +443,12 @@ def summary_md(res: dict, robustness: list, ablations: list, beacon: dict | None
         lines += [
             "## Robustness (agent, held-out variants, 1 seed)",
             "",
-            "| perturbation | top-1 | recovered | false recovery | harmful / run | drop in recovered (pts) | n |",
+            "| perturbation | top-1 | recovered | false recovery | harmful / run | change in recovered (pts) | n |",
             "|---|---|---|---|---|---|---|",
         ]
         for r in robustness:
             lines.append(
-                f"| {r['perturbation']} | {100 * r['top1']['perturbed']:.0f}% | {100 * r['recovered']['perturbed']:.0f}% | {100 * r['false_recovery']['perturbed']:.0f}% | {r['harmful_actions']['perturbed']:.2f} | {100 * r['recovered']['drop']:+.0f} | {r['n_runs']} |"
+                f"| {r['perturbation']} | {100 * r['top1']['perturbed']:.0f}% | {100 * r['recovered']['perturbed']:.0f}% | {100 * r['false_recovery']['perturbed']:.0f}% | {r['harmful_actions']['perturbed']:.2f} | {-100 * r['recovered']['drop']:+.0f} | {r['n_runs']} |"
             )
         lines.append("")
     if ablations:
@@ -469,7 +470,7 @@ def summary_md(res: dict, robustness: list, ablations: list, beacon: dict | None
             f"Synthetic held-out test (n={beacon['n_test']}): precision {beacon['precision']:.3f}, recall {beacon['recall']:.3f}, AP {beacon['average_precision']:.3f}. False-positive rate on health checks: {beacon['false_positive_rate_by_kind']['health']:.3f}, on update polls: {beacon['false_positive_rate_by_kind']['update']:.3f}. Simulator dev scenarios: precision {beacon['simulator_dev_eval']['precision']:.2f}, recall {beacon['simulator_dev_eval']['recall']:.2f}.",
             "",
         ]
-    dev = [(k, v) for k, v in res.items() if k[0] == "dev"]
+    dev = [(k, v) for k, v in res.items() if k[0] == "dev" and k[2] != "smoke"]
     if dev:
         lines += [
             "## Dev split (iteration history; see docs/RESULTS.md)",
