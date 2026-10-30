@@ -20,6 +20,7 @@ from agent.detectors.logs import (
     service_log_scores,
 )
 from agent.detectors.metrics import (
+    INTRINSIC_METRICS,
     MetricAnomaly,
     detect_metric_anomalies,
     service_anomaly_scores,
@@ -49,13 +50,78 @@ class Evidence:
 
     def to_dict(self, max_metrics: int = 12, max_logs: int = 8) -> dict[str, Any]:
         """Compact JSON for the prompt and the trace."""
+        down = [s for s, st in self.status.items() if st != "up"]
         d = {
             "t": self.t,
             "health": round(self.health, 3),
+            "down_services": down,
             "status": self.status,
             "ranked_services": [r.to_dict() for r in self.ranked if r.score > 0.05][:5],
             "metric_anomalies": [m.to_dict() for m in self.metrics[:max_metrics]],
             "log_signatures": [s.to_dict() for s in self.logs[:max_logs]],
+            "beacons": [b.to_dict() for b in self.beacons],
+            **self.extras,
+        }
+        if self.blocked_attempts:
+            d["blocked_egress_attempts"] = self.blocked_attempts
+        return d
+
+    def to_prompt(self, max_items: int = 5) -> dict[str, Any]:
+        """Per-service grouping for the LLM: every fact sits under the service it belongs to."""
+        per: dict[str, dict[str, Any]] = {}
+        for r in self.ranked:
+            per[r.service] = {
+                "status": r.status,
+                "root_cause_score": round(r.score, 2),
+                "symptoms_explained_by": r.explained_by,
+                "metric_anomalies": [],
+                "log_signatures": [],
+            }
+        ordered = sorted(self.metrics, key=lambda m: (m.metric not in INTRINSIC_METRICS, -m.z))
+        for m in ordered:
+            lst = per.setdefault(
+                m.service,
+                {
+                    "status": "?",
+                    "root_cause_score": 0.0,
+                    "symptoms_explained_by": [],
+                    "metric_anomalies": [],
+                    "log_signatures": [],
+                },
+            )["metric_anomalies"]
+            if len(lst) < max_items:
+                lst.append(
+                    f"{m.metric} {m.direction} {m.baseline:.3g}->{m.recent:.3g} (z={m.z:.0f})"
+                )
+        for sg in self.logs:
+            lst = per.setdefault(
+                sg.service,
+                {
+                    "status": "?",
+                    "root_cause_score": 0.0,
+                    "symptoms_explained_by": [],
+                    "metric_anomalies": [],
+                    "log_signatures": [],
+                },
+            )["log_signatures"]
+            if len(lst) < max_items:
+                lst.append(
+                    f"{sg.level} '{sg.template[:70]}' x{sg.recent_count} "
+                    f"(baseline {sg.baseline_count})"
+                )
+        services = {
+            k: v
+            for k, v in sorted(per.items(), key=lambda kv: -kv[1]["root_cause_score"])
+            if v["status"] != "up"
+            or v["metric_anomalies"]
+            or v["log_signatures"]
+            or v["root_cause_score"] > 0.05
+        }
+        d: dict[str, Any] = {
+            "t": self.t,
+            "health": round(self.health, 3),
+            "down_services": [s for s, st in self.status.items() if st != "up"],
+            "services_ranked_by_root_cause_likelihood": services,
             "beacons": [b.to_dict() for b in self.beacons],
             **self.extras,
         }
