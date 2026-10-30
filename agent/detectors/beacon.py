@@ -114,13 +114,19 @@ class BeaconFinding:
 class BeaconDetector:
     """Scores every (src, dst) pair in a flow window."""
 
-    def __init__(self, model_path: Path = MODEL_PATH, threshold: float = 0.5) -> None:
+    def __init__(
+        self,
+        model_path: Path = MODEL_PATH,
+        threshold: float = 0.5,
+        allowlisted_threshold: float = 0.75,
+    ) -> None:
         if not model_path.exists():
             raise FileNotFoundError(
                 f"{model_path} missing; run `python -m agent.detectors.beacon_train`"
             )
         self.model = joblib.load(model_path)
         self.threshold = threshold
+        self.allowlisted_threshold = allowlisted_threshold  # allow-list = prior of legitimacy
 
     def detect(
         self, flows: list[Flow], services: list[str], allowlist: set[str], monitor: str = "monitor"
@@ -145,7 +151,7 @@ class BeaconDetector:
         probs = self.model.predict_proba(np.vstack(rows))[:, 1]
         out = []
         for p, (src, dst, ts, fl) in zip(probs, keys, strict=True):
-            if p < self.threshold:
+            if p < (self.allowlisted_threshold if dst in allowlist else self.threshold):
                 continue
             iat = np.diff(np.sort(ts))
             med = float(np.median(iat)) if iat.size else 0.0

@@ -45,6 +45,10 @@ class Env(ABC):
     def apply_action(self, action: Action) -> ActionResult:
         """Apply a remediation action; the environment advances time so effects become visible."""
 
+    def undo_action(self, action: Action) -> bool:
+        """Best-effort inverse of an action (used by the safety layer's rollback). False = none."""
+        return False
+
     @abstractmethod
     def wait(self, seconds: float) -> None:
         """Let the system run for ``seconds`` without acting."""

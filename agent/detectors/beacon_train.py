@@ -67,11 +67,12 @@ def sample(rng: np.random.Generator) -> tuple[np.ndarray, int, str]:
             "update",
             "poisson_int",
             "poisson_ext",
+            "poisson_ext_short",
             "bursty_ext",
             "sparse_ext",
             "retry_ext",
         ],
-        p=[0.30, 0.13, 0.10, 0.13, 0.14, 0.07, 0.06, 0.07],
+        p=[0.28, 0.12, 0.09, 0.12, 0.12, 0.09, 0.06, 0.06, 0.06],
     )
     match kind:
         case "beacon":
@@ -109,6 +110,9 @@ def sample(rng: np.random.Generator) -> tuple[np.ndarray, int, str]:
             feats = pair_features(
                 ts, rng.uniform(300, 5000, size=ts.size), True, bool(rng.random() < 0.5), False
             )
+        case "poisson_ext_short":  # short verification windows: few events, allow-listed
+            ts = _poisson(rng, float(rng.uniform(0.05, 1)), int(rng.integers(5, 30)))
+            feats = pair_features(ts, rng.uniform(300, 5000, size=ts.size), True, True, False)
         case "bursty_ext":
             ts = _bursty(rng, int(rng.integers(2, 8)), int(rng.integers(3, 20)))
             feats = pair_features(
