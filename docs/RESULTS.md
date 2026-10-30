@@ -80,3 +80,44 @@ Changes for v1 (commits `4d90332`, `17797cd`):
   "already applied without full recovery" actions.
 * **Strict verification thresholds** for the beacon detector: new pairs need p ≥ 0.75 (unknown
   external) / ≥ 0.95 (internal or allow-listed) inside the short post-action window.
+
+## 2026-10-30 — P5 v1: per-service evidence, down-service rule, repeated-plan guard
+
+Command: `python -m bench.runner --split dev --config agent --seeds 1 --workers 3 --tag v1`
+Result file: `results/20261030T013252Z_dev_agent_v1.json` (n = 30; 31 min wall-clock, 3 workers)
+
+| metric | agent v0 | agent v1 | change |
+|---|---|---|---|
+| top-1 root cause | 70% [53, 83] | **90% [80, 100]** | +20 pts |
+| per-fault recall | 67% [50, 81] | **78% [66, 89]** | +11 pts |
+| recovered | 73% [57, 87] | **100% [100, 100]** | +27 pts |
+| false "recovered" claims | 0% | 0% | = |
+| harmful actions / run | 0.00 | 0.00 | = |
+| unnecessary actions / run | 5.13 | **1.47** | −3.7 |
+| LLM calls / run | 7.4 | **4.0** | −46% |
+| tokens / run | 10 695 | **5 357** | −50% |
+
+By concurrency (top-1 / recovered): 1 fault 90% / 100%; 2 faults 83% / 100%; 3 faults 100% / 100%.
+All five previously budget-exhausted scenarios now recover in 2–6 calls.
+
+Remaining failure analysis (`results/traces/20261030T013252Z_dev_agent_v1/`):
+
+1. **Actions on the wrong target after dependency-log misattribution** (`dev_1f_06`:
+   `flush_cache(api)`, `flush_cache(worker)` because api/worker log "cache miss ratio
+   (fallthrough to db)"; `dev_3f_03` same). Costs 2–4 extra calls and unnecessary actions.
+2. **Containment unlocked by an inbound attack** (`dev_3f_03`: `block_egress(gateway)` for
+   credential stuffing) — the evidence gate accepted any security hypothesis, and in fact only
+   gated `isolate_host`, not `block_egress` (an earlier patch had silently not applied).
+3. **Verify false positive** `api->payments.example p=0.80` (`dev_1f_06`): the strict
+   verification threshold was also not wired through (same cause). One wasted iteration.
+4. Fault-type errors that still recover (`dev_1f_03`: cache `latency_injection` labelled
+   `cache_failure` but fixed by `restart_service(cache)`) count as top-1 misses but not as
+   recovery misses — the metric definitions keep these separate on purpose.
+
+Changes for v2 (commit `94737f0`):
+
+* Containment (`isolate_host`, `block_egress`) requires a **beacon finding** from the detector;
+  only when the detector is disabled (ablation / llm_only) does a `c2_beacon` hypothesis suffice;
+  `credential_stuffing` never unlocks containment (`tests/test_agent.py`).
+* Strict verification thresholds actually wired (`EvidenceBuilder._assemble(strict=True)`).
+* System prompt rule: a log line naming a dependency is the dependency's symptom.
