@@ -134,6 +134,33 @@ pressure slows handlers proportionally to leaked bytes instead of swapping the l
 Everything is torn down by `atexit` and signal handlers. Restart without containment relaunches
 the process *with the implant re-injected* (persistence), mirroring the simulator.
 
+## 8b. Decisions from the mid-development scorer audit
+
+* **Health = 0.5·mean + 0.5·min** of per-service health (`env/base.py::combine_health`). With a
+  plain mean, one degraded service among five stayed above the 0.9 bar, so naive baselines could
+  *claim* recovery. Ground truth was never affected (it requires every fault resolved), but the
+  observable number used by the safety layer and by naive claims had to stop lying.
+* **Blocking egress is not free.** api's checkout path calls an external payments API; while its
+  egress is blocked the simulator adds 0.3 error rate and an `egress blocked by policy` log line,
+  so a wrong containment is visible, the regression check can catch it, and the scorer counts
+  containment of an uncompromised host as harmful.
+* **A restart after containment is a rebuild**: the clean host rejoins the network (egress
+  block lifted, isolation cleared) in both environments. Without this, the correct
+  `block_egress → restart_service` sequence on api would leave api degraded forever.
+* **Containment needs beacon evidence.** With the detector on, `isolate_host`/`block_egress`
+  are allowed only on hosts the beacon detector flagged; with the detector off (ablation,
+  llm_only) a `c2_beacon` hypothesis suffices; an inbound attack (credential stuffing) never
+  unlocks containment. Before this gate, v0/v1 blocked egress on innocent hosts 0.2–0.3 times
+  per run (docs/RESULTS.md).
+* **Known beacon pairs cannot hide in short windows.** Verification windows hold few flows, so
+  new pairs need a stricter score (p ≥ 0.75 unknown / ≥ 0.95 allow-listed or internal), but a
+  pair flagged during the incident fails verification on *any* un-blocked flow. The strict
+  threshold alone produced two false "recovered" claims in v2.
+* **Effective actions and action precision.** The simulator records whether an action changed
+  a fault's state; `unnecessary = applied − effective`, `action_precision = effective / applied`.
+* **do_nothing and random are permanent baselines**: a recovery check that either one passes is
+  broken. Both score 0–1 % recovered.
+
 ## 9. Things we deliberately did not do
 
 * No vector memory / RAG over runbooks: the fault taxonomy fits in ~400 tokens of system prompt.

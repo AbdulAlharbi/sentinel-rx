@@ -27,3 +27,6 @@ docs/*.toc
 docs/*.fls
 docs/*.fdb_latexmk
 docs/*.synctex.gz
+
+# scratch logs of long runs
+results/tmp_*

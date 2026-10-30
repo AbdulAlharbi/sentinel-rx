@@ -30,7 +30,7 @@ placeholders are replaced by the final held-out values in the last commit of P8.
 | Baselines: runbook (rules), single_shot (one LLM call), llm_only (loop without detectors), do_nothing and random (sanity floors) | `bench/configs.py`, `agent/runbook.py`, `agent/baselines.py` |
 | Ablations: no_verify, no_loop, no_beacon, no_safety | `bench/configs.py::build_agent`, `make ablate`, `docs/figures/ablation-deltas.png` |
 | Iteration log with before/after numbers for every change on dev, incl. a scorer audit that re-scored earlier runs | `docs/RESULTS.md` (v0 → v1 → v2 → audit → v3) |
-| 124 tests (`pytest -q`): determinism, fault symptoms, persistence, detectors, scorer hand-made cases, safety layer, replay cache, heldout guard, live env | `tests/` |
+| 108 tests (`pytest -q`): determinism, fault symptoms, persistence, detectors, scorer hand-made cases, safety layer, replay cache, heldout guard, live env | `tests/` |
 | CI: ruff + pytest + `make smoke` (replay) + regression floors on every push/PR | `.github/workflows/ci.yml`, `bench/smoke_gate.py` |
 | Record/replay LLM cache keyed by hash(model, system, prompt, options); `--replay` forbids live calls; full benchmark reproduces with no LLM | `agent/llm.py`, `cache/`, `tests/test_agent.py::test_llm_cache_record_and_replay` |
 | Fixed seeds everywhere (simulator, scenario generation, RF training, bootstrap) | `env/sim/sim_env.py::reset`, `scenarios/generate.py`, `agent/detectors/beacon_train.py`, `bench/aggregate.py::bootstrap_ci` |
@@ -51,7 +51,7 @@ placeholders are replaced by the final held-out values in the last commit of P8.
 |---|---|
 | One-command targets | `Makefile`: setup, test, lint, smoke, bench-dev, bench-heldout, bench-perturb, ablate, report, demo-live, all-final |
 | Pinned dependencies, Python 3.12 | `pyproject.toml`, `requirements.lock` |
-| Typed, documented, small modules (ruff with pydocstyle; no file > 400 lines except the live service) | `ruff check .` clean; `pyproject.toml [tool.ruff]` |
+| Typed, documented, small modules (ruff with pydocstyle; every file < 400 lines) | `ruff check .` clean; `pyproject.toml [tool.ruff]` |
 | Reproducible with no LLM installed | `make smoke` (replay) in CI |
 | Clean git history: one branch per phase merged with `--no-ff`, conventional commits, no history rewriting | `git log --graph --oneline` |
 
