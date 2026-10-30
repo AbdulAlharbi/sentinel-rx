@@ -121,3 +121,92 @@ Changes for v2 (commit `94737f0`):
   `credential_stuffing` never unlocks containment (`tests/test_agent.py`).
 * Strict verification thresholds actually wired (`EvidenceBuilder._assemble(strict=True)`).
 * System prompt rule: a log line naming a dependency is the dependency's symptom.
+
+## 2026-10-30 — P5 v2 (pre-audit scorer): containment gate, strict verify, log attribution
+
+Command: `python -m bench.runner --split dev --config agent --seeds 1 --workers 3 --tag v2`
+Result file: `results/20261030T020656Z_dev_agent_v2.json` (n = 30; 29 min)
+
+| metric (pre-audit scorer) | agent v1 | agent v2 |
+|---|---|---|
+| top-1 root cause | 90% | 93% [83, 100] |
+| per-fault recall | 78% | 84% [73, 94] |
+| recovered | 100% | 93% [83, 100] |
+| false "recovered" claims | 0% | **7% [0, 17]** |
+| harmful actions / run | 0.00 | 0.00 |
+| LLM calls / run | 4.0 | 3.7 |
+
+Two **false recovery claims** appeared (`dev_2f_06`, `dev_3f_07`): the beacon on api was in the
+initial evidence (p = 0.80 / 1.00), the model never acted on it, and the *strict* verification
+threshold introduced in v2 then missed the same pair in the short post-action window (4–5
+events). The gate failed exactly where it must not. Fix (in v3): pairs flagged during the
+incident are *known*; in verification any un-blocked flow on a known pair fails the check,
+whatever the short-window score. Strict thresholds only apply to *new* pairs.
+
+## 2026-10-30 — Scorer audit (requested mid-P5)
+
+**Question 1 — why did `dev_1f_01` (db_conn_exhaustion on db) count as recovered although its first
+plan was `block_egress(worker)`, `restart_service(worker)`, `rollback_config(api)`?**
+Because recovery is scored on the *final* ground-truth state, not on the first plan: verification
+rejected the state after iterations 0 and 1 ("too many connections x5"), the model re-planned,
+and iteration 2 applied `scale_connections(db)`, which resolved the fault
+(`results/traces/20261030T013252Z_dev_agent_v1/dev_1f_01_s0.json`, ground_truth.actions: only
+the 7th of 8 actions carries a fault note). The leniency was in the *other* metrics: 7 of the 8
+actions did nothing and `unnecessary_actions` (key-based) counted them inconsistently, and
+`block_egress(worker)` on an uncompromised host was not counted as harmful.
+
+**Question 2 — do faults clear on their own, or via the wrong target?** No. Audit script and new
+tests (`tests/test_faults.py::test_faults_persist_without_remediation`,
+`test_wrong_target_or_wrong_action_never_resolves`): every fault type is still active after 300
+ticks of inaction and after every allowlisted action on every other service and every wrong
+action on the right service (8 actions × 5 services × 10 types). The only cross-service effect is
+dependency propagation (`World.compute_metrics`; cache_failure additionally loads db — documented
+in DESIGN.md §2), which never *resolves* anything. One real leniency was found: with
+`health = mean(service health)`, four fault types (latency_injection, bad_config_deploy,
+c2_beacon, credential_stuffing) left observable health ≥ 0.9 while active, so naive baselines
+could *claim* recovery; ground truth was never fooled because `gt_recovered` requires every
+fault resolved. Fixed: `health = 0.5·mean + 0.5·min` (`env/base.py::combine_health`), credential
+stuffing now saturates the auth backend (error +0.2).
+
+**Question 3 — sanity baselines on dev (3 seeds, n = 90 each):**
+
+| baseline | recovered | false "recovered" | harmful / run | action precision |
+|---|---|---|---|---|
+| do_nothing | **0% [0, 0]** | 3% [0, 8] | 0.00 | n/a |
+| random (1–3 allowlisted actions / iteration) | **1% [0, 3]** | 7% [2, 12] | 3.58 | 4% |
+| runbook | 60% [49, 70] | 0% [0, 0] | 0.03 | 72% |
+
+Neither sanity baseline recovers anything: the recovery check is not broken. Both stay in the
+benchmark (`bench/configs.py`). Files: `results/20261030T024307Z_dev_{runbook,do_nothing,random}_audit.json`.
+
+**Question 4 — scorer changes (`bench/score.py`, tests in `tests/test_score.py`):**
+
+* `action_precision` = effective actions / applied actions, where *effective* means the
+  simulator recorded a fault state change (resolved or contained) — `SimEnv.apply_action` now
+  stores an `effective` flag; for older traces it is derived from the fault notes.
+* `unnecessary_actions` = applied − effective (stricter: repeated correct actions count).
+* `block_egress` / `isolate_host` on a service with no c2 compromise is **harmful**.
+* `rolled_back_actions` counts safety-layer undos; undone actions still count as applied.
+* Simulator realism to match: blocking egress of a service with legitimate external calls (api →
+  payments) now adds 0.3 error rate while blocked, and a restart after containment rebuilds the
+  host and lifts the block (`tests/test_sim.py::test_restart_after_containment_rebuilds_and_lifts_the_block`).
+
+**Question 5 — corrected dev numbers (re-scored from saved traces, `python -m bench.rescore`):**
+
+| metric (audited scorer) | v0 | v1 | v2 |
+|---|---|---|---|
+| top-1 root cause | 70% [53, 83] | 90% [80, 100] | 93% [83, 100] |
+| per-fault recall | 67% [50, 81] | 78% [66, 89] | 84% [73, 94] |
+| recovered | 73% [57, 87] | 100% [100, 100] | 93% [83, 100] |
+| false "recovered" claims | 0% | 0% | 7% [0, 17] |
+| harmful actions / run | **0.27 [0.10, 0.50]** | **0.23 [0.10, 0.43]** | 0.00 |
+| unnecessary actions / run | 5.37 | 1.53 | 1.13 |
+| action precision | 52% [38, 66] | 70% [60, 81] | 80% [69, 89] |
+| actions / run | 7.1 | 3.6 | 3.1 |
+
+What changed: v0 and v1 were **not** harmless — they blocked egress on uncompromised hosts
+0.27 / 0.23 times per run (pre-audit tables above say 0.00 and are kept as "pre-audit").
+v2's containment gate (beacon evidence required) removed that. Files:
+`results/*_rescored.json`. v2's three `block_egress(api)` runs targeted a genuinely compromised
+api, so the new egress cost does not change their outcome, but under the new simulator a
+rebuild now lifts the block; v3 (next entry) is a full re-run on the audited simulator + scorer.
