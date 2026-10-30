@@ -3,92 +3,422 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sentinel-RX</title>
-<meta name="description" content="Security-aware agentic recovery of a failing system: held-out results, robustness, ablations and an incident replay viewer.">
+<title>Sentinel-RX — security-aware agentic recovery of failing systems</title>
+<meta name="description" content="Sentinel-RX identifies, diagnoses, recovers and verifies the recovery of a failing enterprise system with concurrent faults and hidden security incidents. Held-out results, robustness, ablations, figures, reports and an incident replay viewer. Humain Hackathon, Challenge 1.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%2302090B'/><circle cx='16' cy='16' r='7' fill='%23D0F94A'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
-<header class="hero">
+
+<header class="top">
   <div class="wrap">
-    <p class="eyebrow">Hackathon challenge: Agentic Recovery of a Failing System</p>
-    <h1>Sentinel-RX</h1>
-    <p class="lede">A security-aware agent that identifies, diagnoses, recovers and <em>verifies</em> the recovery of a failing enterprise system, plus a reproducible benchmark that proves it on unseen incidents. 100% local, 100% free: a 7B model via Ollama, no Docker, no cloud.</p>
-    <nav class="links" id="links">
-      <a href="https://github.com/AbdulAlharbi/sentinel-rx">Repository</a>
-      <a href="literature_review.pdf">Literature review (PDF)</a>
-      <a href="#replay">Incident replay</a>
+    <a class="brand" href="#top"><span class="dot"></span>Sentinel-RX</a>
+    <nav class="top-nav">
+      <a href="#impact">Impact</a>
+      <a href="#criteria">Judging Criteria</a>
+      <a href="#approach">Approach</a>
+      <a href="#results">Results</a>
+      <a href="#figures">Figures</a>
+      <a href="#replay">Replay</a>
+      <a href="#reports">Reports</a>
+      <a href="#run">Run it</a>
     </nav>
+    <a class="gh" href="https://github.com/AbdulAlharbi/sentinel-rx" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.4 7.4 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      AbdulAlharbi/sentinel-rx
+    </a>
   </div>
 </header>
 
-<main class="wrap">
-<section id="problem">
-  <h2>The problem</h2>
-  <p>State-of-the-art agents solve roughly 11% of realistic incidents (OpenRCA, ITBench), and no AIOps benchmark tests a security threat hidden inside an operational failure. Five gaps from the literature review drive the design: <strong>G1</strong> concurrent faults, <strong>G2</strong> security incidents inside ops incidents, <strong>G3</strong> false "recovered" claims, <strong>G4</strong> the cost of the agent itself, <strong>G5</strong> robustness on unseen combinations and degraded telemetry.</p>
+<!-- ================= HERO ================= -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="eyebrow">Humain Hackathon · Challenge 1 · Agentic Recovery of a Failing System</div>
+    <h1>Sentinel-RX<span class="accent">.</span></h1>
+    <p class="pitch">
+      An agent that <strong>identifies, diagnoses, recovers and verifies the recovery</strong> of a failing enterprise
+      system when several faults are active at once and a security compromise is hiding inside the outage — plus a
+      reproducible benchmark that proves it on incidents the agent has never seen. A local 7B model, no cloud, no
+      Docker, every number replayable without a GPU.
+    </p>
+    <div class="cta">
+      <a class="btn primary" href="sentinel_rx_brief.pdf">Read the 6-page report (PDF)</a>
+      <a class="btn green" href="literature_review.pdf">Research paper: literature review (PDF)</a>
+      <a class="btn" href="#replay">Step through a recorded incident</a>
+    </div>
+    <div class="chips">
+      <span class="chip"><span class="pip"></span>held-out recovered <b>100%</b></span>
+      <span class="chip"><span class="pip"></span>false “recovered” claims <b>0%</b></span>
+      <span class="chip"><span class="pip"></span>harmful actions <b>0.00</b> / run</span>
+      <span class="chip"><span class="pip"></span>top-1 root cause <b>92%</b></span>
+      <span class="chip"><span class="pip"></span><b>6 103</b> tokens / incident</span>
+      <span class="chip"><span class="pip"></span><b>108</b> tests · replay cache · CI</span>
+    </div>
+  </div>
 </section>
 
+<!-- ================= IMPACT ================= -->
+<section id="impact">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Why it matters</div>
+      <h2 class="sec">Impact at the local level, at the global level, and on the research gap</h2>
+      <p class="lede">
+        Incident response is the most expensive, least automated part of running software, and today's auto-remediation is a
+        runbook that cannot tell a symptom from its cause. The agents meant to replace it resolve roughly <strong>11%</strong> of
+        realistic incidents on public benchmarks, are never tested against a compromise hiding inside an outage, and are
+        believed when they say “recovered”. Sentinel-RX was built against those three facts.
+      </p>
+    </div>
+    <div class="impact">
+      <article class="card local">
+        <h3>Locally — sovereign, on-premise, and ready for regulated operators</h3>
+        <p>Everything runs on one machine with an open 7B model served by Ollama: no telemetry, logs or network flows leave the
+        premises, which is the constraint that banks, utilities, telecoms and government services in the Kingdom operate under.
+        Scarce SRE and SOC talent is the binding constraint for Saudi enterprises scaling digital services; an agent that
+        handles the diagnosis and the safe first response, and escalates with a full trace when it cannot verify recovery,
+        multiplies the people who are already there instead of replacing them. The design degrades safely: with a 1.5B
+        model it recovers fewer incidents but still makes <strong>0%</strong> false claims and <strong>0</strong> harmful actions,
+        so it stays trustworthy on cheaper hardware.</p>
+      </article>
+      <article class="card global">
+        <h3>Globally — the security-blind spot in AIOps</h3>
+        <p>Every published incident-recovery benchmark injects one accidental fault per scenario. Real incidents stack faults,
+        and some “performance problems” are intrusions: a compromised host phoning home looks like a slow service, and an
+        ops agent that restarts it destroys the evidence and re-infects the host. Sentinel-RX detects the beacon hidden among
+        health checks and update polls, enforces <strong>contain before restart</strong>, and never claims recovery while a
+        beacon attempt remains. Over 27 held-out runs with a live C2 beacon it recovered <strong>100%</strong> with zero harmful
+        actions, where a single-shot LLM and a raw-telemetry agent were harmful 0.48 and 1.11 times per run.</p>
+      </article>
+      <article class="card gap">
+        <h3>On the research gap — five gaps, five measured answers</h3>
+        <p>The accompanying literature review surveys AIOpsLab, ITBench, OpenRCA, RCAEval, RCACopilot, RCAgent, STRATUS,
+        ToolEmu, BAYWATCH and CTU-13 and ends with five gaps. Each one maps to a metric this benchmark reports:</p>
+        <ul class="gaps">
+          <li><b>G1</b><span>Concurrent, confounded faults → recovery flat at 100% from 1 to 3 faults; every baseline degrades</span></li>
+          <li><b>G2</b><span>Security hidden inside ops incidents → beacon detector + contain-before-restart, 100% isolated-before-restart</span></li>
+          <li><b>G3</b><span>Verification of recovery → false “recovered” as a headline metric: 0% vs 70% single-shot</span></li>
+          <li><b>G4</b><span>Cost of the agent → 6 103 tokens/incident vs 35 018 for the raw-telemetry twin</span></li>
+          <li><b>G5</b><span>Robustness → 95–100% recovery under 4 perturbations and an unseen fault type</span></li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CRITERIA ================= -->
+<section id="criteria">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Built to the Judging Criteria</div>
+      <h2 class="sec">Every criterion has a number behind it, and every number comes from a committed result file</h2>
+      <p class="lede">The six Judging Criteria of the challenge, each answered with evidence you can replay from the repository.</p>
+    </div>
+    <div class="criteria">
+      <div class="crit"><div class="n">01</div><h3>Task Performance</h3>
+        <p>20 held-out scenarios never used in development, 3 seeds (<b>n=60</b>): top-1 root cause <b>92%</b>, per-fault recall <b>82%</b>, recovered <b>100%</b>, false “recovered” <b>0%</b>, harmful actions <b>0.00</b>/run. Runbook recovers 45%, single-shot LLM 30%.</p>
+        <div class="where">results/*_heldout_agent.json · heldout_runs.log</div></div>
+      <div class="crit"><div class="n">02</div><h3>Robustness &amp; Adaptation</h3>
+        <p>Recovery stays <b>95–100%</b> under noisy logs, missing metrics, renamed services and timestamp jitter; an unseen fault type is recovered <b>100%</b>; a 1.5B model keeps <b>0%</b> false claims. The same agent runs unchanged on five real processes.</p>
+        <div class="where">env/perturb.py · make bench-perturb · make demo-live</div></div>
+      <div class="crit"><div class="n">03</div><h3>Evaluation &amp; Iteration</h3>
+        <p>Four dev iterations with before/after numbers (top-1 70→90%, recovered 73→100%), a mid-development scorer audit that re-scored every run, do-nothing and random sanity floors, four ablations, <b>108</b> tests and CI with regression floors.</p>
+        <div class="where">docs/RESULTS.md · bench/smoke_gate.py · .github/workflows/ci.yml</div></div>
+      <div class="crit"><div class="n">04</div><h3>Technical Judgment &amp; Creativity</h3>
+        <p>Hybrid design measured against its raw-telemetry twin (<b>5.7×</b> fewer tokens, <b>2.9×</b> more recoveries); a RandomForest beacon detector on scale-invariant timing features (AP <b>0.999</b>); contain-before-restart; transactional rollback; a verification gate with a known-beacon rule.</p>
+        <div class="where">docs/DESIGN.md · agent/detectors/ · agent/safety.py</div></div>
+      <div class="crit"><div class="n">05</div><h3>Engineering Quality</h3>
+        <p>One <code>make</code> target per step, pinned dependencies, ruff-clean typed modules under 400 lines, one <code>Env</code> interface for simulator and live system, a content-addressed LLM cache so <code>make smoke</code> and CI need no model, one branch per phase merged with <code>--no-ff</code>.</p>
+        <div class="where">Makefile · env/base.py · agent/llm.py · cache/</div></div>
+      <div class="crit"><div class="n">06</div><h3>Communication</h3>
+        <p>This page, a 6-page brief, a 27-page technical report, a literature review with a gap analysis the design answers point by point, README with real console output, DESIGN / RESULTS / LIMITATIONS, and an incident replay viewer.</p>
+        <div class="where">site/ · docs/technical_report/ · docs/literature_review.pdf</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= APPROACH ================= -->
 <section id="approach">
-  <h2>Approach</h2>
-  <svg class="diagram" viewBox="0 0 980 190" role="img" aria-label="Pipeline: telemetry to detectors to LLM hypotheses to checks to safety gate to action to verify">
-    <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--muted)"/></marker></defs>
-    <g class="box" transform="translate(10,40)"><rect width="130" height="70" rx="8"/><text x="65" y="30">telemetry</text><text x="65" y="50" class="sub">metrics · logs · flows</text></g>
-    <g class="box" transform="translate(170,40)"><rect width="150" height="70" rx="8"/><text x="75" y="30">4 detectors</text><text x="75" y="50" class="sub">z-score · templates · dep-ranker · beacon RF</text></g>
-    <g class="box llm" transform="translate(350,40)"><rect width="140" height="70" rx="8"/><text x="70" y="30">LLM hypotheses</text><text x="70" y="50" class="sub">+ targeted checks</text></g>
-    <g class="box llm" transform="translate(520,40)"><rect width="110" height="70" rx="8"/><text x="55" y="30">LLM plan</text><text x="55" y="50" class="sub">ordered actions</text></g>
-    <g class="box safe" transform="translate(660,40)"><rect width="130" height="70" rx="8"/><text x="65" y="30">safety gate</text><text x="65" y="50" class="sub">allowlist · contain-first · rollback</text></g>
-    <g class="box" transform="translate(820,40)"><rect width="150" height="70" rx="8"/><text x="75" y="30">verify</text><text x="75" y="50" class="sub">vs. healthy baseline</text></g>
-    <g class="arrows"><path d="M140,75 L168,75"/><path d="M320,75 L348,75"/><path d="M490,75 L518,75"/><path d="M630,75 L658,75"/><path d="M790,75 L818,75"/><path d="M895,110 C895,160 80,160 75,112" class="loop"/></g>
-    <text x="490" y="175" class="sub center">not recovered → loop with history (step budget) · recovered only when verification passes · otherwise escalate with the trace</text>
-  </svg>
-  <ul class="pillars">
-    <li><strong>Hybrid.</strong> Cheap deterministic detectors turn 4 000 flow records and 2 000 log lines into a ~600-token ranked evidence list; the LLM reasons over that, never over raw telemetry.</li>
-    <li><strong>Security-aware.</strong> A RandomForest beacon detector finds C2 call-backs hidden among health checks and update polls; the safety layer enforces <em>contain before restart</em>.</li>
-    <li><strong>Verification gate.</strong> "Recovered" may only be claimed when post-action telemetry matches the pre-incident baseline and no (blocked) beacon attempts remain.</li>
-    <li><strong>Reproducible.</strong> Seeded simulator, strict dev/held-out split enforced in code, record/replay LLM cache, bootstrap CIs over seeds. The same agent runs on a live system of five real processes.</li>
-  </ul>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Approach</div>
+      <h2 class="sec">Detectors compress, the model reasons, the safety layer screens, the verifier decides</h2>
+      <p class="lede">
+        Four cheap deterministic detectors turn thousands of metric samples, log lines and network flows into a short ranked
+        evidence list. A local <code>qwen2.5:7b</code> proposes ranked hypotheses and targeted checks, then an ordered plan,
+        two JSON calls per iteration. The safety layer enforces an eight-action allowlist, refuses containment of hosts without
+        beacon evidence, reorders plans so containment precedes restarts, and undoes any action that drops observable health by
+        more than 0.15. The verification gate compares post-action telemetry with the remembered healthy baseline and re-scores
+        known beacon pairs; “recovered” may only be claimed when nothing is flagged, otherwise the loop continues (budget 8) or
+        escalates with the trace.
+      </p>
+    </div>
+
+    <div class="diagram" data-diagram>
+<pre class="mermaid">
+flowchart TB
+    T["telemetry<br/>metrics · logs · flows"] --> D["4 detectors<br/>z-score · templates · dependency ranker · beacon RF"]
+    D --> H["LLM call 1<br/>ranked hypotheses + ≤3 checks"]
+    H --> C["targeted checks<br/>deterministic env queries"]
+    C --> P["LLM call 2<br/>ordered plan"]
+    P --> S{"safety gate<br/>allowlist · evidence · contain-first · rollback"}
+    S -->|allowed| A["act"]
+    S -->|blocked, reason recorded| P
+    A --> V{"verify vs. healthy baseline<br/>known beacon pairs"}
+    V -->|no problems| R["<b>RECOVERED</b><br/>claim checked by the scorer"]
+    V -->|problems, i &lt; 8| T
+    V -->|budget exhausted| E["escalate with the trace"]
+</pre>
+      <div class="mermaid-fallback">telemetry → 4 detectors → LLM hypotheses + checks → LLM plan → safety gate → act → verify
+   verify: no problems → RECOVERED · problems → loop (budget 8) · budget exhausted → escalate</div>
+      <p class="cap">The MAPE-K loop. Hypothesize and Plan are the only LLM calls; everything else is deterministic and inspectable in the trace.</p>
+    </div>
+
+    <div class="grid g3" style="margin-top:18px">
+      <article class="card"><h3>Hybrid <span class="badge lime">G4</span></h3><p>The LLM never sees raw telemetry. The <code>llm_only</code> baseline runs the same loop on raw summaries and needs 35 018 tokens to recover 35%; the hybrid needs 6 103 to recover 100%.</p><div class="file">agent/detectors/ · agent/loop.py</div></article>
+      <article class="card"><h3>Security-aware <span class="badge green">G2</span></h3><p>A RandomForest on inter-arrival regularity, spectral concentration, autocorrelation and sub-window stability finds C2 beacons among health checks and update polls; destination knowledge is a prior, not a bypass.</p><div class="file">agent/detectors/beacon.py · models/</div></article>
+      <article class="card"><h3>Verified, not believed <span class="badge sand">G3</span></h3><p>A contained implant keeps trying; the firewall emits blocked flows, so “contained” and “eradicated” are distinguishable and a false claim is falsifiable. The scorer checks every claim against hidden ground truth.</p><div class="file">agent/detectors/evidence.py · bench/score.py</div></article>
+    </div>
+  </div>
 </section>
 
+<!-- ================= RESULTS ================= -->
 <section id="results">
-  <h2>Held-out leaderboard</h2>
-  <p class="note" id="results-meta"></p>
-  <div class="table-wrap"><table id="leaderboard"></table></div>
-  <div class="charts">
-    <figure><canvas id="chart-config"></canvas><figcaption>Held-out results by configuration (mean, 95% bootstrap CI over scenario × seed runs).</figcaption></figure>
-    <figure><canvas id="chart-nfaults"></canvas><figcaption>Recovery rate by number of concurrent faults.</figcaption></figure>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Held-out results</div>
+      <h2 class="sec">Leaderboard on incidents the agent never saw</h2>
+      <p class="note" id="results-meta"></p>
+    </div>
+    <div class="tablewrap"><table id="leaderboard"></table></div>
+    <div class="charts">
+      <figure><canvas id="chart-config"></canvas><figcaption>Held-out results by configuration (mean, 95% bootstrap CI over scenario × seed runs).</figcaption></figure>
+      <figure><canvas id="chart-nfaults"></canvas><figcaption>Recovery rate by number of concurrent faults: the agent is flat at 100%; every baseline degrades.</figcaption></figure>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="v">100%</div><div class="k">recovered</div><div class="sub">CI [100, 100], n = 60</div></div>
+      <div class="stat"><div class="v">0%</div><div class="k">false “recovered”</div><div class="sub">single-shot LLM: 70%</div></div>
+      <div class="stat"><div class="v">0.00</div><div class="k">harmful actions / run</div><div class="sub">random walk: 3.45</div></div>
+      <div class="stat"><div class="v">100%</div><div class="k">isolated before restart</div><div class="sub">27 beacon runs</div></div>
+      <div class="stat"><div class="v">4.6</div><div class="k">LLM calls / incident</div><div class="sub">llm_only: 18.4</div></div>
+      <div class="stat"><div class="v">190 s</div><div class="k">laptop time / incident</div><div class="sub">llm_only: 816 s</div></div>
+    </div>
   </div>
 </section>
 
+<!-- ================= ROBUSTNESS ================= -->
 <section id="robustness">
-  <h2>Robustness &amp; adaptation</h2>
-  <p>The same agent, same prompts, same cache policy, on held-out variants with degraded telemetry, renamed services, an unseen fault type, and a smaller LLM.</p>
-  <div class="charts">
-    <figure><canvas id="chart-robust"></canvas><figcaption>Recovered and top-1 under each perturbation vs. the clean held-out split.</figcaption></figure>
-    <figure><canvas id="chart-ablate"></canvas><figcaption>Ablations: change vs. the full agent when a component is removed.</figcaption></figure>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Robustness, ablations, cost</div>
+      <h2 class="sec">Each component protects a different metric</h2>
+      <p class="lede">
+        Same agent, same prompts, same cache policy, on held-out variants with degraded telemetry, renamed services, an unseen
+        fault type and a smaller model. Then one component removed at a time: without the verification gate the agent takes the
+        same actions but <strong>claims</strong> success in 80% of runs; without the loop it recovers 20% and escalates honestly;
+        without the beacon detector recovery halves; without the safety layer recovery is unchanged but 0.60 harmful actions per
+        run appear.
+      </p>
+    </div>
+    <div class="charts">
+      <figure><canvas id="chart-robust"></canvas><figcaption>Recovered and top-1 under each perturbation vs. the clean held-out split (1 seed).</figcaption></figure>
+      <figure><canvas id="chart-ablate"></canvas><figcaption>Ablations: change vs. the full agent when a component is removed (1 seed).</figcaption></figure>
+    </div>
+    <div class="tablewrap"><table id="robust-table"></table></div>
+    <div class="charts">
+      <figure><canvas id="chart-cost"></canvas><figcaption>LLM tokens per incident vs. recovery rate, held-out, all configurations and ablations.</figcaption></figure>
+      <figure><div id="beacon-card"></div></figure>
+    </div>
   </div>
-  <div class="table-wrap"><table id="robust-table"></table></div>
 </section>
 
-<section id="cost">
-  <h2>Cost of the agent</h2>
-  <div class="charts">
-    <figure><canvas id="chart-cost"></canvas><figcaption>LLM tokens per incident vs. recovery rate (held-out).</figcaption></figure>
-    <figure><div id="beacon-card" class="card"></div></figure>
+<!-- ================= FIGURES ================= -->
+<section id="figures">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Figures</div>
+      <h2 class="sec">Every figure from the report, generated by <code>make report</code></h2>
+      <p class="lede">Static matplotlib renders of the same result files that drive the interactive charts above. Click any figure to open it full size.</p>
+    </div>
+    <div class="gallery">
+      <figure><a href="figures/results-by-config.png" target="_blank"><img src="figures/results-by-config.png" alt="Held-out results by configuration" loading="lazy"></a><figcaption><b>Held-out results by configuration.</b> Top-1, per-fault recall, recovery and false-recovery rate with 95% bootstrap CIs.</figcaption></figure>
+      <figure><a href="figures/accuracy-by-number-of-concurrent-faults.png" target="_blank"><img src="figures/accuracy-by-number-of-concurrent-faults.png" alt="Accuracy by number of concurrent faults" loading="lazy"></a><figcaption><b>Accuracy by number of concurrent faults.</b> The agent's recovery is flat; the baselines fall as faults stack (G1).</figcaption></figure>
+      <figure><a href="figures/robustness-drop.png" target="_blank"><img src="figures/robustness-drop.png" alt="Robustness drop under perturbations" loading="lazy"></a><figcaption><b>Robustness.</b> Agent under each perturbation versus clean held-out (G5).</figcaption></figure>
+      <figure><a href="figures/ablation-deltas.png" target="_blank"><img src="figures/ablation-deltas.png" alt="Ablation deltas" loading="lazy"></a><figcaption><b>Ablation deltas.</b> What each component buys: the gate buys honesty, the loop buys recovery, the safety layer buys harmlessness.</figcaption></figure>
+      <figure><a href="figures/cost-vs-accuracy.png" target="_blank"><img src="figures/cost-vs-accuracy.png" alt="Cost versus accuracy" loading="lazy"></a><figcaption><b>Cost vs. accuracy.</b> Tokens per incident against recovery rate (G4).</figcaption></figure>
+      <figure><a href="figures/beacon-detector-PR-curve.png" target="_blank"><img src="figures/beacon-detector-PR-curve.png" alt="Beacon detector precision-recall curve" loading="lazy"></a><figcaption><b>Beacon detector PR curve.</b> AP 0.999 on a synthetic held-out set; 0 false positives on health checks and update polls (G2).</figcaption></figure>
+    </div>
   </div>
 </section>
 
+<!-- ================= LIVE DEMO ================= -->
+<section id="live">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Same agent, real processes</div>
+      <h2 class="sec">The recorded live demo: three faults on five real services</h2>
+      <p class="lede">
+        <code>make demo-live</code> starts five real local HTTP services and a C2 sinkhole, injects a memory leak on
+        <code>api</code>, a connection-pool hold on <code>db</code> and a beacon on <code>worker</code> every ≈4 s, and runs the
+        byte-identical agent. Health fell from 1.00 to 0.10. The model's first plan tried to restart <code>worker</code>; the safety
+        layer blocked it because the beacon detector had flagged the host. Verification refused “recovered” twice, naming the live
+        beacon. In the third iteration the model blocked the worker's egress and only then restarted it. Ground truth from the live
+        system afterwards: no active faults, restart-before-containment = 0, final health 1.00.
+      </p>
+    </div>
+    <pre class="sh"><span class="c">[21:58:17] INJECTING three concurrent faults: memory_leak -> api · db_conn_exhaustion -> db · c2_beacon -> worker</span>
+<span class="c">[21:59:02] Incident in progress: health = 0.10</span>
+--- iteration 0 ---  plan: scale_connections(api), restart_service(worker), restart_service(api)
+  safety: restart_service(worker) -> <b>blocked</b>  beacon hypothesis open: contain (block_egress/isolate) before restart
+  verify after 18s: ['health 0.10 &lt; 0.9', ..., 'beacon worker->203.0.113.47 p=0.82 blocked=0%']
+--- iteration 1 ---  plan: scale_connections(db), restart_service(api)
+  verify after 19s: ['worker.queue_depth up (0 -> 431)', 'beacon worker->203.0.113.47 p=0.88 blocked=0%']
+--- iteration 2 ---  plan: block_egress(worker), restart_service(worker)
+  verify after 15s: <b>RECOVERED</b>
+<span class="c">GROUND TRUTH from the live system: active faults = none; restart-before-containment = 0; final health = 1.00</span></pre>
+    <p class="cap" style="text-align:left;margin-top:12px">Abridged from <code>results/demo_live_console.txt</code>; the full trace is <code>results/demo_live_trace.json</code>.</p>
+  </div>
+</section>
+
+<!-- ================= REPLAY ================= -->
 <section id="replay">
-  <h2>Incident replay viewer</h2>
-  <p>Step through a recorded held-out trace: what the detectors ranked, what the model hypothesised, which checks it ran, what the safety layer allowed, blocked or rolled back, and what verification said.</p>
-  <div class="replay-controls">
-    <label>Trace <select id="trace-select"></select></label>
-    <button id="prev">◀ prev</button><span id="step-label"></span><button id="next">next ▶</button>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Incident replay viewer</div>
+      <h2 class="sec">Step through a recorded held-out trace</h2>
+      <p class="lede">What the detectors ranked, what the model hypothesised, which checks it ran, what the safety layer allowed, blocked or rolled back, and what verification said, iteration by iteration, then the outcome against hidden ground truth.</p>
+    </div>
+    <div class="replay-controls">
+      <label>Trace <select id="trace-select"></select></label>
+      <button id="prev">◀ prev</button><span id="step-label"></span><button id="next">next ▶</button>
+    </div>
+    <div id="replay-body" class="card"></div>
   </div>
-  <div id="replay-body" class="card"></div>
 </section>
 
-</main>
-<footer class="wrap"><p id="footer-meta">Generated from site/data.json by <code>make report</code>.</p></footer>
+<!-- ================= HONESTY ================= -->
+<section id="honest">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Verified &amp; not verified</div>
+      <h2 class="sec">How the numbers were kept honest, and what they do not show</h2>
+    </div>
+    <div class="grid g2">
+      <div class="honest">
+        <h3 style="color:var(--green-2)">Discipline, in code</h3>
+        <ul>
+          <li><b>Split guard.</b> 30 dev scenarios for tuning, 20 held-out with fault combinations and type multisets never seen in dev; the runner refuses non-dev splits without <code>--final</code> and logs every such run with its git revision. The agent was frozen (tag <code>v1-frozen</code>) before the first held-out run.</li>
+          <li><b>Sanity floors.</b> <code>do_nothing</code> and <code>random</code> are permanent baselines: any scenario they recover is a broken check. They recover 0% on held-out.</li>
+          <li><b>Scorer audit.</b> Mid-development the recovery metric was challenged; two lenient spots were found (a health formula that let one sick service hide, and uncounted containment of innocent hosts), fixed, and every earlier run re-scored. v0 and v1 turned out <em>not</em> to be harmless; the numbers are kept, labelled, in <code>docs/RESULTS.md</code>.</li>
+          <li><b>Replay.</b> Every LLM response is cached by content hash; <code>make smoke</code> and CI reproduce the committed numbers with no model installed.</li>
+        </ul>
+      </div>
+      <div class="honest">
+        <h3 style="color:var(--sand)">Known gaps, stated at the same confidence</h3>
+        <ul>
+          <li><b>The simulator is small and hand-written.</b> Five services, nine known fault types with scripted symptoms that match the taxonomy the agent is told; the unseen fault type is the only open-world test.</li>
+          <li><b>One seed for the secondary arms.</b> <code>llm_only</code>, perturbations, ablations and the small-model run use one seed (n = 20); their deltas are directional. The 3-seed <code>llm_only</code> pass was stopped twice for time and both attempts are in the run log.</li>
+          <li><b>Synthetic beacon training data.</b> No real captures; a real deployment would retrain on NetFlow or Zeek data and face evasion.</li>
+          <li><b>Replay is exact, re-recording is not.</b> Ollama decoding is not bit-stable even at temperature 0, so a fresh recording is a new experiment.</li>
+          <li><b>Not published yet.</b> The repository, CI run and this site live locally until the author pushes them.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REPORTS ================= -->
+<section id="reports">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Reports &amp; paper</div>
+      <h2 class="sec">Three documents, three depths</h2>
+    </div>
+    <div class="reports">
+      <article class="report brief">
+        <h3>Technical brief <span class="badge lime">start here</span></h3>
+        <div class="meta">6 pages · PDF · impact, Judging Criteria map, results, honesty, reproduction</div>
+        <p>The short version: why it matters locally and globally, one evidence row per criterion, the held-out table, robustness and ablations, the live demo timeline, and the limitations stated plainly.</p>
+        <a class="btn primary" href="sentinel_rx_brief.pdf">Open the brief</a>
+      </article>
+      <article class="report">
+        <h3>Literature review <span class="badge green">research</span></h3>
+        <div class="meta">8 pages · PDF · 23 references</div>
+        <p>A structured review of AIOps, LLM agents, agentic SRE benchmarks, remediation safety and C2 beacon detection, ending with the five gaps G1–G5 and the research questions this project answers.</p>
+        <a class="btn green" href="literature_review.pdf">Open the review</a>
+      </article>
+      <article class="report">
+        <h3>Full technical report <span class="badge sand">for the curious</span></h3>
+        <div class="meta">27 pages · PDF · equations, algorithms, six TikZ diagrams, every table</div>
+        <p>For anyone who really wants the detail: the tick model and health equations, the detector mathematics and the beacon features, the agent and verification algorithms, the complete evaluation methodology, the scorer audit, and threats to validity.</p>
+        <ul class="toc">
+          <li>State of the field, gaps G1–G5</li><li>System overview and architecture</li><li>Implementation: SimEnv, LiveEnv, faults, detectors, cache, safety</li>
+          <li>Agent algorithm and verification gate</li><li>Evaluation methodology and metrics</li><li>Results, robustness, ablations, cost, live demo</li>
+          <li>Scorer audit</li><li>Discussion, limitations, path to production</li><li>Reproduction commands, repository map</li>
+        </ul>
+        <a class="btn" href="sentinel_rx_technical_report.pdf">Open the full report</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= RUN ================= -->
+<section id="run">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Run it</div>
+      <h2 class="sec">Clone, replay, then record your own</h2>
+      <p class="lede">Python 3.12, no Docker. Replay targets need no model. Recording targets need Ollama at <code>localhost:11434</code> with <code>qwen2.5:7b</code>.</p>
+    </div>
+    <pre class="sh"><span class="c"># install and verify, no LLM needed</span>
+<span class="p">$</span> make setup          <span class="c"># venv, pinned deps, scenarios, beacon detector training (~1 min)</span>
+<span class="p">$</span> make test           <span class="c"># 108 tests</span>
+<span class="p">$</span> make smoke          <span class="c"># 5 dev scenarios from the replay cache (&lt; 60 s); CI adds regression floors</span>
+
+<span class="c"># exact replay of the headline table from the committed cache</span>
+<span class="p">$</span> python -m bench.runner --split heldout --config agent --seeds 3 --final --replay
+
+<span class="c"># with Ollama + qwen2.5:7b</span>
+<span class="p">$</span> make demo-live      <span class="c"># 5 real local processes + 3 concurrent faults + the agent</span>
+<span class="p">$</span> make all-final      <span class="c"># held-out, perturbations, ablations, report (hours)</span>
+
+<span class="c"># this page</span>
+<span class="p">$</span> python -m http.server -d site 8000</pre>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div id="footer-meta">Sentinel-RX — MIT licensed. Built for the Humain Hackathon, Challenge 1. Simulated and local systems only.</div>
+    <div><a href="https://github.com/AbdulAlharbi/sentinel-rx">github.com/AbdulAlharbi/sentinel-rx</a></div>
+  </div>
+</footer>
+
 <script src="app.js"></script>
+<script type="module">
+  const styles = getComputedStyle(document.documentElement);
+  const v = (n) => styles.getPropertyValue(n).trim();
+  try {
+    const { default: mermaid } = await import('https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs');
+    mermaid.initialize({
+      startOnLoad: false, securityLevel: 'strict', theme: 'base',
+      fontFamily: '"JetBrains Mono", ui-monospace, monospace',
+      flowchart: { curve: 'basis', padding: 14, nodeSpacing: 30, rankSpacing: 38, useMaxWidth: false },
+      themeVariables: {
+        background: v('--bg-2'), primaryColor: v('--surface-2'), primaryTextColor: v('--text'), primaryBorderColor: v('--border-2'),
+        secondaryColor: v('--surface'), tertiaryColor: v('--bg-2'), lineColor: '#5f7a6b', textColor: v('--text-dim'),
+        mainBkg: v('--surface-2'), nodeBorder: v('--border-2'), clusterBkg: v('--bg-2'), edgeLabelBackground: v('--bg-2'), fontSize: '13px'
+      }
+    });
+    await mermaid.run({ querySelector: 'pre.mermaid' });
+  } catch (err) {
+    console.error('Mermaid failed to render, showing text fallback:', err);
+    document.querySelectorAll('[data-diagram]').forEach((d) => d.classList.add('failed'));
+  }
+</script>
 </body>
 </html>

@@ -388,13 +388,13 @@ faults:
 agent/            loop, safety layer, LLM client + cache, prompts, baselines, detectors/
 bench/            scorer, aggregation, runner (held-out guard), rescore, report, smoke gate
 cache/            committed LLM responses (record/replay)
-docs/             DESIGN, RESULTS (iteration log), LIMITATIONS, JUDGING, figures/, literature_review.pdf
+docs/             DESIGN, RESULTS (iteration log), LIMITATIONS, JUDGING, figures/, literature_review.pdf, technical_report/ (brief + full report, LaTeX + PDF)
 env/              Env interface, sim/ (simulator), live/ (real processes), perturb.py
 faults/           fault library (ops + security + held-out dns_failure)
 models/           trained beacon RandomForest + its metrics
 results/          results JSON, traces/, summary.md, heldout_runs.log, demo console + trace
 scenarios/        schema, generator, dev/ heldout/ perturbations/ YAML
-site/             static GitHub Pages site (reads data.json produced by make report)
+site/             static GitHub Pages site in the HUMAIN/PIF palette: impact, Judging Criteria map, results, figures, replay viewer, reports
 tests/            108 tests
 ```
 
@@ -424,6 +424,7 @@ multi-cluster topology, learned (not hand-written) fault signatures, stronger lo
 
 ## Links
 
+* Technical brief (6 pages): [`docs/technical_report/sentinel_rx_brief.pdf`](docs/technical_report/sentinel_rx_brief.pdf) · full technical report (27 pages): [`docs/technical_report/sentinel_rx_technical_report.pdf`](docs/technical_report/sentinel_rx_technical_report.pdf)
 * Literature review: [`docs/literature_review.pdf`](docs/literature_review.pdf)
 * Site (static, serve locally): `python -m http.server -d site 8000` → http://localhost:8000
 * Design: [`docs/DESIGN.md`](docs/DESIGN.md) · Iteration log: [`docs/RESULTS.md`](docs/RESULTS.md) · Judging map: [`docs/JUDGING.md`](docs/JUDGING.md)
