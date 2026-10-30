@@ -1,0 +1,30 @@
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pinned dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install --upgrade pip
+          .venv/bin/pip install -r requirements.lock
+          .venv/bin/pip install -e .
+      - name: Lint (ruff)
+        run: .venv/bin/ruff check . && .venv/bin/ruff format --check .
+      - name: Tests (pytest, no LLM required)
+        run: .venv/bin/python -m pytest -q
+      - name: Regression smoke (5 dev scenarios, replay cache only, no LLM)
+        run: make smoke
+      - name: Smoke must recover every scenario (regression gate)
+        run: .venv/bin/python -m bench.smoke_gate
