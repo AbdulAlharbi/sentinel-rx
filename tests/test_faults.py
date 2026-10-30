@@ -98,18 +98,17 @@ def test_every_fault_is_resolved_by_each_correct_sequence(ftype: str):
 
 @pytest.mark.parametrize("ftype", list(FAULT_CLASSES))
 def test_faults_persist_without_remediation(ftype: str):
+    from agent.detectors.evidence import EvidenceBuilder
+
     target = VALID_TARGETS[ftype][0]
     env = _env(ftype, target)
+    eb = EvidenceBuilder()
+    eb.build(env)  # remembers the pre-incident baseline, as the agent does
     env.wait(3000)  # 300 ticks of doing nothing
     assert not env.gt_all_faults_resolved()
     assert not env.gt_recovered()
-    if ftype == "c2_beacon":  # no ops symptom by design: the evidence is in the flows
-        assert [f for f in env.get_flows(600) if f.dst.startswith("203.")]
-    else:  # the degradation stays observable: health below the bar or detectors still firing
-        from agent.detectors.evidence import EvidenceBuilder
-
-        ev = EvidenceBuilder(use_beacon=False).build(env)
-        assert env.health_score() < 0.9 or ev.metrics or ev.logs
+    # the degradation stays observable to the verifier against the healthy baseline
+    assert eb.verify(env, since=env.now() - 200).problems()
 
 
 @pytest.mark.parametrize("ftype", list(FAULT_CLASSES))
