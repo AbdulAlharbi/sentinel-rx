@@ -61,5 +61,4 @@ copied from that file (held-out, qwen2.5:7b, 3 seeds; llm_only, ablations and pe
 |---|---|
 | README with pitch, flowchart, held-out table + figures, requirements → decisions table, criteria mapping, quick start with real console output, sequence/state diagrams, methodology, testing, extending, layout, verified/known gaps, limitations | `README.md` |
 | Static site with results, charts and an incident replay viewer | `site/` (serve with `python -m http.server -d site`) |
-| Slides content + speaker notes, 3.5-minute video script | `docs/SLIDES.md`, `docs/VIDEO_SCRIPT.md` |
 | Literature review | `docs/literature_review.pdf` |
