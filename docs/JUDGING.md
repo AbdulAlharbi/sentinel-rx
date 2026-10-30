@@ -74,3 +74,4 @@ copied from that file (held-out, qwen2.5:7b, 3 seeds; llm_only, ablations and pe
 | Static site (HUMAIN/PIF palette): impact at local and global level, the six Judging Criteria each with evidence, interactive results, every figure, live-demo excerpt, incident replay viewer, links to the reports | `site/`, deployed by `.github/workflows/pages.yml` |
 | Technical brief (6 pages) and full technical report (27 pages, equations, algorithms, six TikZ diagrams) | `docs/technical_report/sentinel_rx_brief.pdf`, `docs/technical_report/sentinel_rx_technical_report.pdf` (LaTeX sources alongside) |
 | Literature review with the gap analysis G1–G5 the design answers | `docs/literature_review.pdf` |
+| Presentation: 11 slides (overview, problem, research gaps, solution, build, results, robustness, innovation, limits, demo) with speaker notes | `docs/slides/sentinel_rx_slides.pdf`, `docs/slides/sentinel_rx_slides.pptx` |
