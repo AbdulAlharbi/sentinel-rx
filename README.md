@@ -108,7 +108,7 @@ by a restart), scored as misses on purpose.
 | 3. Evaluation & iteration | `docs/RESULTS.md` (v0→v3 with before/after numbers and a scorer audit); baselines incl. do_nothing/random floors; ablations; 108 tests; CI with replay smoke + regression floors (`bench/smoke_gate.py`) |
 | 4. Technical judgment & creativity | Hybrid vs `llm_only`; beacon detector + contain-before-restart; verification gate; transactional rollback; `docs/DESIGN.md` |
 | 5. Engineering quality | `Makefile` targets; pinned deps; ruff-clean typed modules < 400 lines; replay reproducibility; one branch per phase merged with `--no-ff` |
-| 6. Communication | This README, `site/` (leaderboard, charts, incident replay viewer), `docs/SLIDES.md`, `docs/VIDEO_SCRIPT.md`, `docs/literature_review.pdf` |
+| 6. Communication | This README, `site/` (leaderboard, charts, incident replay viewer), `docs/literature_review.pdf` |
 
 ## Quick start
 
@@ -388,7 +388,7 @@ faults:
 agent/            loop, safety layer, LLM client + cache, prompts, baselines, detectors/
 bench/            scorer, aggregation, runner (held-out guard), rescore, report, smoke gate
 cache/            committed LLM responses (record/replay)
-docs/             DESIGN, RESULTS (iteration log), LIMITATIONS, JUDGING, SLIDES, VIDEO_SCRIPT, figures/, literature_review.pdf
+docs/             DESIGN, RESULTS (iteration log), LIMITATIONS, JUDGING, figures/, literature_review.pdf
 env/              Env interface, sim/ (simulator), live/ (real processes), perturb.py
 faults/           fault library (ops + security + held-out dns_failure)
 models/           trained beacon RandomForest + its metrics
@@ -426,7 +426,6 @@ multi-cluster topology, learned (not hand-written) fault signatures, stronger lo
 
 * Literature review: [`docs/literature_review.pdf`](docs/literature_review.pdf)
 * Site (static, serve locally): `python -m http.server -d site 8000` → http://localhost:8000
-* Slides content: [`docs/SLIDES.md`](docs/SLIDES.md) · Video script: [`docs/VIDEO_SCRIPT.md`](docs/VIDEO_SCRIPT.md) · Video: placeholder
 * Design: [`docs/DESIGN.md`](docs/DESIGN.md) · Iteration log: [`docs/RESULTS.md`](docs/RESULTS.md) · Judging map: [`docs/JUDGING.md`](docs/JUDGING.md)
 
 License: MIT.
